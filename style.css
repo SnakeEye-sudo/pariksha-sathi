@@ -71,9 +71,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 
 /* Brand */
 .hero-brand{display:flex;flex-direction:column;align-items:center;gap:1rem;margin-bottom:2rem;animation:fadeUp .8s ease both}
-.brand-logo{width:200px;height:200px;border-radius:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;background:transparent}
+.brand-logo{width:220px;height:220px;border-radius:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:visible;background:transparent}
 .brand-logo::after{display:none}
-.brand-logo-img{width:200px;height:200px;object-fit:contain;display:block}
+.brand-logo-img{width:220px!important;height:220px!important;max-width:220px!important;object-fit:contain;display:block}
 .ptb-logo-img{width:38px;height:38px;object-fit:contain;display:block}
 .footer-logo-img{width:30px;height:30px;object-fit:contain;display:block}
 .brand-text{text-align:left}
