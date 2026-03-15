@@ -568,9 +568,20 @@ function getSyllabus() {
 
 function getSubjectsList() {
   const syl = getSyllabus();
-  return Object.entries(syl).map(([name, data]) => ({
+  const list = Object.entries(syl).map(([name, data]) => ({
     name, marks: data.marks, color: data.color, topics: data.topics
   }));
+
+  // BPSC: Part I Language is qualifying — push it to end so GS/Subject gets priority
+  if (userData.exam === 'bpsc') {
+    const langIdx = list.findIndex(s => s.name.includes('Part I') && s.name.includes('Language'));
+    if (langIdx > -1) {
+      const [lang] = list.splice(langIdx, 1);
+      list.push(lang);
+    }
+  }
+
+  return list;
 }
 
 function getExamDate() {
