@@ -120,25 +120,7 @@ const syl_bpsc15 = {
               'Mirror & Water Image',
               'Practice: 10 questions']},
 
-      // ── HISTORY (Ancient + Medieval + Modern — all are in BPSC TRE GS) ──
-      {name:'History: Ancient India',hindi:'प्राचीन भारत का इतिहास',
-       micro:['Indus Valley Civilisation — Harappa, Mohenjo-daro',
-              'Vedic Age — Rigveda, Upanishads, Aryan society',
-              'Mahajanapadas — 16 kingdoms, Magadha rise',
-              'Maurya Empire — Chandragupta, Ashoka, Dhamma',
-              'Gupta Empire — Golden Age, science & art',
-              'Buddhism & Jainism — founders, teachings, spread',
-              'Important dynasties — Kushana, Satavahana, Chola']},
-
-      {name:'History: Medieval India',hindi:'मध्यकालीन भारत का इतिहास',
-       micro:['Delhi Sultanate — Slave, Khilji, Tughlaq, Lodi dynasties',
-              'Mughal Empire — Babur to Aurangzeb',
-              'Akbar\'s administration — Mansabdari, Din-i-Ilahi',
-              'Bhakti Movement — Kabir, Mirabai, Tulsidas, Ramananda',
-              'Sufi Movement — Chishti, Suhrawardi orders',
-              'Vijayanagara Empire',
-              'Maratha Empire — Shivaji, Peshwas']},
-
+      // ── HISTORY (BPSC TRE 1-5: only Modern India in syllabus) ──
       {name:'History: Modern India & Freedom Movement',hindi:'आधुनिक भारत एवं स्वतंत्रता संग्राम',
        micro:['British East India Company — Plassey, Buxar',
               '1857 Revolt — causes, events, leaders',
