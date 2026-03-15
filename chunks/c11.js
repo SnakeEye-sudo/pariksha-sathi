@@ -194,9 +194,24 @@ function generateExamInfoHTML() {
         <p>• Shankar IAS — Environment</p>
       </div>
     </div>
-    <div class="optional-note">
-      <h4>⚠️ Optional Subject</h4>
-      <p>आपने अभी तक Optional Subject नहीं चुना है। Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science & IR, Anthropology, Philosophy, Psychology</strong>. अपने graduation background और interest के हिसाब से चुनें। Optional चुनने के बाद वापस आकर plan generate करें।</p>
-    </div>
+    ${(() => {
+      const optNames = {
+        history: 'History (इतिहास)', geography: 'Geography (भूगोल)',
+        pub_admin: 'Public Administration (लोक प्रशासन)', sociology: 'Sociology (समाजशास्त्र)',
+        pol_sci: 'Political Science & IR (राजनीति विज्ञान)', anthropology: 'Anthropology (मानवशास्त्र)',
+        philosophy: 'Philosophy (दर्शनशास्त्र)', psychology: 'Psychology (मनोविज्ञान)',
+        economics: 'Economics (अर्थशास्त्र)', law: 'Law (विधि)'
+      };
+      if (userData.optionalSubject && optNames[userData.optionalSubject]) {
+        return `<div class="optional-note selected">
+          <h4>✅ Optional Subject चुना गया</h4>
+          <p>आपने <strong>${optNames[userData.optionalSubject]}</strong> Optional Subject चुना है। इसका syllabus आपके plan में शामिल है — Paper I + Paper II दोनों। Optional में <strong>500 marks</strong> होते हैं जो rank निर्धारित करते हैं।</p>
+        </div>`;
+      }
+      return `<div class="optional-note">
+        <h4>⚠️ Optional Subject नहीं चुना</h4>
+        <p>आपने अभी तक Optional Subject नहीं चुना है। Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science & IR, Anthropology, Philosophy, Psychology</strong>. अपने graduation background और interest के हिसाब से चुनें। Optional चुनने के बाद वापस आकर plan generate करें।</p>
+      </div>`;
+    })()}
   </div>`;
 }

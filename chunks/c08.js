@@ -15,7 +15,13 @@ function getSyllabus() {
     }
     return userData.bpscClass === '1-5' ? syl_bpsc15 : syl_bpsc68;
   }
-  return { ...syl_upsc_pre, ...syl_upsc_mains };
+  // UPSC: merge prelims + mains + optional (if selected)
+  const base = { ...syl_upsc_pre, ...syl_upsc_mains };
+  if (userData.optionalSubject) {
+    const optSyl = getOptionalSyllabus(userData.optionalSubject);
+    if (optSyl) Object.assign(base, optSyl);
+  }
+  return base;
 }
 
 function getSubjectsList() {
@@ -48,13 +54,16 @@ function generatePlan() {
   const slots = [];
   document.querySelectorAll('input[name="slot"]:checked').forEach(s => slots.push(s.value));
 
-  let bpscClass = '';
+  let bpscClass = '', optionalSubject = '';
   if (selectedExam === 'bpsc') {
     const bc = document.querySelector('input[name="bpscClass"]:checked');
     bpscClass = bc ? bc.value : '1-5';
+  } else {
+    const optEl = document.getElementById('upscOptional');
+    optionalSubject = optEl ? optEl.value : '';
   }
 
-  userData = { name, exam: selectedExam, bpscClass, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
+  userData = { name, exam: selectedExam, bpscClass, optionalSubject, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
   studyPlan = buildPlan();
   renderPlan();
   showScreen('planScreen');

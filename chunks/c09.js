@@ -1,10 +1,18 @@
 // renderPlan() + generateDayPlanHTML() — v2 with proper topic display
 function renderPlan() {
+  const optionalNames = {
+    history: 'History', geography: 'Geography', pub_admin: 'Public Administration',
+    sociology: 'Sociology', pol_sci: 'Political Science & IR',
+    anthropology: 'Anthropology', philosophy: 'Philosophy',
+    psychology: 'Psychology', economics: 'Economics', law: 'Law'
+  };
   const examLabel = userData.exam === 'bpsc'
     ? (userData.bpscClass === '1-5' ? 'BPSC TRE 4.0 — Class 1–5 (PRT)'
       : userData.bpscClass === '6-8' ? 'BPSC TRE 4.0 — Class 6–8 (TGT)'
       : 'BPSC TRE 4.0 — Class 1–5 & 6–8')
-    : 'UPSC CSE 2027';
+    : userData.optionalSubject
+      ? `UPSC CSE 2027 • ${optionalNames[userData.optionalSubject] || userData.optionalSubject} Optional`
+      : 'UPSC CSE 2027';
 
   document.getElementById('planTitle').textContent = `${userData.name} का Study Plan`;
   document.getElementById('planSubtitle').textContent =

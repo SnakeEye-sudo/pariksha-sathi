@@ -12,6 +12,7 @@ chunks = [
     'chunks/c05.js',
     'chunks/c06.js',
     'chunks/c07.js',
+    'chunks/c07b.js',
     'chunks/c08.js',
     'chunks/c09.js',
     'chunks/c10.js',

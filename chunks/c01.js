@@ -10,8 +10,10 @@ function showScreen(id){
 function selectExam(exam){
   selectedExam=exam;
   const bg=document.getElementById('bpscClassGroup');
+  const og=document.getElementById('upscOptionalGroup');
   if(exam==='bpsc'){
     bg.classList.remove('hidden');
+    og.classList.add('hidden');
     document.getElementById('formHeaderIcon').textContent='🏫';
     document.getElementById('formTitle').textContent='BPSC TRE 4.0 — जानकारी भरें';
     document.getElementById('formSubtitle').textContent='Class 1-5 (PRT) या 6-8 (TGT) चुनें और plan पाएं';
@@ -21,13 +23,14 @@ function selectExam(exam){
     document.getElementById('slotNum').textContent='05';
   } else {
     bg.classList.add('hidden');
+    og.classList.remove('hidden');
     document.getElementById('formHeaderIcon').textContent='🏛️';
     document.getElementById('formTitle').textContent='UPSC CSE 2027 — जानकारी भरें';
-    document.getElementById('formSubtitle').textContent='Prelims + Mains का personalized plan पाएं';
-    document.getElementById('nameNum').textContent='01';
-    document.getElementById('dateNum').textContent='02';
-    document.getElementById('hoursNum').textContent='03';
-    document.getElementById('slotNum').textContent='04';
+    document.getElementById('formSubtitle').textContent='Prelims + Mains + Optional का personalized plan पाएं';
+    document.getElementById('nameNum').textContent='02';
+    document.getElementById('dateNum').textContent='03';
+    document.getElementById('hoursNum').textContent='04';
+    document.getElementById('slotNum').textContent='05';
   }
   showScreen('formScreen');
 }
