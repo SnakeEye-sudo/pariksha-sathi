@@ -67,7 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (loadPlanFromStorage()) {
     renderPlan();
     showScreen('planScreen');
-  } else {
-    showScreen('welcomeScreen');
   }
+  // else: welcomeScreen is already active by default in HTML
 });
