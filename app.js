@@ -927,9 +927,13 @@ function getSubjectsList() {
   const subjects = [];
   
   if (userData.exam === 'bpsc') {
-    const syllabus = userData.bpscClass === 'both' ? 
-      [...syllabusData.bpsc['1-5'], ...syllabusData.bpsc['6-8']] :
-      syllabusData.bpsc[userData.bpscClass];
+    let syllabus;
+    if (userData.bpscClass === 'both') {
+      // Merge both objects — later keys (6-8) override if same name
+      syllabus = Object.assign({}, syllabusData.bpsc['1-5'], syllabusData.bpsc['6-8']);
+    } else {
+      syllabus = syllabusData.bpsc[userData.bpscClass];
+    }
     
     Object.entries(syllabus).forEach(([subjectName, subjectData]) => {
       subjects.push({
@@ -1381,8 +1385,12 @@ function showTab(tabName) {
   // Show selected tab
   document.getElementById(tabName).classList.add('active');
   
-  // Add active class to clicked button
-  event.target.classList.add('active');
+  // Add active class to matching button
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    if (btn.getAttribute('onclick') === `showTab('${tabName}')`) {
+      btn.classList.add('active');
+    }
+  });
 }
 
 // Update progress
@@ -1507,4 +1515,22 @@ document.addEventListener('DOMContentLoaded', function() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById('startDate').value = today;
   document.getElementById('startDate').min = today;
+  
+  // Create animated particles
+  createParticles();
 });
+
+// Create animated particles background
+function createParticles() {
+  const particlesContainer = document.getElementById('particles');
+  if (!particlesContainer) return;
+  
+  for (let i = 0; i < 50; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 15 + 's';
+    particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+    particlesContainer.appendChild(particle);
+  }
+}

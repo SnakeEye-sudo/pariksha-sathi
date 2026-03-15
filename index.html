@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Smart Study Planner | BPSC TRE 4.0 & UPSC 2027</title>
+  <title>🎯 ParikshaSathi — Your Exam Companion | BPSC TRE 4.0 & UPSC CSE 2027</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -11,22 +13,40 @@
 
 <!-- ═══ WELCOME ═══ -->
 <div id="welcomeScreen" class="screen active">
+  <!-- animated bg particles -->
+  <div class="particles" id="particles"></div>
   <div class="hero">
-    <div class="badge">Er. Sangam Krishna — Study Planner</div>
-    <h1>📚 Smart Study Planner</h1>
-    <p class="subtitle">Personalized Day-by-Day Plan with Daily Revision & Time Slots</p>
+    <div class="hero-top">
+      <div class="logo-mark">PS</div>
+      <span class="logo-name">ParikshaSathi</span>
+    </div>
+    <div class="badge pulse">🎯 Er. Sangam Krishna — Free Study Planner</div>
+    <h1>आपकी परीक्षा,<br/><span class="gradient-text">आपका Plan</span></h1>
+    <p class="subtitle">Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download</p>
+    <div class="stats-row">
+      <div class="stat"><span class="stat-num">2</span><span class="stat-label">Exams</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><span class="stat-num">46K+</span><span class="stat-label">BPSC Vacancies</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Free</span></div>
+    </div>
+    <p class="choose-label">अपना Exam चुनें 👇</p>
     <div class="exam-cards">
       <div class="exam-card" onclick="selectExam('bpsc')">
+        <div class="ec-glow bpsc-glow"></div>
         <div class="ec-icon">🏫</div>
         <div class="ec-title">BPSC TRE 4.0</div>
         <div class="ec-sub">Bihar Primary/Middle Teacher<br/>Exam: 22–27 Sep 2026</div>
         <div class="ec-badge">46,595 Vacancies</div>
+        <div class="ec-arrow">Plan बनाएं →</div>
       </div>
       <div class="exam-card" onclick="selectExam('upsc')">
+        <div class="ec-glow upsc-glow"></div>
         <div class="ec-icon">🏛️</div>
         <div class="ec-title">UPSC CSE 2027</div>
         <div class="ec-sub">Civil Services Examination<br/>Prelims: May 2027</div>
         <div class="ec-badge">IAS / IPS / IFS</div>
+        <div class="ec-arrow">Plan बनाएं →</div>
       </div>
     </div>
   </div>
@@ -112,7 +132,7 @@
     <div id="planBody"></div>
   </div>
   <footer>
-    <p>Made with ❤️ by <strong>Er. Sangam Krishna</strong> | Smart Study Planner</p>
+    <p>Made with ❤️ by <strong>Er. Sangam Krishna</strong> | 🎯 ParikshaSathi — Your Exam Companion</p>
     <p>BPSC TRE 4.0 Exam: 22–27 Sep 2026 | UPSC CSE 2027</p>
   </footer>
 </div>
