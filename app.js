@@ -1398,83 +1398,48 @@ function buildPlan() {
   // Per-subject topic pointer
   const topicPointers = subjects.map(() => 0);
 
-  // Build weighted slot pool: subject appears weight times per cycle
-  // This ensures high-priority subjects get more coverage
-  function buildSlotPool(excludeRecent) {
-    const pool = [];
-    subjects.forEach((subj, si) => {
-      if (topicPointers[si] >= subj.topics.length) return; // exhausted
-      const w = weights[si];
-      for (let i = 0; i < w; i++) pool.push(si);
-    });
-    // Shuffle pool for randomness
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-    return pool;
-  }
-
-  // Pick 3 subjects for a day with these constraints:
-  // 1. Min 2 different subjects per day
-  // 2. No subject that appeared in BOTH of the last 2 days (max 2 consecutive days)
-  // 3. Prefer subjects not seen yesterday
+  // Pick 3 DIFFERENT subjects for a day:
+  // Rule 1: Each slot must be a DIFFERENT subject (no same subject twice in one day)
+  // Rule 2: If a subject appeared on BOTH yesterday AND day-before, it is blocked today
+  // Rule 3: Prefer subjects not seen yesterday (freshness)
+  // Rule 4: High-weight subjects get priority in selection order
   function pickDaySubjects(recentDays) {
-    // recentDays = array of last 2 days' subject indices used
-    const usedYesterday = recentDays[0] || [];
-    const usedDayBefore = recentDays[1] || [];
+    const usedYesterday  = new Set(recentDays[0] || []);
+    const usedDayBefore  = new Set(recentDays[1] || []);
 
-    // Subjects that appeared both yesterday AND day before = blocked (2 consecutive days done)
+    // Blocked = appeared 2 days in a row already
     const blocked = new Set(
-      usedYesterday.filter(si => usedDayBefore.includes(si))
+      [...usedYesterday].filter(si => usedDayBefore.has(si))
     );
 
-    const pool = buildSlotPool();
+    // Build candidate list sorted by priority: fresh > stale > (blocked only if no choice)
+    const available = subjects
+      .map((_, si) => si)
+      .filter(si => topicPointers[si] < subjects[si].topics.length);
+
+    const fresh  = available.filter(si => !usedYesterday.has(si) && !blocked.has(si));
+    const stale  = available.filter(si =>  usedYesterday.has(si) && !blocked.has(si));
+    const blkd   = available.filter(si =>  blocked.has(si)); // last resort
+
+    // Sort each group by weight descending
+    const byWeight = arr => arr.sort((a, b) => weights[b] - weights[a]);
+    const ordered = [...byWeight(fresh), ...byWeight(stale), ...byWeight(blkd)];
+
+    // Pick 3 UNIQUE subjects
     const chosen = [];
     const chosenSet = new Set();
-
-    // Try to pick 3 slots ensuring min 2 different subjects
-    // Pass 1: prefer subjects NOT seen yesterday
-    const fresh = pool.filter(si => !usedYesterday.includes(si) && !blocked.has(si));
-    const stale = pool.filter(si => usedYesterday.includes(si) && !blocked.has(si));
-    const ordered = [...fresh, ...stale];
-
     for (const si of ordered) {
       if (chosen.length >= 3) break;
-      if (topicPointers[si] >= subjects[si].topics.length) continue;
-      chosen.push(si);
-      chosenSet.add(si);
+      if (!chosenSet.has(si)) { chosen.push(si); chosenSet.add(si); }
     }
 
-    // If we couldn't fill 3 slots (all exhausted), allow blocked subjects
-    if (chosen.length < 3) {
-      for (const si of pool) {
-        if (chosen.length >= 3) break;
-        if (topicPointers[si] >= subjects[si].topics.length) continue;
-        if (!chosenSet.has(si)) { chosen.push(si); chosenSet.add(si); }
-        else if (chosen.length < 3) chosen.push(si); // allow repeat if no choice
-      }
-    }
-
-    // Enforce min 2 different subjects: if all 3 are same, swap slot 2
-    const uniqueInDay = new Set(chosen);
-    if (uniqueInDay.size < 2 && chosen.length >= 2) {
-      // Find any different subject
-      for (const si of pool) {
-        if (!uniqueInDay.has(si) && topicPointers[si] < subjects[si].topics.length) {
-          chosen[1] = si;
-          break;
-        }
-      }
-    }
-
-    // Shuffle the 3 chosen slots so same subject isn't always morning
+    // Shuffle so same subject isn't always in morning slot
     for (let i = chosen.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [chosen[i], chosen[j]] = [chosen[j], chosen[i]];
     }
 
-    return chosen.slice(0, 3);
+    return chosen;
   }
 
   const slotTypes = ['morning', 'afternoon', 'evening'];
