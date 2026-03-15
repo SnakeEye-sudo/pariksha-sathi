@@ -2185,9 +2185,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const sd = document.getElementById('startDate');
   if (sd) { sd.value = today; sd.min = today; }
 
-  // Restore saved plan if exists
+  // Restore saved plan — skip welcome screen entirely
   if (loadPlanFromStorage()) {
     renderPlan();
     showScreen('planScreen');
+  } else {
+    showScreen('welcomeScreen');
   }
 });
