@@ -554,7 +554,6 @@ const syllabusData = {
 function getSyllabus() {
   if (userData.exam === 'bpsc') {
     if (userData.bpscClass === 'both') {
-      // Merge 1-5 and 6-8
       const merged = {};
       Object.entries(syl_bpsc15).forEach(([k,v]) => { merged['[1-5] '+k] = v; });
       Object.entries(syl_bpsc68).forEach(([k,v]) => { merged['[6-8] '+k] = v; });
@@ -562,7 +561,6 @@ function getSyllabus() {
     }
     return userData.bpscClass === '1-5' ? syl_bpsc15 : syl_bpsc68;
   }
-  // UPSC — prelims + mains combined
   return { ...syl_upsc_pre, ...syl_upsc_mains };
 }
 
@@ -571,16 +569,11 @@ function getSubjectsList() {
   const list = Object.entries(syl).map(([name, data]) => ({
     name, marks: data.marks, color: data.color, topics: data.topics
   }));
-
-  // BPSC: Part I Language is qualifying — push it to end so GS/Subject gets priority
+  // BPSC: Language is qualifying — schedule last
   if (userData.exam === 'bpsc') {
     const langIdx = list.findIndex(s => s.name.includes('Part I') && s.name.includes('Language'));
-    if (langIdx > -1) {
-      const [lang] = list.splice(langIdx, 1);
-      list.push(lang);
-    }
+    if (langIdx > -1) { const [l] = list.splice(langIdx, 1); list.push(l); }
   }
-
   return list;
 }
 
@@ -607,12 +600,7 @@ function generatePlan() {
     bpscClass = bc ? bc.value : '1-5';
   }
 
-  userData = {
-    name, exam: selectedExam, bpscClass,
-    startDate: new Date(startDate),
-    studyHours: hours, timeSlots: slots
-  };
-
+  userData = { name, exam: selectedExam, bpscClass, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
   studyPlan = buildPlan();
   renderPlan();
   showScreen('planScreen');
@@ -626,50 +614,87 @@ function buildPlan() {
 
   const totalDays = Math.max(1, Math.ceil((endDate - userData.startDate) / 86400000));
   const subjects = getSubjectsList();
+
+  // Per-subject topic pointer — tracks which topic each subject is currently on
+  const topicPointers = subjects.map(() => 0);
+  // Flat queue: expand all subjects × topics into ordered task list
+  // Each task = { subjIdx, topicIdx, microTopics }
+  const taskQueue = [];
+  let pass = 0;
+  while (taskQueue.length < totalDays * 3 + 30) {
+    let added = 0;
+    subjects.forEach((subj, si) => {
+      if (pass < subj.topics.length) {
+        taskQueue.push({ si, topicIdx: pass, topic: subj.topics[pass] });
+        added++;
+      }
+    });
+    if (added === 0) break;
+    pass++;
+  }
+
+  let taskIdx = 0;
   let cur = new Date(userData.startDate);
-  let subIdx = 0;
 
   for (let d = 1; d <= totalDays; d++) {
     const daysLeft = totalDays - d;
     const isMock = daysLeft <= 14 && daysLeft % 7 === 0;
     const isRevision = !isMock && d % 7 === 0;
-
     const daySlots = [];
 
     if (isMock) {
       daySlots.push({ type:'mock', subject:'Mock Test', hindi:'मॉक टेस्ट',
-        topic:'Full Syllabus Mock Test', slotType:'morning' });
-    } else {
-      // 3 subject slots
-      for (let s = 0; s < 3; s++) {
-        const subj = subjects[subIdx % subjects.length];
-        const topicIdx = Math.floor(subIdx / subjects.length) % subj.topics.length;
-        const topic = subj.topics[topicIdx];
-        daySlots.push({
-          type:'subject', subject: subj.name, hindi:'',
-          topic: topic.name, hindiTopic: topic.hindi || '',
-          microTopics: topic.micro || [],
-          slotType: s===0?'morning': s===1?'afternoon':'evening'
-        });
-        subIdx++;
+        topic:'Full Syllabus Mock Test', microTopics:[], slotType:'morning' });
+    } else if (isRevision) {
+      // Revision day: revisit last 3 days' topics
+      const revTopics = [];
+      for (let rb = d - 3; rb < d; rb++) {
+        if (plan[rb - 1]) {
+          plan[rb - 1].slots.filter(s => s.type === 'subject').forEach(s => {
+            revTopics.push(s.topic);
+          });
+        }
       }
-      // Revision slot
-      if (d > 1 && plan[d-2]) {
-        const prev = plan[d-2].slots.filter(s=>s.type==='subject').map(s=>s.subject);
-        daySlots.push({ type:'revision', subject:'Revision', hindi:'दोहराई',
-          topic: prev.slice(0,2).join(', ') || 'Previous topics',
-          slotType:'revision' });
+      daySlots.push({ type:'revision', subject:'📖 Revision Day', hindi:'दोहराई',
+        topic: revTopics.slice(0, 4).join(' • ') || 'Previous week topics',
+        microTopics: revTopics, slotType:'revision' });
+    } else {
+      // Normal day: 3 subject slots, each with a specific topic
+      const slotTypes = ['morning', 'afternoon', 'evening'];
+      for (let s = 0; s < 3; s++) {
+        if (taskIdx < taskQueue.length) {
+          const task = taskQueue[taskIdx++];
+          const subj = subjects[task.si];
+          const topic = task.topic;
+          daySlots.push({
+            type: 'subject',
+            subject: subj.name,
+            color: subj.color || '#f59e0b',
+            topic: topic.name,
+            hindiTopic: topic.hindi || '',
+            microTopics: topic.micro || [],
+            slotType: slotTypes[s]
+          });
+        }
       }
     }
 
-    // Daily Current Affairs (30 min) — every day
-    daySlots.push({ type:'current_affairs', subject:'Current Affairs',
+    // 1 hr Revision slot (non-mock, non-revision days)
+    if (!isMock && !isRevision && d > 1 && plan[d - 2]) {
+      const prev = plan[d - 2].slots.filter(s => s.type === 'subject').map(s => s.topic);
+      daySlots.push({ type:'revision', subject:'🔄 Quick Revision', hindi:'दोहराई',
+        topic: prev.slice(0, 2).join(' + ') || 'Yesterday\'s topics',
+        microTopics: prev, slotType:'revision' });
+    }
+
+    // Daily Current Affairs — 30 min every day
+    daySlots.push({ type:'current_affairs', subject:'📰 Current Affairs',
       hindi:'समसामयिक घटनाएं', topic:'Daily News + Monthly Magazine (30 min)',
-      slotType:'current' });
+      microTopics:[], slotType:'current' });
 
     plan.push({
       day: d, date: new Date(cur),
-      dayName: cur.toLocaleDateString('en-IN',{weekday:'short'}),
+      dayName: cur.toLocaleDateString('en-IN', { weekday: 'short' }),
       slots: daySlots, isMock, isRevision
     });
     cur.setDate(cur.getDate() + 1);
@@ -678,29 +703,28 @@ function buildPlan() {
 }
 
 // ═══ chunks/c09.js ═══
-// renderPlan() + generateDayPlanHTML()
+// renderPlan() + generateDayPlanHTML() — v2 with proper topic display
 function renderPlan() {
-  const exam = userData.exam === 'bpsc'
+  const examLabel = userData.exam === 'bpsc'
     ? (userData.bpscClass === '1-5' ? 'BPSC TRE 4.0 — Class 1–5 (PRT)'
       : userData.bpscClass === '6-8' ? 'BPSC TRE 4.0 — Class 6–8 (TGT)'
       : 'BPSC TRE 4.0 — Class 1–5 & 6–8')
     : 'UPSC CSE 2027';
 
-  document.getElementById('planTitle').textContent = `📅 ${userData.name} का Study Plan`;
+  document.getElementById('planTitle').textContent = `${userData.name} का Study Plan`;
   document.getElementById('planSubtitle').textContent =
-    `${exam} • ${studyPlan.length} Days • ${userData.studyHours} hrs/day`;
+    `${examLabel} • ${studyPlan.length} दिन • ${userData.studyHours} घंटे/दिन`;
 
-  const pct = Math.min(100, Math.round(
-    ((new Date() - userData.startDate) / (getExamDate() - userData.startDate)) * 100
-  ));
-  const bar = document.getElementById('planProgressBar');
-  bar.style.setProperty('--w', Math.max(2, pct) + '%');
-  bar.style.width = Math.max(2, pct) + '%';
+  const now = new Date();
+  const pct = Math.min(100, Math.max(0, Math.round(
+    ((now - userData.startDate) / (getExamDate() - userData.startDate)) * 100
+  )));
+  document.getElementById('planProgressBar').style.width = Math.max(2, pct) + '%';
+  const daysLeft = Math.max(0, Math.ceil((getExamDate() - now) / 86400000));
   document.getElementById('planProgressLabel').textContent =
-    `${Math.max(0, pct)}% Complete • ${studyPlan.length} days remaining`;
+    `${pct}% Complete • परीक्षा में ${daysLeft} दिन बाकी`;
 
-  const body = document.getElementById('planBody');
-  body.innerHTML = `
+  document.getElementById('planBody').innerHTML = `
     <div class="tab-bar">
       <button class="tab-btn active" onclick="showTab('tabPlan')">📅 Day Plan</button>
       <button class="tab-btn" onclick="showTab('tabSyllabus')">📚 Syllabus</button>
@@ -714,80 +738,127 @@ function renderPlan() {
   `;
 }
 
-function getSlotTime(slotType) {
-  const times = {
-    early_morning: '4–6 AM', morning: '6–9 AM', forenoon: '9 AM–12 PM',
-    afternoon: '12–3 PM', evening: '3–6 PM', night: '8–11 PM',
-    revision: '1 hr Revision', current: '30 min'
-  };
-  return times[slotType] || '';
-}
+const SLOT_META = {
+  morning:   { label:'☀️ Morning',   cls:'morning-slot',   time:'6–9 AM'   },
+  afternoon: { label:'🌤️ Afternoon', cls:'afternoon-slot', time:'12–3 PM'  },
+  evening:   { label:'🌆 Evening',   cls:'evening-slot',   time:'3–6 PM'   },
+  revision:  { label:'🔄 Revision',  cls:'revision-slot',  time:'1 hr'     },
+  current:   { label:'📰 Current Affairs', cls:'current-slot', time:'30 min' },
+};
 
 function generateDayPlanHTML() {
-  if (!studyPlan.length) return '<p style="color:var(--t3);text-align:center;padding:2rem">No plan generated.</p>';
+  if (!studyPlan.length) return '<p class="empty-msg">No plan generated.</p>';
 
+  const todayStr = new Date().toDateString();
   const weeks = [];
-  for (let i = 0; i < studyPlan.length; i += 7) {
-    weeks.push(studyPlan.slice(i, i + 7));
-  }
+  for (let i = 0; i < studyPlan.length; i += 7) weeks.push(studyPlan.slice(i, i + 7));
 
   return weeks.map((week, wi) => {
-    const wStart = week[0].date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-    const wEnd = week[week.length - 1].date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
-    const days = week.map(day => {
-      const dateStr = day.date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: '2-digit' });
-      const typeBadge = day.isMock
-        ? '<span class="day-type-badge badge-mock">🎯 Mock Test</span>'
-        : day.isRevision
-          ? '<span class="day-type-badge badge-revision">🔄 Revision Day</span>'
+    const wStart = week[0].date.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+    const wEnd   = week[week.length-1].date.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
+    const isCurrentWeek = week.some(d => d.date.toDateString() === todayStr);
+
+    const daysHTML = week.map(day => {
+      const isToday = day.date.toDateString() === todayStr;
+      const dateStr = day.date.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+
+      let dayClass = 'day-card';
+      if (isToday) dayClass += ' today-card';
+      else if (day.isMock) dayClass += ' mock-day';
+      else if (day.isRevision) dayClass += ' revision-day';
+
+      const badge = isToday
+        ? '<span class="day-badge badge-today">⚡ Today</span>'
+        : day.isMock
+          ? '<span class="day-badge badge-mock">🎯 Mock Test</span>'
+          : day.isRevision
+            ? '<span class="day-badge badge-revision">🔄 Revision Day</span>'
+            : '';
+
+      const slotsHTML = day.slots.map(slot => {
+        const meta = SLOT_META[slot.slotType] || SLOT_META.morning;
+
+        if (slot.type === 'mock') {
+          return `<div class="slot-card mock-slot-card">
+            <div class="slot-card-header">
+              <span class="slot-type-badge" style="background:rgba(239,68,68,.15);color:#f87171;border-color:rgba(239,68,68,.3)">🎯 Mock Test</span>
+              <span class="slot-duration">2–3 hrs</span>
+            </div>
+            <div class="slot-card-title">Full Syllabus Mock Test</div>
+            <div class="slot-card-sub">सभी topics का full-length practice test दें। Time management practice करें।</div>
+          </div>`;
+        }
+
+        if (slot.type === 'current_affairs') {
+          return `<div class="slot-card ca-slot-card">
+            <div class="slot-card-header">
+              <span class="slot-type-badge" style="background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.2)">📰 Current Affairs</span>
+              <span class="slot-duration">30 min</span>
+            </div>
+            <div class="slot-card-title">Daily News + Monthly Magazine</div>
+            <div class="slot-card-sub">The Hindu / Dainik Jagran पढ़ें। Important events note करें।</div>
+          </div>`;
+        }
+
+        if (slot.type === 'revision') {
+          const revList = Array.isArray(slot.microTopics) && slot.microTopics.length
+            ? slot.microTopics.slice(0, 4).map(t => `<span class="rev-tag">${t}</span>`).join('')
+            : `<span class="rev-tag">${slot.topic}</span>`;
+          return `<div class="slot-card rev-slot-card">
+            <div class="slot-card-header">
+              <span class="slot-type-badge" style="background:rgba(245,158,11,.1);color:#fbbf24;border-color:rgba(245,158,11,.25)">🔄 Revision</span>
+              <span class="slot-duration">1 hr</span>
+            </div>
+            <div class="slot-card-title">Quick Revision</div>
+            <div class="rev-tags-wrap">${revList}</div>
+          </div>`;
+        }
+
+        // Normal subject slot
+        const micros = (slot.microTopics || []).slice(0, 4);
+        const microsHTML = micros.length
+          ? `<ul class="slot-micro-list">${micros.map(m => `<li>${m}</li>`).join('')}</ul>`
           : '';
 
-      const slotPills = day.slots.map(slot => {
-        const cls = slot.slotType === 'morning' ? 'morning-slot'
-          : slot.slotType === 'afternoon' ? 'afternoon-slot'
-          : slot.slotType === 'evening' ? 'evening-slot'
-          : slot.slotType === 'revision' ? 'revision-slot'
-          : 'current-slot';
+        const subjectShort = slot.subject.replace(/Part [IVX]+ — /g, '').replace(/\[1-5\] /g,'').replace(/\[6-8\] /g,'');
 
-        const icon = slot.type === 'mock' ? '🎯'
-          : slot.type === 'revision' ? '🔄'
-          : slot.type === 'current_affairs' ? '📰'
-          : '📖';
-
-        const label = slot.type === 'mock' ? 'Mock Test'
-          : slot.type === 'revision' ? 'Revision'
-          : slot.type === 'current_affairs' ? 'Current Affairs'
-          : slot.slotType === 'morning' ? '☀️ Morning'
-          : slot.slotType === 'afternoon' ? '🌤️ Afternoon'
-          : '🌆 Evening';
-
-        const micro = slot.microTopics && slot.microTopics.length
-          ? slot.microTopics.slice(0, 2).join(', ')
-          : '';
-
-        return `<div class="slot-pill ${cls}">
-          <span class="slot-label">${label}</span>
-          <span class="slot-subject">${icon} ${slot.subject}</span>
-          <span class="slot-topics">${slot.topic}${micro ? ' — ' + micro : ''}</span>
-          <span class="slot-time-disp">${getSlotTime(slot.slotType)}</span>
+        return `<div class="slot-card subject-slot-card" style="--slot-color:${slot.color || '#f59e0b'}">
+          <div class="slot-card-header">
+            <span class="slot-type-badge" style="background:rgba(245,158,11,.1);color:${slot.color||'#f59e0b'};border-color:${slot.color||'#f59e0b'}40">${meta.label}</span>
+            <span class="slot-duration">${meta.time}</span>
+          </div>
+          <div class="slot-part-label">${subjectShort}</div>
+          <div class="slot-card-title">${slot.topic}</div>
+          ${slot.hindiTopic ? `<div class="slot-card-hindi">${slot.hindiTopic}</div>` : ''}
+          ${microsHTML}
         </div>`;
       }).join('');
 
-      return `<div class="day-card${day.isMock ? ' mock-day' : day.isRevision ? ' revision-day' : ''}">
-        <div class="day-top">
-          <span class="day-num">Day ${day.day}</span>
-          <span class="day-date">📅 ${dateStr} (${day.dayName})</span>
-          ${typeBadge}
+      return `<div class="${dayClass}">
+        <div class="day-header">
+          <div class="day-header-left">
+            <div class="day-num-circle${isToday ? ' today-circle' : ''}">
+              <span class="day-num-label">Day</span>
+              <span class="day-num-val">${day.day}</span>
+            </div>
+            <div class="day-date-info">
+              <div class="day-date-main">${dateStr}</div>
+              ${badge}
+            </div>
+          </div>
+          <div class="day-slots-count">${day.slots.filter(s=>s.type==='subject').length} subjects</div>
         </div>
-        <div class="slots-row">${slotPills}</div>
+        <div class="slots-grid">${slotsHTML}</div>
       </div>`;
     }).join('');
 
-    return `<div class="week-block">
+    return `<div class="week-block${isCurrentWeek ? ' current-week' : ''}">
       <div class="week-header">
-        Week ${wi + 1} <span class="week-count">${wStart} – ${wEnd} • ${week.length} days</span>
+        <span class="week-title">Week ${wi + 1}</span>
+        <span class="week-range">${wStart} – ${wEnd}</span>
+        ${isCurrentWeek ? '<span class="week-now-badge">Current Week</span>' : ''}
       </div>
-      ${days}
+      <div class="week-days">${daysHTML}</div>
     </div>`;
   }).join('');
 }
