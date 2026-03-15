@@ -70,10 +70,15 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .hero{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:4rem 1.5rem 3rem;text-align:center}
 
 /* Brand */
-.hero-brand{display:flex;flex-direction:column;align-items:center;gap:1rem;margin-bottom:2rem;animation:fadeUp .8s ease both}
-.brand-logo{width:220px;height:220px;border-radius:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:visible;background:transparent}
-.brand-logo::after{display:none}
-.brand-logo-img{width:220px!important;height:220px!important;max-width:220px!important;object-fit:contain;display:block}
+.hero-brand{display:flex;flex-direction:column;align-items:center;gap:.8rem;margin-bottom:2rem;animation:fadeUp .8s ease both}
+.brand-logo-wrap{position:relative;width:160px;height:160px;display:flex;align-items:center;justify-content:center}
+.brand-logo-glow{position:absolute;inset:-20px;border-radius:50%;background:radial-gradient(circle,rgba(245,158,11,.35) 0%,rgba(245,158,11,.1) 50%,transparent 70%);animation:glowPulse 3s ease-in-out infinite;pointer-events:none}
+.brand-logo-img{width:160px;height:160px;object-fit:contain;display:block;position:relative;z-index:1;filter:drop-shadow(0 0 24px rgba(245,158,11,.5)) drop-shadow(0 4px 16px rgba(0,0,0,.6))}
+.brand-logo{display:none}
+.brand-title-text{display:flex;flex-direction:column;align-items:center;gap:.2rem}
+.brand-name-hero{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:800;color:var(--t1);letter-spacing:-.02em;line-height:1}
+.brand-name-accent{background:var(--grad-amber);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.brand-tagline-hero{font-size:.65rem;color:var(--t3);letter-spacing:.18em;text-transform:uppercase;font-weight:600}
 .ptb-logo-img{width:38px;height:38px;object-fit:contain;display:block}
 .footer-logo-img{width:30px;height:30px;object-fit:contain;display:block}
 .brand-text{text-align:left}
