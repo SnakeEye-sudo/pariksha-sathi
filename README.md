@@ -1,19 +1,34 @@
-# BPSC TRE 4.0 Study Planner | Class 1-5
+# ParikshaSathi — आपकी परीक्षा, आपका Plan
 
-**Live Site:** https://[your-username].github.io/bpsc-tre-planner
+**Live Site:** https://snakeeye-sudo.github.io/pariksha-sathi/
 
-A personalized day-by-day study planner for BPSC TRE 4.0 Primary Teacher (Class 1-5) exam.
+Free personalized study planner for competitive exam aspirants. Generate a day-by-day study plan tailored to your start date, available hours, and exam target — with PDF download.
+
+## Supported Exams
+
+- **BPSC TRE 4.0** — Class 1–5 (PRT) & Class 6–8 (TGT) | Bihar Teacher Recruitment
+- **UPSC CSE 2027** — Prelims + Mains | Civil Services Examination
 
 ## Features
-- Personalized study plan based on your start date
-- Complete syllabus (Hindi + English)
-- PYQ important topics from TRE 1.0, 2.0, 3.0
-- PDF download with "Er. Sangam Krishna" watermark
-- Exam Date: 22-27 September 2026
 
-## Deploy on GitHub Pages
-1. Push this repo to GitHub
+- Personalized day-by-day plan based on your start date
+- Full verified syllabus for each exam
+- 3 subjects per day + daily revision + 30 min Current Affairs
+- Mock test days in the final 2 weeks
+- Language/qualifying papers scheduled last
+- PDF download with Er. Sangam Krishna watermark
+- 100% free — no login, no ads
+
+## Tech Stack
+
+Vanilla JS · HTML · CSS · jsPDF · GitHub Pages
+
+## Deploy
+
+1. Fork / clone this repo
 2. Go to Settings → Pages → Source: GitHub Actions
-3. The workflow will auto-deploy
+3. Push to `main` — auto-deploys via workflow
 
-**Created by Er. Sangam Krishna**
+---
+
+Made with ❤️ by **Er. Sangam Krishna**
