@@ -292,9 +292,10 @@
       <span class="ptb-name">ParikshaSathi</span>
     </div>
     <div class="plan-topbar-actions">
+      <button class="ptb-btn ptb-tg" onclick="setupTelegramReminder()">📲 Telegram</button>
       <button class="ptb-btn ptb-download" onclick="downloadPDF()">⬇️ PDF</button>
       <button class="ptb-btn" onclick="showScreen('formScreen')">✏️ Edit</button>
-      <button class="ptb-btn" onclick="showScreen('welcomeScreen')">🏠 Home</button>
+      <button class="ptb-btn ptb-reset" onclick="clearSavedPlan()">🔄 Naya Plan</button>
     </div>
   </div>
 
@@ -321,6 +322,35 @@
     <p>Made with ❤️ by <strong>Er. Sangam Krishna</strong></p>
     <p class="footer-sub">BPSC TRE 4.0: Sep 2026 (Tentative) &nbsp;|&nbsp; UPSC CSE 2027: May 2027</p>
   </footer>
+</div>
+
+<!-- ═══ TELEGRAM MODAL ═══ -->
+<div id="tgModal" class="tg-modal-overlay">
+  <div class="tg-modal">
+    <button class="tg-modal-close" onclick="closeTgModal()">✕</button>
+    <div class="tg-modal-icon">📲</div>
+    <h3 class="tg-modal-title">Daily Telegram Reminder</h3>
+    <p class="tg-modal-sub">हर सुबह आज का study plan Telegram पर पाएं — बिल्कुल free!</p>
+    <div class="tg-steps">
+      <div class="tg-step">
+        <span class="tg-step-num">1</span>
+        <span>Telegram पर <a href="https://t.me/ParikshaSathiBot" target="_blank" class="tg-link">@ParikshaSathiBot</a> को <b>/start</b> भेजें</span>
+      </div>
+      <div class="tg-step">
+        <span class="tg-step-num">2</span>
+        <span>नीचे अपना Telegram username डालें</span>
+      </div>
+    </div>
+    <div class="input-wrap" style="margin:1.2rem 0 .8rem">
+      <span class="input-icon">👤</span>
+      <input type="text" id="tgUsernameInput" placeholder="@your_username" style="text-transform:lowercase"/>
+    </div>
+    <div id="tgStatus" class="tg-status"></div>
+    <button id="tgConnectBtn" class="tg-connect-btn" onclick="connectTelegram()">
+      🔗 Connect करें
+    </button>
+    <p class="tg-skip" onclick="closeTgModal()">अभी नहीं, बाद में करूंगा</p>
+  </div>
 </div>
 
 <script src="app.js"></script>

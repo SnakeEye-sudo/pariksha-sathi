@@ -62,4 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const today = new Date().toISOString().split('T')[0];
   const sd = document.getElementById('startDate');
   if (sd) { sd.value = today; sd.min = today; }
+
+  // Restore saved plan if exists
+  if (loadPlanFromStorage()) {
+    renderPlan();
+    showScreen('planScreen');
+  }
 });

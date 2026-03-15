@@ -434,3 +434,24 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
   .radio-group{flex-direction:column}
   .radio-card{min-width:unset}
 }
+
+/* ── Telegram Modal ─────────────────────────────────────────── */
+.tg-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .3s}
+.tg-modal-overlay.active{opacity:1;pointer-events:all}
+.tg-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:24px;padding:2rem;max-width:420px;width:100%;position:relative;box-shadow:0 24px 80px rgba(0,0,0,.5)}
+.tg-modal-close{position:absolute;top:1rem;right:1rem;background:var(--surface);border:none;color:var(--t2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center}
+.tg-modal-icon{font-size:2.5rem;text-align:center;margin-bottom:.8rem}
+.tg-modal-title{font-size:1.3rem;font-weight:800;color:var(--t1);text-align:center;margin-bottom:.4rem}
+.tg-modal-sub{color:var(--t2);font-size:.88rem;text-align:center;margin-bottom:1.2rem;line-height:1.6}
+.tg-steps{display:flex;flex-direction:column;gap:.7rem;margin-bottom:.5rem}
+.tg-step{display:flex;align-items:flex-start;gap:.8rem;font-size:.88rem;color:var(--t2);line-height:1.5}
+.tg-step-num{background:var(--grad-amber);color:#000;font-weight:800;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;margin-top:1px}
+.tg-link{color:var(--amber);font-weight:700;text-decoration:none}
+.tg-status{font-size:.85rem;color:var(--t2);min-height:1.2rem;margin-bottom:.8rem;line-height:1.5}
+.tg-connect-btn{width:100%;padding:1rem;background:var(--grad-amber);border:none;border-radius:14px;color:#000;font-weight:800;font-size:1rem;cursor:pointer;transition:opacity .2s}
+.tg-connect-btn:hover{opacity:.9}
+.tg-skip{text-align:center;color:var(--t3);font-size:.82rem;margin-top:.8rem;cursor:pointer;text-decoration:underline}
+
+/* ── Plan topbar extra buttons ──────────────────────────────── */
+.ptb-tg{background:rgba(37,211,102,.12);color:#25d366;border-color:rgba(37,211,102,.3)}
+.ptb-reset{background:rgba(239,68,68,.08);color:#f87171;border-color:rgba(239,68,68,.2)}

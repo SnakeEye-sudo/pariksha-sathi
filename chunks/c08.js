@@ -65,8 +65,15 @@ function generatePlan() {
 
   userData = { name, exam: selectedExam, bpscClass, optionalSubject, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
   studyPlan = buildPlan();
+  savePlanToStorage();
   renderPlan();
   showScreen('planScreen');
+  // Ask about Telegram after short delay
+  setTimeout(() => {
+    if (!localStorage.getItem('pariksha_tg_chatid')) {
+      setupTelegramReminder();
+    }
+  }, 2000);
 }
 
 // Subject priority weights by exam type
