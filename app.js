@@ -1,598 +1,1510 @@
-// ============================================================
-// BPSC TRE 4.0 Study Planner | Er. Sangam Krishna
-// Exam Date: 22-27 September 2026
-// ============================================================
+// Smart Study Planner - Complete Application
+// By Er. Sangam Krishna
 
-const EXAM_DATE = new Date('2026-09-22');
-const CUTOFF_DATE = new Date('2026-09-07'); // 15 days before exam
+// Global variables
+let selectedExam = '';
+let userData = {};
+let studyPlan = [];
 
-// ============================================================
-// COMPLETE SYLLABUS DATA (Hindi + English)
-// ============================================================
-const SYLLABUS_UNITS = [
-  // LANGUAGE SECTION
-  {
-    id: 'L1', part: 'Language', subject: 'English Grammar',
-    hindi: 'अंग्रेजी व्याकरण',
-    topics: ['Tenses (काल)', 'Articles (a/an/the)', 'Prepositions', 'Conjunctions', 'Active/Passive Voice', 'Direct/Indirect Speech', 'Comprehension Passage'],
-    days: 3, marks: 15, priority: 'high'
-  },
-  {
-    id: 'L2', part: 'Language', subject: 'Hindi Grammar',
-    hindi: 'हिंदी व्याकरण',
-    topics: ['संज्ञा, सर्वनाम, विशेषण', 'क्रिया, काल', 'संधि, समास', 'मुहावरे, लोकोक्तियाँ', 'अपठित गद्यांश', 'पत्र लेखन', 'वाक्य शुद्धि'],
-    days: 3, marks: 15, priority: 'high'
-  },
-  // MATHEMATICS
-  {
-    id: 'M1', part: 'General Studies', subject: 'Number System',
-    hindi: 'संख्या पद्धति',
-    topics: ['Natural, Whole, Integer Numbers', 'HCF & LCM (म.स.प. और ल.स.प.)', 'Fractions & Decimals (भिन्न)', 'Simplification (सरलीकरण)', 'Number Series'],
-    days: 3, marks: 12, priority: 'high'
-  },
-  {
-    id: 'M2', part: 'General Studies', subject: 'Arithmetic',
-    hindi: 'अंकगणित',
-    topics: ['Percentage (प्रतिशत)', 'Profit & Loss (लाभ-हानि)', 'Simple & Compound Interest (ब्याज)', 'Ratio & Proportion (अनुपात)', 'Average (औसत)', 'Time & Work (समय-कार्य)', 'Time & Distance (चाल)'],
-    days: 4, marks: 15, priority: 'high'
-  },
-  {
-    id: 'M3', part: 'General Studies', subject: 'Geometry & Mensuration',
-    hindi: 'ज्यामिति और क्षेत्रमिति',
-    topics: ['Lines & Angles (रेखाएं और कोण)', 'Triangle, Circle (त्रिभुज, वृत्त)', 'Area of Rectangle, Square (क्षेत्रफल)', 'Volume of Cube, Cylinder (आयतन)', 'Perimeter (परिमाप)'],
-    days: 3, marks: 10, priority: 'medium'
-  },
-  // MENTAL ABILITY
-  {
-    id: 'MA1', part: 'General Studies', subject: 'Mental Ability / Reasoning',
-    hindi: 'मानसिक क्षमता / तर्कशक्ति',
-    topics: ['Analogy (सादृश्यता)', 'Classification (वर्गीकरण)', 'Series Completion (श्रृंखला)', 'Coding-Decoding', 'Blood Relations (रक्त संबंध)', 'Direction Sense (दिशा ज्ञान)', 'Venn Diagram', 'Puzzle & Seating Arrangement'],
-    days: 3, marks: 12, priority: 'high'
-  },
-  // GENERAL SCIENCE
-  {
-    id: 'S1', part: 'General Studies', subject: 'Physics Basics',
-    hindi: 'भौतिक विज्ञान (मूल)',
-    topics: ['Motion & Force (गति और बल)', 'Work, Energy, Power (कार्य, ऊर्जा)', 'Light & Sound (प्रकाश और ध्वनि)', 'Heat & Temperature (ताप)', 'Electricity (विद्युत)', 'Simple Machines (सरल मशीनें)'],
-    days: 3, marks: 10, priority: 'high'
-  },
-  {
-    id: 'S2', part: 'General Studies', subject: 'Chemistry Basics',
-    hindi: 'रसायन विज्ञान (मूल)',
-    topics: ['Matter & Its States (पदार्थ)', 'Acids, Bases, Salts (अम्ल, क्षार, लवण)', 'Chemical Reactions (रासायनिक अभिक्रिया)', 'Metals & Non-metals (धातु-अधातु)', 'Carbon Compounds', 'Common Chemicals in Daily Life'],
-    days: 3, marks: 10, priority: 'high'
-  },
-  {
-    id: 'S3', part: 'General Studies', subject: 'Biology Basics',
-    hindi: 'जीव विज्ञान (मूल)',
-    topics: ['Cell Structure (कोशिका)', 'Plant Kingdom (पादप जगत)', 'Animal Kingdom (जंतु जगत)', 'Human Body Systems (मानव शरीर)', 'Nutrition & Diseases (पोषण और रोग)', 'Reproduction (जनन)', 'Ecosystem & Food Chain'],
-    days: 3, marks: 10, priority: 'high'
-  },
-  // GEOGRAPHY
-  {
-    id: 'G1', part: 'General Studies', subject: 'Indian Geography',
-    hindi: 'भारत का भूगोल',
-    topics: ['Physical Features (भौतिक स्वरूप)', 'Rivers of India (नदियाँ)', 'Climate (जलवायु)', 'Soils & Vegetation (मिट्टी)', 'Agriculture (कृषि)', 'Minerals & Industries', 'Population & Urbanization'],
-    days: 3, marks: 10, priority: 'high'
-  },
-  {
-    id: 'G2', part: 'General Studies', subject: 'World Geography & Bihar Geography',
-    hindi: 'विश्व भूगोल और बिहार भूगोल',
-    topics: ['Continents & Oceans (महाद्वीप)', 'Latitude & Longitude (अक्षांश-देशांतर)', 'Bihar Geography (बिहार का भूगोल)', 'Bihar Rivers & Districts', 'Natural Resources of Bihar'],
-    days: 2, marks: 8, priority: 'medium'
-  },
-  // ENVIRONMENT / EVS
-  {
-    id: 'E1', part: 'General Studies', subject: 'Environment & EVS',
-    hindi: 'पर्यावरण अध्ययन',
-    topics: ['Ecosystem (पारिस्थितिकी तंत्र)', 'Biodiversity (जैव विविधता)', 'Environmental Pollution (प्रदूषण)', 'Climate Change (जलवायु परिवर्तन)', 'Natural Disasters (प्राकृतिक आपदाएं)', 'Conservation (संरक्षण)', 'EVS Pedagogy (शिक्षाशास्त्र)'],
-    days: 2, marks: 8, priority: 'medium'
-  },
-  // SOCIAL SCIENCE
-  {
-    id: 'SS1', part: 'General Studies', subject: 'History of India',
-    hindi: 'भारत का इतिहास',
-    topics: ['Ancient India (प्राचीन भारत)', 'Medieval India (मध्यकालीन भारत)', 'Mughal Empire (मुगल साम्राज्य)', 'Maratha Empire', 'British Rule (ब्रिटिश शासन)', 'Social Reforms (सामाजिक सुधार)'],
-    days: 3, marks: 10, priority: 'high'
-  },
-  {
-    id: 'SS2', part: 'General Studies', subject: 'Indian National Movement',
-    hindi: 'भारतीय राष्ट्रीय आंदोलन',
-    topics: ['1857 Revolt (1857 का विद्रोह)', 'Indian National Congress (INC)', 'Non-Cooperation Movement (असहयोग)', 'Civil Disobedience (सविनय अवज्ञा)', 'Quit India Movement (भारत छोड़ो)', 'Role of Bihar in Freedom Struggle', 'Important Leaders & Events'],
-    days: 3, marks: 12, priority: 'high'
-  },
-  {
-    id: 'SS3', part: 'General Studies', subject: 'Indian Polity & Constitution',
-    hindi: 'भारतीय राजव्यवस्था और संविधान',
-    topics: ['Constitution of India (संविधान)', 'Fundamental Rights (मौलिक अधिकार)', 'Directive Principles (नीति निदेशक तत्व)', 'Parliament (संसद)', 'State Government (राज्य सरकार)', 'Panchayati Raj', 'Elections (चुनाव)'],
-    days: 3, marks: 10, priority: 'high'
-  },
-  // GENERAL AWARENESS
-  {
-    id: 'GA1', part: 'General Studies', subject: 'General Awareness - Static',
-    hindi: 'सामान्य जागरूकता (स्थैतिक)',
-    topics: ['National Symbols (राष्ट्रीय प्रतीक)', 'Important Days (महत्वपूर्ण दिवस)', 'Books & Authors', 'Awards & Honours (पुरस्कार)', 'Sports (खेल)', 'Bihar GK (बिहार सामान्य ज्ञान)', 'Famous Personalities'],
-    days: 2, marks: 8, priority: 'medium'
-  },
-  {
-    id: 'GA2', part: 'General Studies', subject: 'Current Affairs & Bihar Current',
-    hindi: 'समसामयिकी और बिहार करंट अफेयर्स',
-    topics: ['National Current Affairs (राष्ट्रीय)', 'International Events (अंतर्राष्ट्रीय)', 'Bihar Government Schemes (बिहार सरकार की योजनाएं)', 'Economic News', 'Science & Technology News'],
-    days: 2, marks: 8, priority: 'medium'
-  },
-  // REVISION & MOCK
-  {
-    id: 'R1', part: 'Revision', subject: 'Full Revision - Language',
-    hindi: 'पूर्ण पुनरावृत्ति - भाषा',
-    topics: ['English Grammar Revision', 'Hindi Grammar Revision', 'Practice Questions'],
-    days: 2, marks: 0, priority: 'revision'
-  },
-  {
-    id: 'R2', part: 'Revision', subject: 'Full Revision - Maths & Reasoning',
-    hindi: 'पूर्ण पुनरावृत्ति - गणित और तर्क',
-    topics: ['All Math Topics Revision', 'Reasoning Practice', 'Speed & Accuracy'],
-    days: 2, marks: 0, priority: 'revision'
-  },
-  {
-    id: 'R3', part: 'Revision', subject: 'Full Revision - Science & Geography',
-    hindi: 'पूर्ण पुनरावृत्ति - विज्ञान और भूगोल',
-    topics: ['Physics, Chemistry, Biology Revision', 'Geography Revision', 'EVS Revision'],
-    days: 2, marks: 0, priority: 'revision'
-  },
-  {
-    id: 'R4', part: 'Revision', subject: 'Full Revision - History & Polity',
-    hindi: 'पूर्ण पुनरावृत्ति - इतिहास और राजव्यवस्था',
-    topics: ['History Revision', 'National Movement Revision', 'Polity Revision', 'GK Revision'],
-    days: 2, marks: 0, priority: 'revision'
-  },
-  {
-    id: 'MT1', part: 'Mock Test', subject: 'Mock Test 1 + Analysis',
-    hindi: 'मॉक टेस्ट 1 + विश्लेषण',
-    topics: ['Full Length Mock Test (150 Questions)', 'Answer Analysis', 'Weak Area Identification'],
-    days: 1, marks: 0, priority: 'mock'
-  },
-  {
-    id: 'MT2', part: 'Mock Test', subject: 'Mock Test 2 + Analysis',
-    hindi: 'मॉक टेस्ट 2 + विश्लेषण',
-    topics: ['Full Length Mock Test (150 Questions)', 'PYQ Practice', 'Time Management'],
-    days: 1, marks: 0, priority: 'mock'
-  },
-  {
-    id: 'MT3', part: 'Mock Test', subject: 'Mock Test 3 + Final Revision',
-    hindi: 'मॉक टेस्ट 3 + अंतिम पुनरावृत्ति',
-    topics: ['Final Mock Test', 'Quick Notes Revision', 'Important Formulas & Facts'],
-    days: 1, marks: 0, priority: 'mock'
-  }
-];
-
-// ============================================================
-// PYQ DATA (from TRE 1.0, 2.0, 3.0)
-// ============================================================
-const PYQ_DATA = [
-  {
-    title: 'Mathematics PYQs (गणित)',
-    items: [
-      'LCM/HCF based questions (हर बार 3-4 प्रश्न)',
-      'Percentage & Profit-Loss (5-6 प्रश्न)',
-      'Simple Interest calculations',
-      'Area of Triangle & Rectangle',
-      'Number Series completion',
-      'Average problems (औसत)',
-      'Ratio & Proportion'
-    ]
-  },
-  {
-    title: 'Reasoning PYQs (तर्कशक्ति)',
-    items: [
-      'Analogy (सादृश्यता) - 4-5 questions',
-      'Coding-Decoding - 3-4 questions',
-      'Blood Relations - 2-3 questions',
-      'Direction Sense - 2-3 questions',
-      'Series (अक्षर/संख्या श्रृंखला)',
-      'Odd One Out (विषम पद)',
-      'Venn Diagram'
-    ]
-  },
-  {
-    title: 'Science PYQs (विज्ञान)',
-    items: [
-      'Human digestive system (पाचन तंत्र)',
-      'Photosynthesis (प्रकाश संश्लेषण)',
-      'Newton\'s Laws of Motion',
-      'Acids & Bases (pH scale)',
-      'Diseases & their causes (रोग)',
-      'Food chain & Ecosystem',
-      'Electricity & Magnetism'
-    ]
-  },
-  {
-    title: 'History & Polity PYQs',
-    items: [
-      '1857 Revolt leaders & events',
-      'Gandhi ji\'s movements (गांधी जी के आंदोलन)',
-      'Fundamental Rights (मौलिक अधिकार)',
-      'Preamble of Constitution (प्रस्तावना)',
-      'Bihar in freedom struggle',
-      'Important Articles of Constitution',
-      'Rajya Sabha & Lok Sabha'
-    ]
-  },
-  {
-    title: 'Geography PYQs (भूगोल)',
-    items: [
-      'Rivers of Bihar (बिहार की नदियाँ)',
-      'Longest/Highest in India',
-      'Soil types (मिट्टी के प्रकार)',
-      'Climate zones of India',
-      'Tropic of Cancer passing states',
-      'National Parks & Wildlife',
-      'Bihar districts & geography'
-    ]
-  },
-  {
-    title: 'Hindi Language PYQs (हिंदी)',
-    items: [
-      'संधि विच्छेद (3-4 प्रश्न)',
-      'समास (2-3 प्रश्न)',
-      'मुहावरे और लोकोक्तियाँ',
-      'अपठित गद्यांश',
-      'वाक्य शुद्धि',
-      'पर्यायवाची और विलोम',
-      'रस, छंद, अलंकार'
-    ]
-  }
-];
-
-// ============================================================
-// SCREEN NAVIGATION
-// ============================================================
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+// Screen navigation
+function showScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(screen => {
+    screen.classList.remove('active');
+  });
+  document.getElementById(screenId).classList.add('active');
 }
 
-function showForm() {
+// Exam selection
+function selectExam(exam) {
+  selectedExam = exam;
+  const formTitle = document.getElementById('formTitle');
+  const bpscClassGroup = document.getElementById('bpscClassGroup');
+  
+  if (exam === 'bpsc') {
+    formTitle.textContent = '📝 BPSC TRE 4.0 - अपनी जानकारी भरें';
+    bpscClassGroup.classList.remove('hidden');
+  } else {
+    formTitle.textContent = '📝 UPSC CSE 2027 - अपनी जानकारी भरें';
+    bpscClassGroup.classList.add('hidden');
+  }
+  
   showScreen('formScreen');
-  // Set default start date to today
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById('startDate').value = today;
-  document.getElementById('startDate').min = today;
 }
 
-// ============================================================
-// PLAN GENERATION
-// ============================================================
+// Complete syllabus data
+const syllabusData = {
+  bpsc: {
+    '1-5': {
+      'Language': {
+        marks: 30,
+        hindi: true,
+        topics: [
+          {
+            name: 'English Grammar',
+            hindi: 'अंग्रेजी व्याकरण',
+            micro: [
+              'Tenses (all 12 types)',
+              'Parts of Speech',
+              'Articles',
+              'Voice (Active/Passive)',
+              'Narration (Direct/Indirect)',
+              'Sentence Correction',
+              'Comprehension',
+              'Synonyms & Antonyms',
+              'One-word substitution',
+              'Idioms'
+            ]
+          },
+          {
+            name: 'Hindi Grammar',
+            hindi: 'हिंदी व्याकरण',
+            micro: [
+              'वर्ण विचार',
+              'संधि (स्वर/व्यंजन/विसर्ग)',
+              'समास (6 प्रकार)',
+              'उपसर्ग-प्रत्यय',
+              'पर्यायवाची-विलोम (100-100)',
+              'मुहावरे-लोकोक्तियाँ (100+50)',
+              'वाक्य शुद्धि',
+              'रस-छंद-अलंकार',
+              'अपठित गद्यांश'
+            ]
+          }
+        ]
+      },
+      'General Studies': {
+        marks: 120,
+        hindi: false,
+        topics: [
+          {
+            name: 'Elementary Mathematics',
+            hindi: 'प्रारंभिक गणित',
+            micro: [
+              'Number System (types, HCF/LCM, fractions, BODMAS, series)',
+              'Percentage',
+              'Profit & Loss',
+              'Simple & Compound Interest',
+              'Ratio & Proportion',
+              'Average',
+              'Time & Work',
+              'Speed, Distance & Time',
+              'Pipes & Cisterns',
+              'Boat & Stream',
+              'Geometry & Mensuration (2D & 3D shapes)'
+            ]
+          },
+          {
+            name: 'Mental Ability/Reasoning',
+            hindi: 'मानसिक क्षमता/तर्क',
+            micro: [
+              'Analogy',
+              'Classification',
+              'Series',
+              'Coding-Decoding',
+              'Blood Relations',
+              'Direction-Distance',
+              'Ranking',
+              'Venn Diagram',
+              'Syllogism',
+              'Seating Arrangement',
+              'Puzzles',
+              'Statement-Conclusion'
+            ]
+          },
+          {
+            name: 'General Science - Physics',
+            hindi: 'सामान्य विज्ञान - भौतिकी',
+            micro: [
+              'Motion, Force, Newton\'s Laws',
+              'Work, Energy, Power',
+              'Light (reflection, refraction, lenses)',
+              'Sound (wave properties, echo)',
+              'Heat (conduction, convection, radiation)',
+              'Electricity (Ohm\'s law, circuits)',
+              'Magnetism',
+              'Simple Machines'
+            ]
+          },
+          {
+            name: 'General Science - Chemistry',
+            hindi: 'सामान्य विज्ञान - रसायन',
+            micro: [
+              'Matter & States',
+              'Atoms & Molecules',
+              'Acids, Bases, Salts (pH scale)',
+              'Chemical Reactions',
+              'Metals & Non-metals',
+              'Carbon Compounds',
+              'Everyday Chemistry'
+            ]
+          },
+          {
+            name: 'General Science - Biology',
+            hindi: 'सामान्य विज्ञान - जीव विज्ञान',
+            micro: [
+              'Cell (structure, organelles, division)',
+              'Plant Kingdom (photosynthesis, transpiration, reproduction)',
+              'Animal Kingdom (classification)',
+              'Human Body Systems (digestive, respiratory, circulatory, nervous, excretory, reproductive)',
+              'Diseases (bacterial, viral, deficiency)',
+              'Nutrition',
+              'Ecosystem & Food Chain',
+              'Biodiversity'
+            ]
+          },
+          {
+            name: 'Social Science - History',
+            hindi: 'सामाजिक विज्ञान - इतिहास',
+            micro: [
+              'Ancient India (Indus Valley, Vedic, Maurya, Gupta)',
+              'Medieval India (Delhi Sultanate, Mughal Empire, Bhakti-Sufi)',
+              'Modern India (British rule, social reforms, 1857 revolt)',
+              'Indian National Movement (INC formation, Partition of Bengal, Non-Cooperation, Civil Disobedience, Quit India)',
+              'Role of Bihar (Champaran, JP Narayan, Rajendra Prasad)',
+              'Important Leaders'
+            ]
+          },
+          {
+            name: 'Social Science - Polity',
+            hindi: 'सामाजिक विज्ञान - राजनीति',
+            micro: [
+              'Constitution (Preamble, Fundamental Rights Art 12-35, DPSP Art 36-51, Fundamental Duties)',
+              'Parliament (Lok Sabha, Rajya Sabha)',
+              'President, Prime Minister, Cabinet',
+              'Supreme Court, High Court',
+              'Panchayati Raj (73rd, 74th amendment)',
+              'Elections (Election Commission)',
+              'Emergency Provisions'
+            ]
+          },
+          {
+            name: 'Social Science - Geography',
+            hindi: 'सामाजिक विज्ञान - भूगोल',
+            micro: [
+              'Physical India (mountains, plateaus, plains, rivers, lakes, coastline)',
+              'Climate (monsoon, seasons, rainfall)',
+              'Soils (alluvial, black, red, laterite)',
+              'Natural Vegetation',
+              'Agriculture (crops, irrigation)',
+              'Minerals & Industries',
+              'Population',
+              'World Geography (continents, oceans, lat-long, time zones)',
+              'Bihar Geography (location, rivers, districts, agriculture, industries)'
+            ]
+          },
+          {
+            name: 'Environment/EVS',
+            hindi: 'पर्यावरण/EVS',
+            micro: [
+              'Ecosystem (components, food chain/web, energy flow)',
+              'Biodiversity (hotspots, endemic species, IUCN categories)',
+              'Pollution (air, water, soil, noise - causes, effects, control)',
+              'Climate Change (greenhouse gases, global warming, ozone depletion)',
+              'Natural Disasters (earthquake, flood, drought, cyclone - India focus)',
+              'Conservation (national parks, wildlife sanctuaries, biosphere reserves)',
+              'EVS Pedagogy (scope, importance, integrated approach)'
+            ]
+          },
+          {
+            name: 'General Awareness',
+            hindi: 'सामान्य जागरूकता',
+            micro: [
+              'National Symbols',
+              'Important Days',
+              'Books & Authors',
+              'Awards (Bharat Ratna, Padma, Nobel)',
+              'Sports (Olympics, CWG, Asian Games)',
+              'Bihar GK (history, culture, famous personalities, schemes)',
+              'Science & Technology News',
+              'Government Schemes (PM Awas, Ujjwala, Jan Dhan, Ayushman Bharat)'
+            ]
+          }
+        ]
+      }
+    },
+    '6-8': {
+      'Language': {
+        marks: 30,
+        hindi: true,
+        topics: [
+          {
+            name: 'English Grammar (Advanced)',
+            hindi: 'अंग्रेजी व्याकरण (उच्च स्तर)',
+            micro: [
+              'Advanced Tenses & Structures',
+              'Complex Parts of Speech',
+              'Advanced Articles Usage',
+              'Complex Voice Patterns',
+              'Advanced Narration',
+              'Sentence Transformation',
+              'Advanced Comprehension',
+              'Sophisticated Vocabulary',
+              'Complex One-word Substitution',
+              'Literary Idioms'
+            ]
+          },
+          {
+            name: 'Hindi Grammar (Advanced)',
+            hindi: 'हिंदी व्याकरण (उच्च स्तर)',
+            micro: [
+              'उन्नत वर्ण विचार',
+              'जटिल संधि नियम',
+              'उन्नत समास प्रकार',
+              'जटिल उपसर्ग-प्रत्यय',
+              'व्यापक पर्यायवाची-विलोम',
+              'साहित्यिक मुहावरे-लोकोक्तियाँ',
+              'उन्नत वाक्य शुद्धि',
+              'गूढ़ रस-छंद-अलंकार',
+              'साहित्यिक अपठित गद्यांश'
+            ]
+          }
+        ]
+      },
+      'General Studies': {
+        marks: 40,
+        hindi: false,
+        topics: [
+          // Same topics as 1-5 but at higher difficulty level
+          {
+            name: 'Mathematics (Class 6-8 Level)',
+            hindi: 'गणित (कक्षा 6-8 स्तर)',
+            micro: [
+              'Integers & Rational Numbers',
+              'Fractions & Decimals',
+              'Basic Algebra (Linear Equations)',
+              'Geometry (Lines, Angles, Triangles, Quadrilaterals)',
+              'Mensuration (Area, Volume, Surface Area)',
+              'Data Handling (Graphs, Charts)',
+              'Ratio & Proportion',
+              'Percentage & Applications',
+              'Practical Geometry',
+              'Exponents & Powers'
+            ]
+          },
+          {
+            name: 'Science (Class 6-8 Level)',
+            hindi: 'विज्ञान (कक्षा 6-8 स्तर)',
+            micro: [
+              'Food & Nutrition',
+              'Materials & Classification',
+              'The World of Living (Plants & Animals)',
+              'Moving Things, People & Ideas',
+              'Natural Phenomena',
+              'Natural Resources',
+              'Basic Physics Concepts',
+              'Basic Chemistry Concepts',
+              'Environmental Science'
+            ]
+          },
+          {
+            name: 'Social Science - History',
+            hindi: 'सामान्य विज्ञान - इतिहास',
+            micro: [
+              'Our Pasts I, II, III (Class 6-8)',
+              'Ancient Civilizations',
+              'Medieval Kingdoms',
+              'Modern Indian History',
+              'Freedom Struggle',
+              'World History Overview',
+              'Bihar in National Context'
+            ]
+          },
+          {
+            name: 'Social Science - Geography',
+            hindi: 'सामान्य विज्ञान - भूगोल',
+            micro: [
+              'The Earth Our Habitat',
+              'Our Environment',
+              'Resources & Development',
+              'Physical Geography',
+              'Human Geography',
+              'Indian Geography',
+              'Bihar Geography'
+            ]
+          },
+          {
+            name: 'Social Science - Civics',
+            hindi: 'सामान्य विज्ञान - नागरिक शास्त्र',
+            micro: [
+              'Social & Political Life I, II, III',
+              'Democracy & Government',
+              'Constitution & Rights',
+              'Local Government',
+              'Judiciary',
+              'Media & Communication'
+            ]
+          }
+        ]
+      },
+      'Subject Concerned': {
+        marks: 80,
+        hindi: false,
+        topics: [
+          {
+            name: 'Mathematics-Science (Combined)',
+            hindi: 'गणित-विज्ञान (संयुक्त)',
+            micro: [
+              'Class 6-8 NCERT Mathematics Complete',
+              'Class 6-8 NCERT Science Complete',
+              'Problem Solving Techniques',
+              'Practical Applications',
+              'Conceptual Understanding'
+            ]
+          },
+          {
+            name: 'Social Science',
+            hindi: 'सामाजिक विज्ञान',
+            micro: [
+              'History Complete (Class 6-8)',
+              'Geography Complete (Class 6-8)',
+              'Civics Complete (Class 6-8)',
+              'Integrated Approach',
+              'Concept Mapping'
+            ]
+          },
+          {
+            name: 'Hindi',
+            hindi: 'हिंदी',
+            micro: [
+              'Vasant, Durva, Bal Mahabharat Textbooks',
+              'Grammar & Literature',
+              'Comprehension Skills',
+              'Writing Skills',
+              'Cultural Context'
+            ]
+          },
+          {
+            name: 'English',
+            hindi: 'अंग्रेजी',
+            micro: [
+              'Honeysuckle, It So Happened, Honeydew',
+              'Grammar & Literature',
+              'Comprehension Skills',
+              'Writing Skills',
+              'Communication Skills'
+            ]
+          }
+        ]
+      }
+    }
+  },
+  upsc: {
+    prelims: {
+      'GS Paper I': {
+        marks: 200,
+        hindi: false,
+        topics: [
+          {
+            name: 'History',
+            hindi: 'इतिहास',
+            micro: [
+              'Ancient India (sources, Indus Valley, Vedic, Buddhism/Jainism, Maurya, Sangam, Gupta, Harsha)',
+              'Medieval India (Rajputs, Delhi Sultanate, Vijayanagara, Mughal, Maratha, Bhakti-Sufi)',
+              'Modern India (British expansion, economic impact, social reforms, 1857, nationalist movements)',
+              'Post-independence India (integration of states, constitution making)'
+            ]
+          },
+          {
+            name: 'Geography',
+            hindi: 'भूगोल',
+            micro: [
+              'Physical Geography (geomorphology, climatology, oceanography, biogeography)',
+              'Indian Geography (physiography, drainage, climate, soils, vegetation, resources)',
+              'World Geography (continents, countries, economic geography)'
+            ]
+          },
+          {
+            name: 'Polity & Governance',
+            hindi: 'राजनीति एवं शासन',
+            micro: [
+              'Constitution (historical background, features, amendments)',
+              'Fundamental Rights, Duties, DPSP',
+              'Parliament, President, PM, Judiciary',
+              'Federalism, Local self-government',
+              'Elections, Constitutional & Non-constitutional bodies',
+              'Government schemes & policies'
+            ]
+          },
+          {
+            name: 'Economy',
+            hindi: 'अर्थव्यवस्था',
+            micro: [
+              'Basic concepts (GDP, GNP, NNP, inflation, deflation)',
+              'Planning (Five Year Plans, NITI Aayog)',
+              'Agriculture (Green Revolution, land reforms, food security)',
+              'Industry (industrial policy, MSMEs, Make in India)',
+              'Banking (RBI, monetary policy, types of banks)',
+              'Capital markets, International trade (WTO, FDI, FII)',
+              'Budget (fiscal policy, taxes, deficit)',
+              'Poverty & unemployment, Social sector schemes'
+            ]
+          },
+          {
+            name: 'Environment & Ecology',
+            hindi: 'पर्यावरण एवं पारिस्थितिकी',
+            micro: [
+              'Ecology basics',
+              'Biodiversity (CBD, CITES, Ramsar, World Heritage)',
+              'Climate change (UNFCCC, Kyoto, Paris Agreement)',
+              'Environmental laws (EPA, Forest Act, Wildlife Protection Act)',
+              'Pollution, Disaster management'
+            ]
+          },
+          {
+            name: 'Science & Technology',
+            hindi: 'विज्ञान एवं प्रौद्योगिकी',
+            micro: [
+              'Space (ISRO missions - Chandrayaan, Mangalyaan, Gaganyaan)',
+              'Defence (DRDO, missiles, nuclear)',
+              'Biotechnology (GMO, stem cells, CRISPR)',
+              'IT & AI, Nanotechnology',
+              'Energy (solar, nuclear, renewable)',
+              'Health (vaccines, diseases, WHO)'
+            ]
+          },
+          {
+            name: 'Current Affairs',
+            hindi: 'समकालीन घटनाएँ',
+            micro: [
+              'National & International events (last 12 months)',
+              'Government schemes',
+              'Awards, Sports, Important appointments',
+              'India\'s foreign policy',
+              'International organisations (UN, IMF, World Bank, WTO, SCO, BRICS, G20)'
+            ]
+          }
+        ]
+      },
+      'CSAT Paper II': {
+        marks: 200,
+        hindi: false,
+        topics: [
+          {
+            name: 'Reading Comprehension',
+            hindi: 'अपठित गद्यांश',
+            micro: [
+              'English Comprehension Passages',
+              'Hindi Comprehension Passages',
+              'Critical Reasoning',
+              'Inference Drawing'
+            ]
+          },
+          {
+            name: 'Logical Reasoning & Analytical Ability',
+            hindi: 'तार्किक तर्क एवं विश्लेषणात्मक क्षमता',
+            micro: [
+              'Logical Deduction',
+              'Analytical Reasoning',
+              'Critical Thinking',
+              'Problem Solving'
+            ]
+          },
+          {
+            name: 'Decision Making',
+            hindi: 'निर्णय लेना',
+            micro: [
+              'Ethical Decision Making',
+              'Situational Analysis',
+              'Problem Solving',
+              'Managerial Skills'
+            ]
+          },
+          {
+            name: 'General Mental Ability',
+            hindi: 'सामान्य मानसिक क्षमता',
+            micro: [
+              'Numerical Ability',
+              'Pattern Recognition',
+              'Series Completion',
+              'Analogies'
+            ]
+          },
+          {
+            name: 'Basic Numeracy',
+            hindi: 'आधारभूत संख्यात्मकता',
+            micro: [
+              'Class 10 Level Mathematics',
+              'Arithmetic Operations',
+              'Data Interpretation',
+              'Graph Analysis'
+            ]
+          },
+          {
+            name: 'Data Interpretation',
+            hindi: 'आँकड़ा व्याख्या',
+            micro: [
+              'Tables, Charts, Graphs',
+              'Statistical Analysis',
+              'Data Sufficiency',
+              'Logical Data Arrangement'
+            ]
+          }
+        ]
+      }
+    },
+    mains: {
+      'GS I': {
+        marks: 250,
+        hindi: false,
+        topics: [
+          {
+            name: 'Indian Heritage & Culture',
+            hindi: 'भारतीय विरासत एवं संस्कृति',
+            micro: [
+              'Art Forms (Classical, Folk, Tribal)',
+              'Literature (Ancient, Medieval, Modern)',
+              'Architecture (Temple, Sultanate, Mughal, Colonial)',
+              'Cultural Diversity (Religion, Language, Customs)',
+              'Philosophy & Religion'
+            ]
+          },
+          {
+            name: 'History',
+            hindi: 'इतिहास',
+            micro: [
+              'Ancient & Medieval World',
+              'Indian History - Comprehensive',
+              'Modern Indian History - Detailed',
+              'Post-independence Consolidation',
+              'World History - Revolutions, Wars'
+            ]
+          },
+          {
+            name: 'Geography',
+            hindi: 'भूगोल',
+            micro: [
+              'Physical Geography - Detailed',
+              'Human Geography',
+              'Economic Geography',
+              'Indian Geography - Comprehensive',
+              'Geographical Thought'
+            ]
+          }
+        ]
+      },
+      'GS II': {
+        marks: 250,
+        hindi: false,
+        topics: [
+          {
+            name: 'Governance',
+            hindi: 'शासन',
+            micro: [
+              'Constitution - Detailed Analysis',
+              'Federal Structure',
+              'Separation of Powers',
+              'Dispute Resolution',
+              'Decentralized Governance'
+            ]
+          },
+          {
+            name: 'Constitution',
+            hindi: 'संविधान',
+            micro: [
+              'Fundamental Rights - Detailed',
+              'Directive Principles',
+              'Fundamental Duties',
+              'Constitutional Amendments',
+              'Judicial Review'
+            ]
+          },
+          {
+            name: 'Polity',
+            hindi: 'राजनीति',
+            micro: [
+              'Executive, Legislature, Judiciary',
+              'Election Commission',
+              'Political Parties',
+              'Pressure Groups',
+              'Good Governance'
+            ]
+          },
+          {
+            name: 'Social Justice',
+            hindi: 'सामाजिक न्याय',
+            micro: [
+              'Welfare Schemes',
+              'Vulnerable Sections',
+              'Development Policies',
+              'Health & Education',
+              'Poverty Alleviation'
+            ]
+          },
+          {
+            name: 'International Relations',
+            hindi: 'अंतर्राष्ट्रीय संबंध',
+            micro: [
+              'India & Neighbours',
+              'Global Groupings',
+              'Foreign Policy',
+              'Diaspora',
+              'International Law'
+            ]
+          }
+        ]
+      },
+      'GS III': {
+        marks: 250,
+        hindi: false,
+        topics: [
+          {
+            name: 'Technology',
+            hindi: 'प्रौद्योगिकी',
+            micro: [
+              'IT & Communication',
+              'Space Technology',
+              'Biotechnology',
+              'Nanotechnology',
+              'Robotics & AI'
+            ]
+          },
+          {
+            name: 'Economic Development',
+            hindi: 'आर्थिक विकास',
+            micro: [
+              'Indian Economy - Structure',
+              'Planning & Liberalization',
+              'Inclusive Growth',
+              'Investment Models',
+              'Monetary & Fiscal Policy'
+            ]
+          },
+          {
+            name: 'Biodiversity',
+            hindi: 'जैव विविधता',
+            micro: [
+              'Conservation Strategies',
+              'Protected Areas',
+              'Endangered Species',
+              'Biodiversity Hotspots',
+              'Traditional Knowledge'
+            ]
+          },
+          {
+            name: 'Environment',
+            hindi: 'पर्यावरण',
+            micro: [
+              'Environmental Pollution',
+              'Climate Change',
+              'Disaster Management',
+              'Sustainable Development',
+              'Environmental Laws'
+            ]
+          },
+          {
+            name: 'Security',
+            hindi: 'सुरक्षा',
+            micro: [
+              'Internal Security',
+              'External Security',
+              'Terrorism & Naxalism',
+              'Border Management',
+              'Cyber Security'
+            ]
+          },
+          {
+            name: 'Disaster Management',
+            hindi: 'आपदा प्रबंधन',
+            micro: [
+              'Disaster Types',
+              'Response Mechanisms',
+              'Mitigation Strategies',
+              'Rehabilitation',
+              'International Cooperation'
+            ]
+          }
+        ]
+      },
+      'GS IV': {
+        marks: 250,
+        hindi: false,
+        topics: [
+          {
+            name: 'Ethics',
+            hindi: 'नीतिशास्त्र',
+            micro: [
+              'Ethical Concepts',
+              'Moral Thinkers',
+              'Ethical Dilemmas',
+              'Public Service Values',
+              'Integrity in Governance'
+            ]
+          },
+          {
+            name: 'Integrity',
+            hindi: 'ईमानदारी',
+            micro: [
+              'Corruption',
+              'Work Culture',
+              'Citizen Charter',
+              'Information Sharing',
+              'Transparency'
+            ]
+          },
+          {
+            name: 'Aptitude',
+            hindi: 'अभिरुचि',
+            micro: [
+              'Emotional Intelligence',
+              'Moral Reasoning',
+              'Attitude & Foundation',
+              'Contributions of Moral Thinkers',
+              'Case Studies'
+            ]
+          }
+        ]
+      },
+      'Essay': {
+        marks: 250,
+        hindi: false,
+        topics: [
+          {
+            name: 'Essay Writing',
+            hindi: 'निबंध लेखन',
+            micro: [
+              'Current Issues',
+              'Philosophical Topics',
+              'Administrative Topics',
+              'Social Issues',
+              'International Relations'
+            ]
+          }
+        ]
+      }
+    }
+  }
+};
+
+// Time slot configurations
+const timeSlots = {
+  early_morning: { display: 'Early Morning', time: '4–6 AM', hindi: 'प्रातः काल' },
+  morning: { display: 'Morning', time: '6–9 AM', hindi: 'सुबह' },
+  forenoon: { display: 'Forenoon', time: '9 AM–12 PM', hindi: 'दोपहर' },
+  afternoon: { display: 'Afternoon', time: '12–3 PM', hindi: 'अपराह्न' },
+  evening: { display: 'Evening', time: '3–6 PM', hindi: 'शाम' },
+  night: { display: 'Night', time: '8–11 PM', hindi: 'रात्रि' }
+};
+
+// Generate study plan
 function generatePlan() {
-  const name = document.getElementById('userName').value.trim();
-  const startDateVal = document.getElementById('startDate').value;
-  const hours = parseInt(document.getElementById('studyHours').value);
-
-  if (!name) { alert('कृपया अपना नाम भरें / Please enter your name'); return; }
-  if (!startDateVal) { alert('कृपया शुरुआत की तारीख चुनें / Please select start date'); return; }
-
-  const startDate = new Date(startDateVal);
-  const totalDays = Math.floor((CUTOFF_DATE - startDate) / (1000 * 60 * 60 * 24));
-
-  if (totalDays <= 0) {
-    alert('शुरुआत की तारीख exam से 15 दिन पहले (7 Sep 2026) से पहले होनी चाहिए।');
+  // Collect user data
+  const userName = document.getElementById('userName').value.trim();
+  const startDate = document.getElementById('startDate').value;
+  const studyHours = document.getElementById('studyHours').value;
+  
+  // Validation
+  if (!userName || !startDate) {
+    alert('कृपया सभी आवश्यक जानकारी भरें!');
     return;
   }
-
-  // Update header
-  document.getElementById('planTitle').textContent = `📅 ${name} का Study Plan`;
-  document.getElementById('planSubtitle').textContent =
-    `${formatDate(startDate)} से ${formatDate(CUTOFF_DATE)} तक | कुल ${totalDays} दिन | ${hours} घंटे/दिन`;
-
-  // Render PYQs
-  renderPYQs();
-
-  // Generate day-by-day plan
-  renderDayPlan(startDate, totalDays, hours, name);
-
+  
+  // Get selected time slots
+  const selectedSlots = [];
+  document.querySelectorAll('input[name="slot"]:checked').forEach(slot => {
+    selectedSlots.push(slot.value);
+  });
+  
+  // Get BPSC class if applicable
+  let bpscClass = '';
+  if (selectedExam === 'bpsc') {
+    bpscClass = document.querySelector('input[name="bpscClass"]:checked').value;
+  }
+  
+  // Store user data
+  userData = {
+    name: userName,
+    exam: selectedExam,
+    bpscClass: bpscClass,
+    startDate: new Date(startDate),
+    studyHours: parseInt(studyHours),
+    timeSlots: selectedSlots
+  };
+  
+  // Generate the actual plan
+  studyPlan = createStudyPlan();
+  
+  // Display the plan
+  displayPlan();
+  
+  // Navigate to plan screen
   showScreen('planScreen');
 }
 
-function renderPYQs() {
-  const grid = document.getElementById('pyqGrid');
-  grid.innerHTML = PYQ_DATA.map(p => `
-    <div class="pyq-card">
-      <h5>${p.title}</h5>
-      <ul>${p.items.map(i => `<li>${i}</li>`).join('')}</ul>
-    </div>
-  `).join('');
-}
-
-function renderDayPlan(startDate, totalDays, hoursPerDay, name) {
-  // Build schedule: distribute syllabus units across available days
-  const schedule = buildSchedule(totalDays, hoursPerDay);
-  const container = document.getElementById('planTable');
-  container.innerHTML = '';
-
-  let weekDays = [];
-  let weekNum = 1;
+// Create study plan based on user data
+function createStudyPlan() {
+  const plan = [];
+  const startDate = userData.startDate;
+  const examDate = userData.exam === 'bpsc' ? 
+    new Date('2026-09-22') : 
+    new Date('2027-05-15'); // Approximate UPSC prelims date
+  
+  const endDate = new Date(examDate);
+  endDate.setDate(endDate.getDate() - 15); // 15 days before exam
+  
+  const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+  
+  // Get subjects based on exam and class
+  const subjects = getSubjectsList();
+  
+  // Create day-by-day plan
   let currentDate = new Date(startDate);
-
-  schedule.forEach((entry, idx) => {
-    const d = new Date(currentDate);
-    d.setDate(d.getDate() + idx);
-    weekDays.push({ day: idx + 1, date: d, entry });
-
-    if (weekDays.length === 7 || idx === schedule.length - 1) {
-      const weekEl = document.createElement('div');
-      weekEl.className = 'week-block';
-      weekEl.innerHTML = `<div class="week-header">📅 Week ${weekNum} (${formatDate(weekDays[0].date)} – ${formatDate(weekDays[weekDays.length-1].date)})</div>`;
-
-      weekDays.forEach(wd => {
-        const rowClass = wd.entry.priority === 'revision' ? 'revision' :
-                         wd.entry.priority === 'mock' ? 'mock' : '';
-        const topicsHtml = wd.entry.topics.slice(0, 3).join(' | ');
-        const moreTopics = wd.entry.topics.length > 3 ? ` +${wd.entry.topics.length - 3} more` : '';
-        weekEl.innerHTML += `
-          <div class="day-row ${rowClass}">
-            <div class="day-num">Day ${wd.day}</div>
-            <div class="day-date">${formatDate(wd.date)}<br/><small>${getDayName(wd.date)}</small></div>
-            <div class="day-topic">
-              <strong>${wd.entry.subject} | ${wd.entry.hindi}</strong>
-              <span>${topicsHtml}${moreTopics}</span>
-            </div>
-            <div class="day-hours">⏱ ${wd.entry.hoursToday || hoursPerDay}h</div>
-          </div>`;
-      });
-
-      container.appendChild(weekEl);
-      weekDays = [];
-      weekNum++;
+  let subjectIndex = 0;
+  
+  for (let day = 1; day <= totalDays; day++) {
+    const dayPlan = {
+      day: day,
+      date: new Date(currentDate),
+      dayName: currentDate.toLocaleDateString('en-US', { weekday: 'long' }),
+      slots: [],
+      isRevisionDay: false,
+      isMockDay: false
+    };
+    
+    // Determine if this is a revision or mock test day
+    const daysLeft = totalDays - day;
+    if (daysLeft <= 14 && daysLeft % 5 === 0) {
+      dayPlan.isMockDay = true;
+    } else if (daysLeft <= 21 && daysLeft % 3 === 0) {
+      dayPlan.isRevisionDay = true;
     }
-  });
-}
-
-function buildSchedule(totalDays, hoursPerDay) {
-  const schedule = [];
-  // Total syllabus days needed
-  const totalSyllabusDays = SYLLABUS_UNITS.reduce((s, u) => s + u.days, 0);
-
-  // Scale factor: if we have more days, add buffer/extra revision
-  const scaleFactor = totalDays / totalSyllabusDays;
-
-  SYLLABUS_UNITS.forEach(unit => {
-    const daysForUnit = Math.max(1, Math.round(unit.days * scaleFactor));
-    for (let d = 0; d < daysForUnit; d++) {
-      const topicsPerDay = Math.ceil(unit.topics.length / daysForUnit);
-      const startTopic = d * topicsPerDay;
-      const dayTopics = unit.topics.slice(startTopic, startTopic + topicsPerDay);
-      schedule.push({
-        subject: unit.subject,
-        hindi: unit.hindi,
-        part: unit.part,
-        topics: dayTopics.length > 0 ? dayTopics : unit.topics,
-        priority: unit.priority,
-        hoursToday: hoursPerDay
-      });
-    }
-  });
-
-  // Trim or pad to totalDays
-  while (schedule.length < totalDays) {
-    // Add extra revision days
-    const revUnit = SYLLABUS_UNITS.find(u => u.priority === 'revision');
-    schedule.push({
-      subject: 'Extra Revision & Practice',
-      hindi: 'अतिरिक्त पुनरावृत्ति और अभ्यास',
-      part: 'Revision',
-      topics: ['PYQ Practice', 'Weak Topics Revision', 'Speed Test'],
-      priority: 'revision',
-      hoursToday: hoursPerDay
-    });
-  }
-
-  return schedule.slice(0, totalDays);
-}
-
-// ============================================================
-// PDF DOWNLOAD with Watermark
-// ============================================================
-function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-  const name = document.getElementById('userName').value.trim();
-  const startDateVal = document.getElementById('startDate').value;
-  const startDate = new Date(startDateVal);
-  const hours = parseInt(document.getElementById('studyHours').value);
-  const totalDays = Math.floor((CUTOFF_DATE - startDate) / (1000 * 60 * 60 * 24));
-  const schedule = buildSchedule(totalDays, hours);
-
-  const W = 210, H = 297;
-  let y = 0;
-
-  function addWatermark() {
-    doc.saveGraphicsState();
-    doc.setGState(new doc.GState({ opacity: 0.08 }));
-    doc.setFontSize(28);
-    doc.setTextColor(100, 100, 100);
-    for (let wy = 40; wy < H; wy += 55) {
-      for (let wx = 10; wx < W; wx += 80) {
-        doc.text('Er. Sangam Krishna', wx, wy, { angle: 35 });
+    
+    // Create 3 subject slots per day
+    if (!dayPlan.isMockDay) {
+      for (let slot = 0; slot < 3; slot++) {
+        const subject = subjects[subjectIndex % subjects.length];
+        const topic = getTopicForSubject(subject, day, slot);
+        
+        dayPlan.slots.push({
+          type: 'subject',
+          subject: subject.name,
+          hindi: subject.hindi || '',
+          topic: topic.name,
+          hindiTopic: topic.hindi || '',
+          microTopics: topic.micro || [],
+          slotType: slot === 0 ? 'morning' : slot === 1 ? 'afternoon' : 'evening'
+        });
+        
+        subjectIndex++;
       }
     }
-    doc.restoreGraphicsState();
-  }
-
-  function newPage() {
-    doc.addPage();
-    y = 20;
-    addWatermark();
-    // Header on each page
-    doc.setFillColor(15, 23, 42);
-    doc.rect(0, 0, W, 15, 'F');
-    doc.setFontSize(9);
-    doc.setTextColor(245, 158, 11);
-    doc.text('BPSC TRE 4.0 Study Plan | Er. Sangam Krishna', 10, 10);
-    doc.setTextColor(148, 163, 184);
-    doc.text(`${name} | Exam: 22-27 Sep 2026`, W - 10, 10, { align: 'right' });
-    y = 22;
-  }
-
-  // PAGE 1 - Cover
-  doc.setFillColor(15, 23, 42);
-  doc.rect(0, 0, W, H, 'F');
-  addWatermark();
-
-  doc.setFillColor(245, 158, 11);
-  doc.rect(0, 0, W, 3, 'F');
-
-  doc.setFontSize(11);
-  doc.setTextColor(245, 158, 11);
-  doc.text('BPSC TRE 4.0 | Class 1-5 | Primary Teacher', W / 2, 40, { align: 'center' });
-
-  doc.setFontSize(22);
-  doc.setTextColor(255, 255, 255);
-  doc.text('PERSONALIZED STUDY PLAN', W / 2, 60, { align: 'center' });
-
-  doc.setFontSize(16);
-  doc.setTextColor(52, 211, 153);
-  doc.text(name, W / 2, 80, { align: 'center' });
-
-  doc.setFontSize(11);
-  doc.setTextColor(148, 163, 184);
-  doc.text(`Study Period: ${formatDate(startDate)} to ${formatDate(CUTOFF_DATE)}`, W / 2, 95, { align: 'center' });
-  doc.text(`Total Days: ${totalDays} | Daily Hours: ${hours}`, W / 2, 105, { align: 'center' });
-
-  doc.setFontSize(13);
-  doc.setTextColor(251, 191, 36);
-  doc.text('Exam Date: 22-27 September 2026', W / 2, 120, { align: 'center' });
-  doc.text('Total Vacancies: 46,595', W / 2, 132, { align: 'center' });
-
-  // Syllabus summary box
-  doc.setFillColor(30, 41, 59);
-  doc.roundedRect(20, 145, W - 40, 80, 4, 4, 'F');
-  doc.setFontSize(12);
-  doc.setTextColor(245, 158, 11);
-  doc.text('EXAM PATTERN', W / 2, 158, { align: 'center' });
-  doc.setFontSize(10);
-  doc.setTextColor(226, 232, 240);
-  const pattern = [
-    'Part I: Language (English + Hindi/Urdu/Bengali) - 30 Marks [Qualifying - 30%]',
-    'Part II: General Studies - 120 Marks [Negative Marking]',
-    '  • Elementary Mathematics | Mental Ability | General Awareness',
-    '  • General Science | Social Science | Indian National Movement',
-    '  • Geography | Environment (EVS)',
-    'Total: 150 Questions | 150 Marks | 2.5 Hours | MCQ Format'
-  ];
-  pattern.forEach((line, i) => {
-    doc.text(line, 25, 168 + i * 8);
-  });
-
-  doc.setFontSize(9);
-  doc.setTextColor(100, 116, 139);
-  doc.text('Created by Er. Sangam Krishna | BPSC TRE 4.0 Study Planner', W / 2, H - 15, { align: 'center' });
-
-  // PAGE 2 - Complete Syllabus
-  newPage();
-  doc.setFontSize(14);
-  doc.setTextColor(245, 158, 11);
-  doc.text('COMPLETE SYLLABUS | BPSC TRE 4.0 Class 1-5', W / 2, y, { align: 'center' });
-  y += 10;
-
-  SYLLABUS_UNITS.filter(u => u.priority !== 'revision' && u.priority !== 'mock').forEach(unit => {
-    if (y > H - 40) newPage();
-    doc.setFillColor(30, 41, 59);
-    doc.rect(10, y, W - 20, 7, 'F');
-    doc.setFontSize(10);
-    doc.setTextColor(52, 211, 153);
-    doc.text(`${unit.subject} | ${unit.hindi}  [${unit.marks} Marks]`, 13, y + 5);
-    y += 9;
-    doc.setFontSize(9);
-    doc.setTextColor(148, 163, 184);
-    unit.topics.forEach(t => {
-      if (y > H - 15) newPage();
-      doc.text(`  • ${t}`, 13, y);
-      y += 5;
-    });
-    y += 3;
-  });
-
-  // PAGE 3+ - Day by Day Plan
-  newPage();
-  doc.setFontSize(14);
-  doc.setTextColor(245, 158, 11);
-  doc.text('DAY-BY-DAY STUDY PLAN', W / 2, y, { align: 'center' });
-  y += 10;
-
-  // Table header
-  const cols = [12, 35, 65, 155, 185];
-  function tableHeader() {
-    doc.setFillColor(30, 58, 95);
-    doc.rect(10, y, W - 20, 8, 'F');
-    doc.setFontSize(9);
-    doc.setTextColor(245, 158, 11);
-    doc.text('Day', cols[0], y + 5.5);
-    doc.text('Date', cols[1], y + 5.5);
-    doc.text('Subject', cols[2], y + 5.5);
-    doc.text('Topics', cols[3] - 90, y + 5.5);
-    doc.text('Hrs', cols[4], y + 5.5);
-    y += 10;
-  }
-  tableHeader();
-
-  let currentDate = new Date(startDate);
-  schedule.forEach((entry, idx) => {
-    const d = new Date(currentDate);
-    d.setDate(d.getDate() + idx);
-
-    if (y > H - 20) {
-      newPage();
-      tableHeader();
+    
+    // Add revision slot
+    if (day > 1 && !dayPlan.isMockDay) {
+      const previousDay = plan[day - 2];
+      if (previousDay && previousDay.slots.length > 0) {
+        dayPlan.slots.push({
+          type: 'revision',
+          subject: 'Revision',
+          hindi: 'अभ्यास',
+          topic: 'Previous Day Topics',
+          hindiTopic: 'पिछले दिन के विषय',
+          previousTopics: previousDay.slots.map(s => s.subject).join(', '),
+          slotType: 'revision'
+        });
+      }
     }
+    
+    // Add current affairs slot
+    dayPlan.slots.push({
+      type: 'current_affairs',
+      subject: 'Current Affairs',
+      hindi: 'समकालीन घटनाएँ',
+      topic: 'Daily Current Affairs',
+      hindiTopic: 'दैनिक समकालीन घटनाएँ',
+      duration: '30 min',
+      slotType: 'current'
+    });
+    
+    plan.push(dayPlan);
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  return plan;
+}
 
-    const isRev = entry.priority === 'revision';
-    const isMock = entry.priority === 'mock';
-    if (isRev) doc.setFillColor(245, 158, 11, 0.1);
-    else if (isMock) doc.setFillColor(239, 68, 68, 0.1);
-    else doc.setFillColor(15, 23, 42);
-    doc.rect(10, y - 1, W - 20, 8, 'F');
+// Get subjects list based on exam and class
+function getSubjectsList() {
+  const subjects = [];
+  
+  if (userData.exam === 'bpsc') {
+    const syllabus = userData.bpscClass === 'both' ? 
+      [...syllabusData.bpsc['1-5'], ...syllabusData.bpsc['6-8']] :
+      syllabusData.bpsc[userData.bpscClass];
+    
+    Object.entries(syllabus).forEach(([subjectName, subjectData]) => {
+      subjects.push({
+        name: subjectName,
+        hindi: getSubjectHindiName(subjectName),
+        marks: subjectData.marks,
+        topics: subjectData.topics
+      });
+    });
+  } else if (userData.exam === 'upsc') {
+    // UPSC Prelims subjects
+    Object.entries(syllabusData.upsc.prelims).forEach(([subjectName, subjectData]) => {
+      subjects.push({
+        name: subjectName,
+        hindi: getSubjectHindiName(subjectName),
+        marks: subjectData.marks,
+        topics: subjectData.topics
+      });
+    });
+  }
+  
+  return subjects;
+}
 
-    doc.setFontSize(8);
-    doc.setTextColor(isRev ? 245 : isMock ? 239 : 226, isRev ? 158 : isMock ? 68 : 232, isRev ? 11 : isMock ? 68 : 240);
-    doc.text(`${idx + 1}`, cols[0], y + 5);
-    doc.setTextColor(100, 116, 139);
-    doc.text(formatDateShort(d), cols[1], y + 5);
-    doc.setTextColor(isRev ? 245 : isMock ? 239 : 52, isRev ? 158 : isMock ? 68 : 211, isRev ? 11 : isMock ? 68 : 153);
-    doc.text(entry.subject.substring(0, 28), cols[2], y + 5);
-    doc.setTextColor(148, 163, 184);
-    const topicStr = entry.topics.slice(0, 2).join(', ');
-    doc.text(topicStr.substring(0, 45), cols[3] - 90, y + 5);
-    doc.setTextColor(59, 130, 246);
-    doc.text(`${entry.hoursToday || hours}h`, cols[4], y + 5);
-    y += 9;
+// Get Hindi name for subject
+function getSubjectHindiName(subjectName) {
+  const hindiNames = {
+    'Language': 'भाषा',
+    'General Studies': 'सामान्य अध्ययन',
+    'Subject Concerned': 'विषय विशेष',
+    'GS Paper I': 'जीएस पेपर I',
+    'CSAT Paper II': 'सीएसएटी पेपर II'
+  };
+  return hindiNames[subjectName] || subjectName;
+}
+
+// Get topic for subject
+function getTopicForSubject(subject, day, slot) {
+  const topicIndex = (day - 1) * 3 + slot;
+  const topics = subject.topics;
+  return topics[topicIndex % topics.length];
+}
+
+// Display the plan
+function displayPlan() {
+  const planBody = document.getElementById('planBody');
+  const planTitle = document.getElementById('planTitle');
+  const planSubtitle = document.getElementById('planSubtitle');
+  
+  // Set title
+  if (userData.exam === 'bpsc') {
+    planTitle.textContent = `📅 ${userData.name} का BPSC TRE 4.0 Study Plan`;
+    planSubtitle.textContent = `${userData.bpscClass === 'both' ? 'Class 1-5 & 6-8' : `Class ${userData.bpscClass}`} | ${userData.studyHours} घंटे प्रतिदिन`;
+  } else {
+    planTitle.textContent = `📅 ${userData.name} का UPSC CSE 2027 Study Plan`;
+    planSubtitle.textContent = `Prelims Focus | ${userData.studyHours} घंटे प्रतिदिन`;
+  }
+  
+  // Create tabs
+  const tabsHTML = `
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showTab('dayPlan')">📅 Day Plan</button>
+      <button class="tab-btn" onclick="showTab('syllabus')">📖 Syllabus</button>
+      <button class="tab-btn" onclick="showTab('pyqs')">🔥 PYQs</button>
+      <button class="tab-btn" onclick="showTab('examInfo')">ℹ️ Exam Info</button>
+    </div>
+  `;
+  
+  // Create content sections
+  const dayPlanHTML = generateDayPlanHTML();
+  const syllabusHTML = generateSyllabusHTML();
+  const pyqsHTML = generatePYQsHTML();
+  const examInfoHTML = generateExamInfoHTML();
+  
+  planBody.innerHTML = tabsHTML + `
+    <div id="dayPlan" class="tab-content active">${dayPlanHTML}</div>
+    <div id="syllabus" class="tab-content">${syllabusHTML}</div>
+    <div id="pyqs" class="tab-content">${pyqsHTML}</div>
+    <div id="examInfo" class="tab-content">${examInfoHTML}</div>
+  `;
+  
+  // Update progress
+  updateProgress();
+}
+
+// Generate day plan HTML
+function generateDayPlanHTML() {
+  let html = '';
+  let currentWeek = 0;
+  
+  studyPlan.forEach((day, index) => {
+    const weekNumber = Math.floor(index / 7) + 1;
+    
+    if (weekNumber !== currentWeek) {
+      currentWeek = weekNumber;
+      html += `
+        <div class="week-block">
+          <div class="week-header">Week ${weekNumber}</div>
+      `;
+    }
+    
+    const dayClasses = [];
+    if (day.isRevisionDay) dayClasses.push('revision-day');
+    if (day.isMockDay) dayClasses.push('mock-day');
+    
+    html += `
+      <div class="day-card ${dayClasses.join(' ')}">
+        <div class="day-top">
+          <span class="day-num">Day ${day.day}</span>
+          <span class="day-date">${day.date.toLocaleDateString()} ${day.dayName}</span>
+        </div>
+        <div class="day-slots-label">Daily Schedule:</div>
+        <div class="slots-row">
+    `;
+    
+    day.slots.forEach(slot => {
+      const timeDisplay = userData.timeSlots.length > 0 ? 
+        getTimeDisplay(slot.slotType) : 
+        getGenericSlotDisplay(slot.slotType);
+      
+      const slotClass = `${slot.slotType}-slot`;
+      
+      html += `
+        <div class="slot-pill ${slotClass}">
+          <span class="slot-label">${timeDisplay}</span>
+          <span class="slot-subject">${slot.subject}</span>
+          <span class="slot-topics">${slot.topic}</span>
+          ${timeDisplay.includes('AM') || timeDisplay.includes('PM') ? `<span class="slot-time">${timeDisplay}</span>` : ''}
+        </div>
+      `;
+    });
+    
+    html += `
+        </div>
+      </div>
+    `;
+    
+    // Close week block if last day of week or last day overall
+    if ((index + 1) % 7 === 0 || index === studyPlan.length - 1) {
+      html += '</div>';
+    }
   });
+  
+  return html;
+}
 
-  // Last page footer
-  if (y > H - 30) newPage();
-  y += 10;
-  doc.setFillColor(245, 158, 11);
-  doc.rect(10, y, W - 20, 0.5, 'F');
-  y += 8;
-  doc.setFontSize(10);
-  doc.setTextColor(245, 158, 11);
-  doc.text('Best of Luck! आपको शुभकामनाएं!', W / 2, y, { align: 'center' });
-  y += 7;
+// Get time display for slot
+function getTimeDisplay(slotType) {
+  const slotMapping = {
+    'morning': userData.timeSlots.includes('morning') ? 'Morning Slot' : 'Slot 1',
+    'afternoon': userData.timeSlots.includes('afternoon') ? 'Afternoon Slot' : 'Slot 2',
+    'evening': userData.timeSlots.includes('evening') ? 'Evening Slot' : 'Slot 3',
+    'revision': userData.timeSlots.includes('night') ? 'Night Revision' : 'Revision',
+    'current': userData.timeSlots.includes('forenoon') ? 'Forenoon CA' : 'Current Affairs'
+  };
+  return slotMapping[slotType] || 'Study Slot';
+}
+
+// Get generic slot display
+function getGenericSlotDisplay(slotType) {
+  const genericMapping = {
+    'morning': 'Slot 1',
+    'afternoon': 'Slot 2',
+    'evening': 'Slot 3',
+    'revision': 'Revision',
+    'current': 'Current Affairs'
+  };
+  return genericMapping[slotType] || 'Study Slot';
+}
+
+// Generate syllabus HTML
+function generateSyllabusHTML() {
+  let html = '';
+  
+  if (userData.exam === 'bpsc') {
+    const syllabusKey = userData.bpscClass === 'both' ? 
+      ['1-5', '6-8'] : [userData.bpscClass];
+    
+    syllabusKey.forEach(classLevel => {
+      html += `<div class="section-block">`;
+      html += `<h3>BPSC TRE 4.0 - Class ${classLevel} Syllabus</h3>`;
+      
+      const syllabus = syllabusData.bpsc[classLevel];
+      Object.entries(syllabus).forEach(([subjectName, subjectData]) => {
+        const borderColors = ['f59e0b', '10b981', '8b5cf6', 'ef4444', '3b82f6'];
+        const borderColor = borderColors[Object.keys(syllabus).indexOf(subjectName) % borderColors.length];
+        
+        html += `
+          <div class="syl-subject" style="border-left-color: #${borderColor}">
+            <div class="syl-head" onclick="toggleAccordion(this)">
+              <div class="syl-head-left">
+                <span class="syl-head-title">${subjectName}</span>
+                ${subjectData.hindi ? `<span class="syl-head-hindi">${getSubjectHindiName(subjectName)}</span>` : ''}
+              </div>
+              <div>
+                <span class="syl-marks">${subjectData.marks} marks</span>
+                <span class="syl-arrow">▼</span>
+              </div>
+            </div>
+            <div class="syl-body">
+        `;
+        
+        subjectData.topics.forEach(topic => {
+          html += `
+            <div class="subtopic">
+              <div class="subtopic-name">${topic.name}</div>
+              ${topic.hindi ? `<div class="subtopic-hindi">${topic.hindi}</div>` : ''}
+              <ul class="micro-list">
+                ${topic.micro.map(micro => `<li>${micro}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+        });
+        
+        html += `
+            </div>
+          </div>
+        `;
+      });
+      
+      html += `</div>`;
+    });
+  } else if (userData.exam === 'upsc') {
+    // Prelims syllabus
+    html += `<div class="section-block">`;
+    html += `<h3>UPSC CSE 2027 - Prelims Syllabus</h3>`;
+    
+    Object.entries(syllabusData.upsc.prelims).forEach(([subjectName, subjectData]) => {
+      const borderColors = ['f59e0b', '10b981', '8b5cf6', 'ef4444', '3b82f6', '06b6d4'];
+      const borderColor = borderColors[Object.keys(syllabusData.upsc.prelims).indexOf(subjectName) % borderColors.length];
+      
+      html += `
+        <div class="syl-subject" style="border-left-color: #${borderColor}">
+          <div class="syl-head" onclick="toggleAccordion(this)">
+            <div class="syl-head-left">
+              <span class="syl-head-title">${subjectName}</span>
+              <span class="syl-head-hindi">${getSubjectHindiName(subjectName)}</span>
+            </div>
+            <div>
+              <span class="syl-marks">${subjectData.marks} marks</span>
+              <span class="syl-arrow">▼</span>
+            </div>
+          </div>
+          <div class="syl-body">
+      `;
+      
+      subjectData.topics.forEach(topic => {
+        html += `
+          <div class="subtopic">
+            <div class="subtopic-name">${topic.name}</div>
+            ${topic.hindi ? `<div class="subtopic-hindi">${topic.hindi}</div>` : ''}
+            <ul class="micro-list">
+              ${topic.micro.map(micro => `<li>${micro}</li>`).join('')}
+            </ul>
+          </div>
+        `;
+      });
+      
+      html += `
+          </div>
+        </div>
+      `;
+    });
+    
+    html += `</div>`;
+    
+    // Mains syllabus note
+    html += `
+      <div class="optional-note">
+        <h4>📝 Mains & Optional Subject</h4>
+        <p>Mains syllabus (GS I, II, III, IV + Essay) will be covered after Prelims. Please select your optional subject and visit the planner again for comprehensive Mains preparation.</p>
+        <p><strong>Popular Optional Subjects:</strong> History, Geography, Public Administration, Sociology, Political Science, PSIR, Anthropology, Philosophy</p>
+      </div>
+    `;
+  }
+  
+  return html;
+}
+
+// Generate PYQs HTML
+function generatePYQsHTML() {
+  let html = '<div class="section-block">';
+  
+  if (userData.exam === 'bpsc') {
+    html += '<h3>📚 BPSC TRE 4.0 - Previous Year Questions</h3>';
+    html += `
+      <div class="pyq-grid">
+        <div class="pyq-card">
+          <h5>BPSC TRE 3.0 (2024)</h5>
+          <ul>
+            <li>Class 1-5 PRT Question Paper</li>
+            <li>Class 6-8 TGT Question Paper</li>
+            <li>Subject-wise Papers</li>
+          </ul>
+        </div>
+        <div class="pyq-card">
+          <h5>BPSC TRE 2.0 (2023)</h5>
+          <ul>
+            <li>Language Papers</li>
+            <li>General Studies Papers</li>
+            <li>Subject Papers</li>
+          </ul>
+        </div>
+        <div class="pyq-card">
+          <h5>BPSC TRE 1.0 (2022)</h5>
+          <ul>
+            <li>All Previous Papers</li>
+            <li>Answer Keys</li>
+            <li>Solution Papers</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    html += `
+      <div class="pyq-links">
+        <a href="https://www.adda247.com/teaching-jobs-exam/bpsc-teacher-previous-year-question-papers/" target="_blank" class="pyq-link">📖 Adda247 BPSC Papers</a>
+        <a href="https://www.adda247.com/teaching-jobs-exam/bpsc-tre-3-0-question-papers-2024/" target="_blank" class="pyq-link">📖 BPSC TRE 3.0 Papers</a>
+        <a href="https://testbook.com/bihar-teacher/test-series" target="_blank" class="pyq-link">📖 Testbook BPSC Papers</a>
+      </div>
+    `;
+  } else {
+    html += '<h3>📚 UPSC CSE - Previous Year Questions</h3>';
+    html += `
+      <div class="pyq-grid">
+        <div class="pyq-card">
+          <h5>UPSC Prelims 2024</h5>
+          <ul>
+            <li>GS Paper I</li>
+            <li>CSAT Paper II</li>
+            <li>Answer Keys</li>
+          </ul>
+        </div>
+        <div class="pyq-card">
+          <h5>UPSC Prelims 2023</h5>
+          <ul>
+            <li>GS Paper I</li>
+            <li>CSAT Paper II</li>
+            <li>Solution Papers</li>
+          </ul>
+        </div>
+        <div class="pyq-card">
+          <h5>UPSC Prelims 2022</h5>
+          <ul>
+            <li>GS Paper I</li>
+            <li>CSAT Paper II</li>
+            <li>Analysis Papers</li>
+          </ul>
+        </div>
+      </div>
+    `;
+    
+    html += `
+      <div class="pyq-links">
+        <a href="https://upsc.gov.in/examinations/previous-question-papers" target="_blank" class="pyq-link">📖 Official UPSC Papers</a>
+        <a href="https://www.insightsonindia.com/upsc-previous-year-question-papers/" target="_blank" class="pyq-link">📖 Insights on India</a>
+        <a href="https://www.drishtiias.com/free-downloads/upsc-previous-years-papers/prelims" target="_blank" class="pyq-link">📖 Drishti IAS Papers</a>
+      </div>
+    `;
+  }
+  
+  html += '</div>';
+  return html;
+}
+
+// Generate exam info HTML
+function generateExamInfoHTML() {
+  let html = '<div class="section-block">';
+  
+  if (userData.exam === 'bpsc') {
+    html += '<h3>📋 BPSC TRE 4.0 Exam Information</h3>';
+    html += `
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>📅 Exam Dates</h4>
+          <p><strong>Examination:</strong> 22–27 September 2026</p>
+          <p><strong>Admit Card:</strong> 2 weeks before exam</p>
+          <p><strong>Result:</strong> November 2026 (Expected)</p>
+        </div>
+        <div class="info-card">
+          <h4>📝 Exam Pattern</h4>
+          <p><strong>Total Marks:</strong> 150</p>
+          <p><strong>Duration:</strong> 2.5 hours</p>
+          <p><strong>Type:</strong> MCQ Objective</p>
+          <p><strong>Language:</strong> Hindi & English</p>
+        </div>
+        <div class="info-card">
+          <h4>🎯 Vacancies</h4>
+          <p><strong>Total Posts:</strong> 46,595</p>
+          <p><strong>Class 1-5 (PRT):</strong> ~25,000</p>
+          <p><strong>Class 6-8 (TGT):</strong> ~21,595</p>
+        </div>
+      </div>
+    `;
+  } else {
+    html += '<h3>📋 UPSC CSE 2027 Exam Information</h3>';
+    html += `
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>📅 Exam Timeline</h4>
+          <p><strong>Prelims:</strong> May 2027 (Expected)</p>
+          <p><strong>Mains:</strong> September 2027 (Expected)</p>
+          <p><strong>Interview:</strong> February-March 2028</p>
+          <p><strong>Final Result:</strong> May 2028 (Expected)</p>
+        </div>
+        <div class="info-card">
+          <h4>📝 Prelims Pattern</h4>
+          <p><strong>GS Paper I:</strong> 200 marks, 100 questions</p>
+          <p><strong>CSAT Paper II:</strong> 200 marks, 80 questions</p>
+          <p><strong>Negative Marking:</strong> GS-I: -0.66/wrong | CSAT: -0.83/wrong</p>
+          <p><strong>Duration:</strong> 2 hours each paper</p>
+        </div>
+        <div class="info-card">
+          <h4>📝 Mains Pattern</h4>
+          <p><strong>GS Papers (I-IV):</strong> 250×4 = 1000 marks</p>
+          <p><strong>Essay:</strong> 250 marks</p>
+          <p><strong>Optional:</strong> 500 marks (2 papers)</p>
+          <p><strong>Interview:</strong> 275 marks</p>
+        </div>
+      </div>
+    `;
+  }
+  
+  html += '</div>';
+  return html;
+}
+
+// Toggle accordion
+function toggleAccordion(element) {
+  const body = element.nextElementSibling;
+  const arrow = element.querySelector('.syl-arrow');
+  
+  body.classList.toggle('open');
+  arrow.style.transform = body.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+// Show tab
+function showTab(tabName) {
+  // Hide all tabs
+  document.querySelectorAll('.tab-content').forEach(tab => {
+    tab.classList.remove('active');
+  });
+  
+  // Remove active class from all buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  
+  // Show selected tab
+  document.getElementById(tabName).classList.add('active');
+  
+  // Add active class to clicked button
+  event.target.classList.add('active');
+}
+
+// Update progress
+function updateProgress() {
+  const today = new Date();
+  const startDate = userData.startDate;
+  const totalDays = studyPlan.length;
+  const daysPassed = Math.ceil((today - startDate) / (1000 * 60 * 60 * 24));
+  const progress = Math.min(Math.max((daysPassed / totalDays) * 100, 0), 100);
+  
+  // You can add a progress bar to the UI if needed
+  console.log(`Progress: ${progress.toFixed(1)}%`);
+}
+
+// Download PDF
+function downloadPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  
+  // Set font
+  doc.setFont('helvetica');
+  
+  // Add watermark
+  doc.setTextColor(200, 200, 200);
+  doc.setFontSize(8);
+  doc.text('Er. Sangam Krishna', 105, 140, { align: 'center', angle: 45 });
+  
+  // Reset text color
+  doc.setTextColor(0, 0, 0);
+  
+  // Cover page
+  doc.setFontSize(20);
+  doc.text('Smart Study Plan', 105, 30, { align: 'center' });
+  
+  doc.setFontSize(14);
+  doc.text(`By: ${userData.name}`, 105, 45, { align: 'center' });
+  doc.text(`Exam: ${userData.exam === 'bpsc' ? 'BPSC TRE 4.0' : 'UPSC CSE 2027'}`, 105, 55, { align: 'center' });
+  
+  if (userData.exam === 'bpsc') {
+    doc.text(`Class: ${userData.bpscClass}`, 105, 65, { align: 'center' });
+  }
+  
+  doc.text(`Start Date: ${userData.startDate.toLocaleDateString()}`, 105, 75, { align: 'center' });
+  doc.text(`Daily Study: ${userData.studyHours} hours`, 105, 85, { align: 'center' });
+  
+  // Add syllabus summary
+  doc.setFontSize(12);
+  doc.text('Syllabus Overview:', 20, 110);
+  
+  let yPos = 120;
+  const subjects = getSubjectsList();
+  subjects.forEach(subject => {
+    if (yPos > 270) {
+      doc.addPage();
+      yPos = 20;
+    }
+    doc.setFontSize(10);
+    doc.text(`• ${subject.name} (${subject.marks} marks)`, 25, yPos);
+    yPos += 8;
+  });
+  
+  // Add day plan summary
+  doc.addPage();
+  doc.setFontSize(12);
+  doc.text('Study Plan Summary:', 20, 20);
+  
+  yPos = 30;
   doc.setFontSize(9);
-  doc.setTextColor(100, 116, 139);
-  doc.text('Created by Er. Sangam Krishna | BPSC TRE 4.0 Study Planner', W / 2, y, { align: 'center' });
-
-  doc.save(`BPSC_TRE4_StudyPlan_${name.replace(/\s+/g, '_')}_SangamKrishna.pdf`);
+  studyPlan.slice(0, 30).forEach((day, index) => {
+    if (yPos > 270) {
+      doc.addPage();
+      yPos = 20;
+    }
+    doc.text(`Day ${day.day}: ${day.date.toLocaleDateString()}`, 25, yPos);
+    yPos += 6;
+    
+    day.slots.forEach(slot => {
+      if (yPos > 270) {
+        doc.addPage();
+        yPos = 20;
+      }
+      doc.text(`  - ${slot.subject}: ${slot.topic}`, 30, yPos);
+      yPos += 5;
+    });
+    yPos += 3;
+  });
+  
+  // Add PYQ links
+  doc.addPage();
+  doc.setFontSize(12);
+  doc.text('Previous Year Question Papers:', 20, 20);
+  
+  yPos = 30;
+  doc.setFontSize(9);
+  
+  if (userData.exam === 'bpsc') {
+    doc.text('BPSC TRE 4.0 PYQ Links:', 25, yPos);
+    yPos += 10;
+    doc.text('https://www.adda247.com/teaching-jobs-exam/bpsc-teacher-previous-year-question-papers/', 25, yPos);
+    yPos += 8;
+    doc.text('https://testbook.com/bihar-teacher/test-series', 25, yPos);
+  } else {
+    doc.text('UPSC CSE PYQ Links:', 25, yPos);
+    yPos += 10;
+    doc.text('https://upsc.gov.in/examinations/previous-question-papers', 25, yPos);
+    yPos += 8;
+    doc.text('https://www.insightsonindia.com/upsc-previous-year-question-papers/', 25, yPos);
+    yPos += 8;
+    doc.text('https://www.drishtiias.com/free-downloads/upsc-previous-years-papers/prelims', 25, yPos);
+  }
+  
+  // Save PDF
+  const filename = userData.exam === 'bpsc' ? 
+    `BPSC_TRE4_StudyPlan_${userData.name.replace(/\s+/g, '_')}_SangamKrishna.pdf` :
+    `UPSC2027_StudyPlan_${userData.name.replace(/\s+/g, '_')}_SangamKrishna.pdf`;
+  
+  doc.save(filename);
 }
 
-// ============================================================
-// UTILITY FUNCTIONS
-// ============================================================
-function formatDate(d) {
-  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-}
-function formatDateShort(d) {
-  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
-}
-function getDayName(d) {
-  return d.toLocaleDateString('en-IN', { weekday: 'short' });
-}
+// Initialize date input with today's date
+document.addEventListener('DOMContentLoaded', function() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('startDate').value = today;
+  document.getElementById('startDate').min = today;
+});

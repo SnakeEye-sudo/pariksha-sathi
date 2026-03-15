@@ -1,110 +1,122 @@
 <!DOCTYPE html>
 <html lang="hi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BPSC TRE 4.0 Study Planner | Class 1-5</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Smart Study Planner | BPSC TRE 4.0 & UPSC 2027</title>
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
-  <!-- WELCOME SCREEN -->
-  <div id="welcomeScreen" class="screen active">
-    <div class="hero">
-      <div class="badge">BPSC TRE 4.0 | Class 1-5</div>
-      <h1>📚 Smart Study Planner</h1>
-      <p class="subtitle">Personalized Day-by-Day Study Plan for Bihar Primary Teacher Exam</p>
-      <p class="exam-date-info">🗓️ Exam Date: <strong>22–27 September 2026</strong></p>
-      <button class="btn-primary" onclick="showForm()">अपना Plan बनाएं / Create Your Plan</button>
+
+<!-- ═══ WELCOME ═══ -->
+<div id="welcomeScreen" class="screen active">
+  <div class="hero">
+    <div class="badge">Er. Sangam Krishna — Study Planner</div>
+    <h1>📚 Smart Study Planner</h1>
+    <p class="subtitle">Personalized Day-by-Day Plan with Daily Revision & Time Slots</p>
+    <div class="exam-cards">
+      <div class="exam-card" onclick="selectExam('bpsc')">
+        <div class="ec-icon">🏫</div>
+        <div class="ec-title">BPSC TRE 4.0</div>
+        <div class="ec-sub">Bihar Primary/Middle Teacher<br/>Exam: 22–27 Sep 2026</div>
+        <div class="ec-badge">46,595 Vacancies</div>
+      </div>
+      <div class="exam-card" onclick="selectExam('upsc')">
+        <div class="ec-icon">🏛️</div>
+        <div class="ec-title">UPSC CSE 2027</div>
+        <div class="ec-sub">Civil Services Examination<br/>Prelims: May 2027</div>
+        <div class="ec-badge">IAS / IPS / IFS</div>
+      </div>
     </div>
   </div>
+</div>
 
-  <!-- FORM SCREEN -->
-  <div id="formScreen" class="screen">
+<!-- ═══ FORM ═══ -->
+<div id="formScreen" class="screen">
+  <div class="form-wrap">
     <div class="form-container">
-      <h2>📝 अपनी जानकारी भरें</h2>
+      <div class="form-back" onclick="showScreen('welcomeScreen')">← वापस</div>
+      <h2 id="formTitle">📝 अपनी जानकारी भरें</h2>
+
+      <!-- BPSC extra: class selection -->
+      <div id="bpscClassGroup" class="form-group hidden">
+        <label>किस Class का Syllabus चाहिए? *</label>
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="bpscClass" value="1-5" checked/>
+            <span>Class 1–5<br/><small>Primary Teacher (PRT)</small></span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="bpscClass" value="6-8"/>
+            <span>Class 6–8<br/><small>Middle Teacher (TGT)</small></span>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="bpscClass" value="both"/>
+            <span>दोनों (1–5 & 6–8)<br/><small>Combined Plan</small></span>
+          </label>
+        </div>
+      </div>
+
       <div class="form-group">
         <label>आपका नाम / Your Name *</label>
-        <input type="text" id="userName" placeholder="जैसे: Rahul Kumar" />
+        <input type="text" id="userName" placeholder="जैसे: Rahul Kumar"/>
       </div>
       <div class="form-group">
-        <label>पढ़ाई शुरू करने की तारीख / Study Start Date *</label>
-        <input type="date" id="startDate" />
+        <label>पढ़ाई शुरू करने की तारीख *</label>
+        <input type="date" id="startDate"/>
       </div>
       <div class="form-group">
-        <label>रोज़ कितने घंटे पढ़ सकते हैं? / Daily Study Hours *</label>
+        <label>रोज़ कितने घंटे पढ़ सकते हैं? *</label>
         <select id="studyHours">
-          <option value="2">2 घंटे / 2 Hours</option>
-          <option value="3">3 घंटे / 3 Hours</option>
-          <option value="4" selected>4 घंटे / 4 Hours</option>
-          <option value="5">5 घंटे / 5 Hours</option>
-          <option value="6">6 घंटे / 6 Hours</option>
-          <option value="8">8 घंटे / 8 Hours</option>
+          <option value="3">3 घंटे</option>
+          <option value="4" selected>4 घंटे</option>
+          <option value="5">5 घंटे</option>
+          <option value="6">6 घंटे</option>
+          <option value="8">8 घंटे</option>
+          <option value="10">10 घंटे</option>
         </select>
       </div>
+
+      <!-- Optional time slots -->
+      <div class="form-group">
+        <label class="opt-label">⏰ आप किस समय पढ़ सकते हैं? <span class="opt-tag">Optional</span></label>
+        <p class="opt-hint">इससे आपका plan और personalized बनेगा</p>
+        <div class="slot-grid">
+          <label class="slot-card"><input type="checkbox" name="slot" value="early_morning"/> 🌅 Early Morning<br/><small>4 AM – 6 AM</small></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="morning" checked/> ☀️ Morning<br/><small>6 AM – 9 AM</small></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="forenoon"/> 🕙 Forenoon<br/><small>9 AM – 12 PM</small></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="afternoon"/> 🌤️ Afternoon<br/><small>12 PM – 3 PM</small></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="evening" checked/> 🌆 Evening<br/><small>3 PM – 6 PM</small></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="night"/> 🌙 Night<br/><small>8 PM – 11 PM</small></label>
+        </div>
+      </div>
+
       <button class="btn-primary" onclick="generatePlan()">🚀 Plan Generate करें</button>
-      <button class="btn-secondary" onclick="showScreen('welcomeScreen')">← वापस जाएं</button>
     </div>
   </div>
+</div>
 
-  <!-- PLAN SCREEN -->
-  <div id="planScreen" class="screen">
+<!-- ═══ PLAN ═══ -->
+<div id="planScreen" class="screen">
+  <div class="plan-wrap">
     <div class="plan-header">
       <h2 id="planTitle">📅 आपका Study Plan</h2>
       <p id="planSubtitle"></p>
       <div class="plan-actions">
-        <button class="btn-download" onclick="downloadPDF()">⬇️ PDF Download करें</button>
-        <button class="btn-secondary" onclick="showScreen('formScreen')">← Edit करें</button>
+        <button class="btn-download" onclick="downloadPDF()">⬇️ PDF Download</button>
+        <button class="btn-secondary" onclick="showScreen('formScreen')">← Edit</button>
+        <button class="btn-secondary" onclick="showScreen('welcomeScreen')">🏠 Home</button>
       </div>
     </div>
-
-    <!-- SYLLABUS OVERVIEW -->
-    <div class="syllabus-overview">
-      <h3>📖 Complete Syllabus Overview | BPSC TRE 4.0 Class 1-5</h3>
-      <div class="syllabus-grid">
-        <div class="syl-card lang">
-          <h4>Part I: Language (भाषा) — 30 Marks</h4>
-          <p><strong>Qualifying (30% minimum)</strong></p>
-          <ul>
-            <li>English Grammar & Comprehension</li>
-            <li>Hindi / Urdu / Bengali (कोई एक)</li>
-            <li>व्याकरण, अपठित गद्यांश, रचना</li>
-          </ul>
-        </div>
-        <div class="syl-card gs">
-          <h4>Part II: General Studies (सामान्य अध्ययन) — 120 Marks</h4>
-          <ul>
-            <li>प्राथमिक गणित / Elementary Mathematics</li>
-            <li>मानसिक क्षमता / Mental Ability</li>
-            <li>सामान्य जागरूकता / General Awareness</li>
-            <li>सामान्य विज्ञान / General Science</li>
-            <li>सामाजिक विज्ञान / Social Science</li>
-            <li>भारतीय राष्ट्रीय आंदोलन / Indian National Movement</li>
-            <li>भूगोल / Geography</li>
-            <li>पर्यावरण / Environment (EVS)</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-
-    <!-- PYQ SECTION -->
-    <div class="pyq-section">
-      <h3>🔥 Important PYQ Topics (TRE 1.0, 2.0, 3.0 से)</h3>
-      <div class="pyq-grid" id="pyqGrid"></div>
-    </div>
-
-    <!-- DAY BY DAY PLAN -->
-    <div class="plan-table-container">
-      <h3>📅 Day-by-Day Study Plan</h3>
-      <div id="planTable"></div>
-    </div>
+    <div id="planBody"></div>
   </div>
-
   <footer>
-    <p>Made with ❤️ by <strong>Er. Sangam Krishna</strong> | BPSC TRE 4.0 Study Planner</p>
-    <p>Exam Date: 22–27 September 2026 | 46,595 Vacancies</p>
+    <p>Made with ❤️ by <strong>Er. Sangam Krishna</strong> | Smart Study Planner</p>
+    <p>BPSC TRE 4.0 Exam: 22–27 Sep 2026 | UPSC CSE 2027</p>
   </footer>
+</div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
