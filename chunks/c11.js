@@ -126,9 +126,9 @@ function generateExamInfoHTML() {
       <div class="info-grid">
         <div class="info-card">
           <h4>📅 Important Dates</h4>
-          <p><strong>Exam Date:</strong> 22–27 Sep 2026</p>
+          <p><strong>Exam Date:</strong> Sep 2026 (Tentative)</p>
           <p><strong>Notification:</strong> BPSC Official</p>
-          <p><strong>Plan Ends:</strong> 7 Sep 2026 (15 days before)</p>
+          <p><strong>Plan Ends:</strong> 15 days before exam</p>
         </div>
         <div class="info-card">
           <h4>📝 Exam Pattern</h4>
