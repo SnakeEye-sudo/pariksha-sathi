@@ -1,0 +1,27 @@
+name: Telegram Daily Reminder
+
+on:
+  schedule:
+    # Daily at 6:00 AM IST (12:30 AM UTC)
+    - cron: '30 0 * * *'
+  workflow_dispatch: # manual trigger for testing
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Send daily Telegram reminders
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: python telegram_bot/send_daily.py
