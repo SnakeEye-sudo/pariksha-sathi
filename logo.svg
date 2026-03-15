@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f1117"/>
+      <stop offset="100%" style="stop-color:#1a1d2e"/>
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="50%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f97316"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24"/>
+      <stop offset="100%" style="stop-color:#f97316"/>
+    </linearGradient>
+    <linearGradient id="dotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#34d399"/>
+      <stop offset="100%" style="stop-color:#10b981"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softglow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bgGrad)"/>
+
+  <!-- Outer decorative ring -->
+  <circle cx="256" cy="256" r="230" fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.4"/>
+
+  <!-- Inner ring -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="url(#ringGrad)" stroke-width="1" opacity="0.2"/>
+
+  <!-- Glow circle behind PS -->
+  <circle cx="256" cy="230" r="130" fill="#f59e0b" opacity="0.06" filter="url(#glow)"/>
+
+  <!-- Book icon (open book) -->
+  <g transform="translate(256, 175)" filter="url(#softglow)">
+    <!-- Left page -->
+    <path d="M-70 -30 Q-70 -45 -55 -48 L-10 -52 L-10 52 L-55 48 Q-70 45 -70 30 Z"
+          fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.7"/>
+    <!-- Right page -->
+    <path d="M70 -30 Q70 -45 55 -48 L10 -52 L10 52 L55 48 Q70 45 70 30 Z"
+          fill="none" stroke="url(#ringGrad)" stroke-width="3" opacity="0.7"/>
+    <!-- Spine -->
+    <line x1="0" y1="-52" x2="0" y2="52" stroke="url(#ringGrad)" stroke-width="3" opacity="0.9"/>
+    <!-- Lines on left page -->
+    <line x1="-55" y1="-20" x2="-15" y2="-22" stroke="#fbbf24" stroke-width="2" opacity="0.4"/>
+    <line x1="-55" y1="-5" x2="-15" y2="-7" stroke="#fbbf24" stroke-width="2" opacity="0.4"/>
+    <line x1="-55" y1="10" x2="-15" y2="8" stroke="#fbbf24" stroke-width="2" opacity="0.4"/>
+    <line x1="-55" y1="25" x2="-30" y2="23" stroke="#fbbf24" stroke-width="2" opacity="0.3"/>
+    <!-- Lines on right page -->
+    <line x1="15" y1="-22" x2="55" y2="-20" stroke="#fbbf24" stroke-width="2" opacity="0.4"/>
+    <line x1="15" y1="-7" x2="55" y2="-5" stroke="#fbbf24" stroke-width="2" opacity="0.4"/>
+    <line x1="15" y1="8" x2="55" y2="10" stroke="#fbbf24" stroke-width="2" opacity="0.4"/>
+    <line x1="15" y1="23" x2="40" y2="25" stroke="#fbbf24" stroke-width="2" opacity="0.3"/>
+  </g>
+
+  <!-- PS Text -->
+  <text x="256" y="360"
+        font-family="'Arial Black', 'Helvetica Neue', sans-serif"
+        font-size="88"
+        font-weight="900"
+        text-anchor="middle"
+        fill="url(#textGrad)"
+        filter="url(#softglow)"
+        letter-spacing="-2">PS</text>
+
+  <!-- Tagline -->
+  <text x="256" y="400"
+        font-family="Arial, sans-serif"
+        font-size="22"
+        font-weight="600"
+        text-anchor="middle"
+        fill="#94a3b8"
+        letter-spacing="4">PARIKSHA SATHI</text>
+
+  <!-- Green dot accent (top right of ring) -->
+  <circle cx="430" cy="130" r="12" fill="url(#dotGrad)" filter="url(#softglow)"/>
+  <circle cx="82" cy="382" r="8" fill="#f59e0b" opacity="0.5"/>
+  <circle cx="400" cy="390" r="5" fill="#f97316" opacity="0.4"/>
+
+  <!-- Corner accent dots on ring -->
+  <circle cx="256" cy="26" r="5" fill="url(#ringGrad)" opacity="0.8"/>
+  <circle cx="256" cy="486" r="5" fill="url(#ringGrad)" opacity="0.8"/>
+</svg>
+</svg>
