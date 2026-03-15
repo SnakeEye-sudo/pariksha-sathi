@@ -68,12 +68,6 @@ function generatePlan() {
   savePlanToStorage();
   renderPlan();
   showScreen('planScreen');
-  // Ask about Telegram after short delay
-  setTimeout(() => {
-    if (!localStorage.getItem('pariksha_tg_chatid')) {
-      setupTelegramReminder();
-    }
-  }, 2000);
 }
 
 // Subject priority weights by exam type
