@@ -1356,31 +1356,70 @@ function generatePlan() {
 }
 
 // Subject priority weights by exam type
-// Higher weight = more slots allocated = more important for exam
+// Higher weight = more frequently scheduled
+// BPSC TRE & UPSC are ARTS-heavy exams — GS/History/Polity/Geography dominate
 function getSubjectWeights(subjects, exam) {
   const bpscPriority = {
-    'Mathematics': 5, 'Reasoning': 4, 'General Science': 4,
-    'General Studies': 4, 'History': 3, 'Geography': 3,
-    'Polity': 3, 'Economy': 3, 'Environment': 2,
-    'Computer': 2, 'Child Development': 3, 'Language': 1
+    // High weight — core GS subjects, max marks
+    'GENERAL STUDIES': 5,
+    'HISTORY': 5,
+    'POLITY': 5,
+    'GEOGRAPHY': 5,
+    'ENVIRONMENT': 4,
+    'ECONOMY': 4,
+    'CHILD DEVELOPMENT': 4,
+    'PEDAGOGY': 4,
+    // Medium — supporting subjects
+    'SCIENCE': 3,
+    'REASONING': 3,
+    'COMPUTER': 2,
+    // Low — maths is small section, language is qualifying
+    'MATHEMATICS': 2,
+    'MATHS': 2,
+    'LANGUAGE': 1,
+    'HINDI': 1,
+    'ENGLISH': 1,
   };
   const upscPriority = {
-    'Prelims': 5, 'History': 4, 'Geography': 4, 'Polity': 5,
-    'Economy': 4, 'Environment': 4, 'Science': 3, 'Ethics': 3,
-    'IR': 3, 'Internal Security': 2, 'Optional': 5
+    // Very high — core mains subjects
+    'HISTORY': 5,
+    'POLITY': 5,
+    'GEOGRAPHY': 5,
+    'ECONOMY': 5,
+    'ENVIRONMENT': 5,
+    'ETHICS': 5,
+    'OPTIONAL': 5,
+    // High — prelims + IR
+    'PRELIMS': 4,
+    'INTERNATIONAL': 4,
+    'GOVERNANCE': 4,
+    'SOCIAL': 4,
+    // Medium — science & tech, security
+    'SCIENCE': 3,
+    'TECHNOLOGY': 3,
+    'SECURITY': 3,
+    // Low — no maths in UPSC
+    'MATHEMATICS': 1,
+    'MATHS': 1,
+    'LANGUAGE': 1,
   };
+
   const priorityMap = exam === 'bpsc' ? bpscPriority : upscPriority;
 
   return subjects.map(subj => {
-    let weight = 2; // default
     const name = subj.name.toUpperCase();
-    Object.entries(priorityMap).forEach(([key, w]) => {
-      if (name.includes(key.toUpperCase())) weight = Math.max(weight, w);
-    });
-    // Optional subject always high priority
-    if (name.includes('OPTIONAL') || name.includes('PAPER I') || name.includes('PAPER II')) weight = 5;
-    // Language/qualifying always lowest
-    if (name.includes('LANGUAGE') || name.includes('QUALIFYING')) weight = 1;
+    let weight = 3; // default medium
+    // Match against priority map keys
+    for (const [key, w] of Object.entries(priorityMap)) {
+      if (name.includes(key)) {
+        weight = Math.max(weight, w);
+      }
+    }
+    // Language/qualifying always lowest regardless
+    if (name.includes('LANGUAGE') || name.includes('QUALIFYING') ||
+        name.includes('PART I') && name.includes('LANG')) {
+      weight = 1;
+    }
     return weight;
   });
 }
