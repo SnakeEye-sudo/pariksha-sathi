@@ -64,6 +64,10 @@ function generatePlan() {
 
   const slots = [];
   document.querySelectorAll('input[name="slot"]:checked').forEach(s => slots.push(s.value));
+  if (!slots.length) {
+    alert(lang === 'en' ? 'Please select at least one study time slot!' : 'कृपया कम से कम एक time slot चुनें!');
+    return;
+  }
 
   let bpscClass = '', optionalSubject = '', upscYear = '2027';
 
@@ -81,7 +85,22 @@ function generatePlan() {
     upscYear = yrEl ? yrEl.value : '2027';
   }
 
-  userData = { name, exam: selectedExam, bpscClass, optionalSubject, upscYear, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
+  // Year picker support
+  const yearPickerEl = document.querySelector('input[name="examYear"]:checked');
+  const selectedExamYear = yearPickerEl ? parseInt(yearPickerEl.value) : null;
+
+  userData = {
+    name, exam: selectedExam, bpscClass, optionalSubject, upscYear,
+    startDate: new Date(startDate), studyHours: hours, timeSlots: slots,
+    // Combined exam fields (set by c25.js if in combined mode)
+    _combinedExam1: userData._combinedExam1 || '',
+    _combinedExam2: userData._combinedExam2 || '',
+    _combinedRecommendedHours: userData._combinedRecommendedHours || 0,
+    // Year picker
+    _selectedExamYear: selectedExamYear || userData._selectedExamYear || null,
+    _selectedExamMonth: userData._selectedExamMonth || null,
+    _selectedExamDay: userData._selectedExamDay || null,
+  };
   studyPlan = buildPlan();
   savePlanToStorage();
   renderPlan();
@@ -224,7 +243,13 @@ function buildPlan() {
     return chosen;
   }
 
-  const slotTypes = ['morning', 'afternoon', 'evening'];
+  // ── Use ONLY the slots the user selected ──────────────────────
+  const SLOT_ORDER = ['early_morning','morning','forenoon','afternoon','evening','night'];
+  const userSlots = (userData.timeSlots && userData.timeSlots.length)
+    ? SLOT_ORDER.filter(s => userData.timeSlots.includes(s))
+    : ['morning','afternoon','evening']; // fallback if none selected
+  const slotTypes = userSlots;
+
   let cur = new Date(userData.startDate);
   // Track last 2 days' subject indices for consecutive-day check
   const recentSubjectDays = []; // recentSubjectDays[0] = yesterday, [1] = day before

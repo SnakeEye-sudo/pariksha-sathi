@@ -126,10 +126,49 @@ function renderStreakBadge() {
   const el = document.getElementById('streakBadge');
   if (!el) return;
   const s = getStreak();
-  const fire = s.count >= 7 ? '🔥' : s.count >= 3 ? '⚡' : '📅';
-  el.innerHTML = `${fire} <span class="streak-num">${s.count}</span> ${lang === 'hi' ? 'दिन की Streak' : 'Day Streak'}
-    <span class="streak-best">${lang === 'hi' ? 'Best:' : 'Best:'} ${s.longest}</span>`;
-  el.title = lang === 'hi' ? `सबसे लंबी streak: ${s.longest} दिन` : `Longest streak: ${s.longest} days`;
+  const count = s.count || 0;
+  const longest = s.longest || 0;
+
+  // Determine tier
+  const tier = count >= 30 ? 'diamond' : count >= 14 ? 'gold' : count >= 7 ? 'fire' : count >= 3 ? 'spark' : 'start';
+  const tierConfig = {
+    diamond: { icon:'💎', color:'#a78bfa', glow:'rgba(167,139,250,.4)', label: lang==='hi'?'Diamond Streak':'Diamond Streak' },
+    gold:    { icon:'🏆', color:'#fbbf24', glow:'rgba(251,191,36,.4)',  label: lang==='hi'?'Gold Streak':'Gold Streak' },
+    fire:    { icon:'🔥', color:'#f97316', glow:'rgba(249,115,22,.4)',  label: lang==='hi'?'Fire Streak':'Fire Streak' },
+    spark:   { icon:'⚡', color:'#facc15', glow:'rgba(250,204,21,.4)',  label: lang==='hi'?'Spark Streak':'Spark Streak' },
+    start:   { icon:'📅', color:'#94a3b8', glow:'rgba(148,163,184,.2)', label: lang==='hi'?'Streak':'Streak' },
+  };
+  const cfg = tierConfig[tier];
+
+  // Build circular progress (max 30 days for full circle)
+  const maxDays = tier === 'diamond' ? 60 : tier === 'gold' ? 30 : tier === 'fire' ? 14 : tier === 'spark' ? 7 : 3;
+  const pct = Math.min(100, Math.round((count / maxDays) * 100));
+  const circumference = 2 * Math.PI * 20; // r=20
+  const dashOffset = circumference - (pct / 100) * circumference;
+
+  el.innerHTML = `
+    <div class="streak-badge-inner" style="--streak-color:${cfg.color};--streak-glow:${cfg.glow}">
+      <div class="streak-ring-wrap">
+        <svg class="streak-ring-svg" viewBox="0 0 48 48" width="64" height="64">
+          <circle cx="24" cy="24" r="20" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3.5"/>
+          <circle cx="24" cy="24" r="20" fill="none" stroke="${cfg.color}" stroke-width="3.5"
+            stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}"
+            stroke-linecap="round" transform="rotate(-90 24 24)"
+            style="filter:drop-shadow(0 0 4px ${cfg.color});transition:stroke-dashoffset .6s ease"/>
+        </svg>
+        <div class="streak-ring-center">
+          <span class="streak-ring-icon">${cfg.icon}</span>
+          <span class="streak-ring-num" style="color:${cfg.color}">${count}</span>
+        </div>
+      </div>
+      <div class="streak-info">
+        <div class="streak-label" style="color:${cfg.color}">${cfg.label}</div>
+        <div class="streak-days-text">${lang==='hi' ? `${count} दिन लगातार` : `${count} day${count!==1?'s':''} in a row`}</div>
+        <div class="streak-best-text">${lang==='hi' ? `🏅 Best: ${longest} दिन` : `🏅 Best: ${longest} day${longest!==1?'s':''}`}</div>
+      </div>
+    </div>
+  `;
+  el.title = lang === 'hi' ? `सबसे लंबी streak: ${longest} दिन` : `Longest streak: ${longest} days`;
 }
 
 // ── Reschedule helpers ────────────────────────────────────────

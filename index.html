@@ -246,8 +246,8 @@ function updateAuthUI(user) {
       </div>
     </div>
 
-    <!-- 🏛️ Civil Services -->
-    <div class="exam-category-label">🏛️ Civil Services</div>
+    <!-- 🏛️ Civil Services & State PSC -->
+    <div class="exam-category-label">🏛️ Civil Services & State PSC</div>
     <div class="exam-cards">
       <div class="exam-card upsc-card" onclick="selectExam('upsc_2026')">
         <div class="ec-top">
@@ -281,11 +281,6 @@ function updateAuthUI(user) {
         </div>
         <div class="ec-btn"><span data-i18n="upscBtn">Plan बनाएं</span> <span class="ec-arrow">→</span></div>
       </div>
-    </div>
-
-    <!-- ⚖️ State PSC -->
-    <div class="exam-category-label">⚖️ State PSC</div>
-    <div class="exam-cards">
       <div class="exam-card bpsc71-card" onclick="selectExam('bpsc_71')">
         <div class="ec-top">
           <div class="ec-icon-wrap bpsc71-icon-wrap">⚖️</div>
@@ -298,7 +293,7 @@ function updateAuthUI(user) {
         <div class="ec-details">
           <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Mains: Apr 25–30, 2026</span></div>
           <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>1,298 Vacancies</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Mains + Interview</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">�</span><span>Mains + Interview</span></div>
         </div>
         <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
       </div>
@@ -314,6 +309,70 @@ function updateAuthUI(user) {
         <div class="ec-details">
           <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Jul 2026</span></div>
           <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~1500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card uppsc-card" onclick="selectExam('uppsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap uppsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">UPPSC PCS 2026</div>
+            <div class="ec-sub">Uttar Pradesh PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Dec 6, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card mppsc-card" onclick="selectExam('mppsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap mppsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">MPPSC SSE 2026</div>
+            <div class="ec-sub">Madhya Pradesh PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Apr 26, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>155–191 Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card rpsc-card" onclick="selectExam('rpsc_ras_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap rpsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">RPSC RAS 2026</div>
+            <div class="ec-sub">Rajasthan Administrative Service</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Jun–Jul 2026 (Tentative)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>New Syllabus 2026</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card mpsc-card" onclick="selectExam('mpsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap mpsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">MPSC Rajyaseva 2026</div>
+            <div class="ec-sub">Maharashtra PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Mains: Mar–Apr 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>79 Vacancies (Group A & B)</span></div>
           <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
         </div>
         <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
@@ -489,75 +548,30 @@ function updateAuthUI(user) {
       </div>
     </div>
 
-    <!-- 🗺️ Other State PSC -->
-    <div class="exam-category-label">🗺️ Other State PSC</div>
+    <!-- Combined Syllabus Option -->
+    <div class="exam-category-label">&#x1F517; Do Exams Ek Saath</div>
     <div class="exam-cards">
-      <div class="exam-card uppsc-card" onclick="selectExam('uppsc_2026')">
+      <div class="exam-card combined-card" onclick="selectCombinedExam()">
+        <div class="ec-ribbon" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">New Feature</div>
         <div class="ec-top">
-          <div class="ec-icon-wrap uppsc-icon-wrap">⚖️</div>
+          <div class="ec-icon-wrap" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(236,72,153,.2));border-color:rgba(139,92,246,.3)">🔗</div>
           <div class="ec-info">
-            <div class="ec-title">UPPSC PCS 2026</div>
-            <div class="ec-sub">Uttar Pradesh PSC</div>
+            <div class="ec-title">Combined Dual Exam Plan</div>
+            <div class="ec-sub">Do exams ek saath prepare karein</div>
           </div>
         </div>
         <div class="ec-divider"></div>
         <div class="ec-details">
-          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Dec 6, 2026</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>UPSC + BPSC / BPSC + SSC etc.</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📊</span><span>Smart combined syllabus + hours calculation</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">⏰</span><span>Aapke time ke hisab se plan</span></div>
         </div>
-        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
-      </div>
-      <div class="exam-card mppsc-card" onclick="selectExam('mppsc_2026')">
-        <div class="ec-top">
-          <div class="ec-icon-wrap mppsc-icon-wrap">⚖️</div>
-          <div class="ec-info">
-            <div class="ec-title">MPPSC SSE 2026</div>
-            <div class="ec-sub">Madhya Pradesh PSC</div>
-          </div>
-        </div>
-        <div class="ec-divider"></div>
-        <div class="ec-details">
-          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Apr 26, 2026</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>155–191 Vacancies</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
-        </div>
-        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
-      </div>
-      <div class="exam-card rpsc-card" onclick="selectExam('rpsc_ras_2026')">
-        <div class="ec-top">
-          <div class="ec-icon-wrap rpsc-icon-wrap">⚖️</div>
-          <div class="ec-info">
-            <div class="ec-title">RPSC RAS 2026</div>
-            <div class="ec-sub">Rajasthan Administrative Service</div>
-          </div>
-        </div>
-        <div class="ec-divider"></div>
-        <div class="ec-details">
-          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Jun–Jul 2026 (Tentative)</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>New Syllabus 2026</span></div>
-        </div>
-        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
-      </div>
-      <div class="exam-card mpsc-card" onclick="selectExam('mpsc_2026')">
-        <div class="ec-top">
-          <div class="ec-icon-wrap mpsc-icon-wrap">⚖️</div>
-          <div class="ec-info">
-            <div class="ec-title">MPSC Rajyaseva 2026</div>
-            <div class="ec-sub">Maharashtra PSC</div>
-          </div>
-        </div>
-        <div class="ec-divider"></div>
-        <div class="ec-details">
-          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Mains: Mar–Apr 2026</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>79 Vacancies (Group A & B)</span></div>
-          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
-        </div>
-        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+        <div class="ec-btn" style="background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(236,72,153,.15));border-color:rgba(139,92,246,.3)"><span>Combined Plan बनाएं</span> <span class="ec-arrow">→</span></div>
       </div>
     </div>
 
+
+    <!-- Combined Exam Modal (injected by JS) -->
 
     <div class="hero-footer-note">
       <span data-i18n="footerBy">Made with ❤️ by</span> <strong>Er. Sangam Krishna</strong>
@@ -741,13 +755,13 @@ function updateAuthUI(user) {
         <div class="slot-grid">
           <label class="slot-card"><input type="checkbox" name="slot" value="early_morning"/>
             <div class="slot-inner"><span class="slot-emoji">🌅</span><span class="slot-name">Early Morning</span><span class="slot-time-txt">4–6 AM</span></div></label>
-          <label class="slot-card"><input type="checkbox" name="slot" value="morning" checked/>
+          <label class="slot-card"><input type="checkbox" name="slot" value="morning"/>
             <div class="slot-inner"><span class="slot-emoji">☀️</span><span class="slot-name">Morning</span><span class="slot-time-txt">6–9 AM</span></div></label>
           <label class="slot-card"><input type="checkbox" name="slot" value="forenoon"/>
             <div class="slot-inner"><span class="slot-emoji">🕙</span><span class="slot-name">Forenoon</span><span class="slot-time-txt">9 AM–12 PM</span></div></label>
           <label class="slot-card"><input type="checkbox" name="slot" value="afternoon"/>
             <div class="slot-inner"><span class="slot-emoji">🌤️</span><span class="slot-name">Afternoon</span><span class="slot-time-txt">12–3 PM</span></div></label>
-          <label class="slot-card"><input type="checkbox" name="slot" value="evening" checked/>
+          <label class="slot-card"><input type="checkbox" name="slot" value="evening"/>
             <div class="slot-inner"><span class="slot-emoji">🌆</span><span class="slot-name">Evening</span><span class="slot-time-txt">3–6 PM</span></div></label>
           <label class="slot-card"><input type="checkbox" name="slot" value="night"/>
             <div class="slot-inner"><span class="slot-emoji">🌙</span><span class="slot-name">Night</span><span class="slot-time-txt">8–11 PM</span></div></label>

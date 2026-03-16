@@ -7,13 +7,21 @@ function renderPlan() {
     psychology: 'Psychology', economics: 'Economics', law: 'Law'
   };
   const yr = userData.upscYear || '2027';
-  const examLabel = userData.exam === 'bpsc'
-    ? (userData.bpscClass === '1-5' ? 'BPSC TRE 4.0 — Class 1–5 (PRT)'
-      : userData.bpscClass === '6-8' ? 'BPSC TRE 4.0 — Class 6–8 (TGT)'
-      : 'BPSC TRE 4.0 — Class 1–5 & 6–8')
-    : userData.optionalSubject
-      ? `UPSC CSE ${yr} • ${optionalNames[userData.optionalSubject] || userData.optionalSubject} Optional`
-      : `UPSC CSE ${yr}`;
+  let examLabel;
+  if (userData.exam === 'combined' && userData._combinedExam1 && userData._combinedExam2) {
+    const COMB_OPTS = typeof COMBINED_EXAM_OPTIONS !== 'undefined' ? COMBINED_EXAM_OPTIONS : [];
+    const l1 = COMB_OPTS.find(e=>e.id===userData._combinedExam1)?.label || userData._combinedExam1;
+    const l2 = COMB_OPTS.find(e=>e.id===userData._combinedExam2)?.label || userData._combinedExam2;
+    examLabel = `${l1} + ${l2} (Combined)`;
+  } else {
+    examLabel = userData.exam === 'bpsc'
+      ? (userData.bpscClass === '1-5' ? 'BPSC TRE 4.0 — Class 1–5 (PRT)'
+        : userData.bpscClass === '6-8' ? 'BPSC TRE 4.0 — Class 6–8 (TGT)'
+        : 'BPSC TRE 4.0 — Class 1–5 & 6–8')
+      : userData.optionalSubject
+        ? `UPSC CSE ${yr} • ${optionalNames[userData.optionalSubject] || userData.optionalSubject} Optional`
+        : `UPSC CSE ${yr}`;
+  }
 
   const daysUnit = lang === 'en' ? 'days' : 'दिन';
   const hrsUnit  = lang === 'en' ? 'hrs/day' : 'घंटे/दिन';
@@ -49,11 +57,14 @@ function renderPlan() {
 }
 
 const SLOT_META = {
-  morning:   { label:'☀️ Morning',   cls:'morning-slot',   time:'6–9 AM'   },
-  afternoon: { label:'🌤️ Afternoon', cls:'afternoon-slot', time:'12–3 PM'  },
-  evening:   { label:'🌆 Evening',   cls:'evening-slot',   time:'3–6 PM'   },
-  revision:  { label:'🔄 Revision',  cls:'revision-slot',  time:'1 hr'     },
-  current:   { label:'📰 Current Affairs', cls:'current-slot', time:'30 min' },
+  early_morning: { label:'🌅 Early Morning', cls:'early-slot',     time:'4–6 AM'      },
+  morning:       { label:'☀️ Morning',       cls:'morning-slot',   time:'6–9 AM'      },
+  forenoon:      { label:'🕙 Forenoon',      cls:'forenoon-slot',  time:'9 AM–12 PM'  },
+  afternoon:     { label:'🌤️ Afternoon',     cls:'afternoon-slot', time:'12–3 PM'     },
+  evening:       { label:'🌆 Evening',       cls:'evening-slot',   time:'3–6 PM'      },
+  night:         { label:'🌙 Night',         cls:'night-slot',     time:'8–11 PM'     },
+  revision:      { label:'🔄 Revision',      cls:'revision-slot',  time:'1 hr'        },
+  current:       { label:'📰 Current Affairs',cls:'current-slot', time:'30 min'      },
 };
 
 function generateDayPlanHTML() {
