@@ -54,7 +54,7 @@
 
     <div class="hero-stats">
       <div class="hstat">
-        <div class="hstat-num">11+</div>
+        <div class="hstat-num">18+</div>
         <div class="hstat-lbl" data-i18n="statExams">Exams</div>
       </div>
       <div class="hstat-sep"></div>
@@ -278,6 +278,133 @@
           <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Apr 12, 2026</span></div>
           <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~400+ Vacancies</span></div>
           <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Maths + GAT + SSB</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 🩺 Medical -->
+    <div class="exam-category-label">🩺 Medical</div>
+    <div class="exam-cards">
+      <div class="exam-card neet-card" onclick="selectExam('neet_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap neet-icon-wrap">🩺</div>
+          <div class="ec-info">
+            <div class="ec-title">NEET UG 2026</div>
+            <div class="ec-sub">National Eligibility cum Entrance Test</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: May 3, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>1 Lakh+ MBBS/BDS/AYUSH Seats</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>MCQ • 720 Marks • Offline</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- ⚙️ Engineering -->
+    <div class="exam-category-label">⚙️ Engineering</div>
+    <div class="exam-cards">
+      <div class="exam-card jee-card" onclick="selectExam('jee_main_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap jee-icon-wrap">⚙️</div>
+          <div class="ec-info">
+            <div class="ec-title">JEE Main 2026</div>
+            <div class="ec-sub">NITs / IIITs / GFTIs</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Session 2: Apr 1–10, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>NITs / IIITs / GFTIs</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>CBT • 300 Marks</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card jee-adv-card" onclick="selectExam('jee_advanced_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap jee-adv-icon-wrap">🎓</div>
+          <div class="ec-info">
+            <div class="ec-title">JEE Advanced 2026</div>
+            <div class="ec-sub">IITs — IIT Roorkee</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: May 17, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>IIT Seats (~17,000)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Paper 1 + Paper 2 • CBT</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 🗺️ Other State PSC -->
+    <div class="exam-category-label">🗺️ Other State PSC</div>
+    <div class="exam-cards">
+      <div class="exam-card uppsc-card" onclick="selectExam('uppsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap uppsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">UPPSC PCS 2026</div>
+            <div class="ec-sub">Uttar Pradesh PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Dec 6, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card mppsc-card" onclick="selectExam('mppsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap mppsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">MPPSC SSE 2026</div>
+            <div class="ec-sub">Madhya Pradesh PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Apr 26, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>155–191 Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card rpsc-card" onclick="selectExam('rpsc_ras_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap rpsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">RPSC RAS 2026</div>
+            <div class="ec-sub">Rajasthan Administrative Service</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: May 2026 (Tentative)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>New Syllabus 2026</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card mpsc-card" onclick="selectExam('mpsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap mpsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">MPSC Rajyaseva 2026</div>
+            <div class="ec-sub">Maharashtra PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Mains: Mar–Apr 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>79 Vacancies (Group A & B)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
         </div>
         <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
       </div>

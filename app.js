@@ -3692,3 +3692,536 @@ const syl_nda = {
     ]
   }
 };
+
+// ═══ chunks/c19.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c19.js — Exam Registry Extension: NEET, JEE Main, JEE Advanced,
+//           UPPSC, MPPSC, RPSC RAS, MPSC
+// By Er. Sangam Krishna | ParikshaSathi
+// ═══════════════════════════════════════════════════════════════
+
+Object.assign(EXAM_REGISTRY, {
+
+  // ── NEET UG 2026 ─────────────────────────────────────────────
+  neet_2026: {
+    id: 'neet_2026', title: 'NEET UG 2026', subtitle: 'National Eligibility cum Entrance Test',
+    icon: '🩺', color: '#10b981', cardClass: 'neet-card',
+    examDate: new Date('2026-05-03'), category: 'medical',
+    vacancies: '1 Lakh+ MBBS/BDS/AYUSH Seats', pattern: 'MCQ • 720 Marks • Offline',
+    getSyllabus: () => syl_neet,
+    priorityMap: {
+      'BIOLOGY':5,'BOTANY':5,'ZOOLOGY':5,'PHYSICS':4,'CHEMISTRY':4,
+      'ORGANIC':4,'INORGANIC':3,'PHYSICAL':4,'MECHANICS':4,'OPTICS':3,
+      'GENETICS':5,'ECOLOGY':4,'HUMAN PHYSIOLOGY':5,'CELL':5,'EVOLUTION':4
+    }
+  },
+
+  // ── JEE Main 2026 ────────────────────────────────────────────
+  jee_main_2026: {
+    id: 'jee_main_2026', title: 'JEE Main 2026', subtitle: 'Joint Entrance Exam — NITs/IIITs/GFTIs',
+    icon: '⚙️', color: '#3b82f6', cardClass: 'jee-card',
+    examDate: new Date('2026-04-05'), category: 'engineering',
+    vacancies: 'NITs / IIITs / GFTIs', pattern: 'CBT • 300 Marks • Session 2: Apr 2026',
+    getSyllabus: () => syl_jee_main,
+    priorityMap: {
+      'MATHEMATICS':5,'MATHS':5,'PHYSICS':5,'CHEMISTRY':4,
+      'ORGANIC':4,'INORGANIC':3,'PHYSICAL':4,'CALCULUS':5,'ALGEBRA':5,
+      'MECHANICS':5,'ELECTROSTATICS':4,'OPTICS':3,'THERMODYNAMICS':4
+    }
+  },
+
+  // ── JEE Advanced 2026 ────────────────────────────────────────
+  jee_advanced_2026: {
+    id: 'jee_advanced_2026', title: 'JEE Advanced 2026', subtitle: 'Joint Entrance Exam — IITs (IIT Roorkee)',
+    icon: '🎓', color: '#f59e0b', cardClass: 'jee-adv-card',
+    examDate: new Date('2026-05-17'), category: 'engineering',
+    vacancies: 'IIT Seats (~17,000)', pattern: 'Paper 1 + Paper 2 • CBT',
+    getSyllabus: () => syl_jee_advanced,
+    priorityMap: {
+      'MATHEMATICS':5,'MATHS':5,'PHYSICS':5,'CHEMISTRY':4,
+      'ORGANIC':5,'INORGANIC':4,'PHYSICAL':5,'CALCULUS':5,'ALGEBRA':5,
+      'MECHANICS':5,'ELECTROSTATICS':5,'OPTICS':4,'THERMODYNAMICS':5
+    }
+  },
+
+  // ── UPPSC PCS 2026 ───────────────────────────────────────────
+  uppsc_2026: {
+    id: 'uppsc_2026', title: 'UPPSC PCS 2026', subtitle: 'Uttar Pradesh Public Service Commission',
+    icon: '⚖️', color: '#8b5cf6', cardClass: 'uppsc-card',
+    examDate: new Date('2026-12-06'), category: 'state_psc',
+    vacancies: '~500+', pattern: 'Pre + Mains + Interview',
+    getSyllabus: () => syl_uppsc,
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':4,
+      'SCIENCE':4,'CURRENT':4,'UP':5,'UTTAR PRADESH':5,'ETHICS':4,
+      'REASONING':3,'MATHEMATICS':2,'LANGUAGE':1,'HINDI':2,'ENGLISH':1
+    }
+  },
+
+  // ── MPPSC SSE 2026 ───────────────────────────────────────────
+  mppsc_2026: {
+    id: 'mppsc_2026', title: 'MPPSC SSE 2026', subtitle: 'Madhya Pradesh State Service Exam',
+    icon: '⚖️', color: '#f97316', cardClass: 'mppsc-card',
+    examDate: new Date('2026-04-26'), category: 'state_psc',
+    vacancies: '155–191', pattern: 'Pre + Mains + Interview',
+    getSyllabus: () => syl_mppsc,
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':4,
+      'SCIENCE':4,'CURRENT':4,'MP':5,'MADHYA PRADESH':5,'APTITUDE':4,
+      'REASONING':4,'HINDI':3,'MATHEMATICS':2,'LANGUAGE':1
+    }
+  },
+
+  // ── RPSC RAS 2026 ────────────────────────────────────────────
+  rpsc_ras_2026: {
+    id: 'rpsc_ras_2026', title: 'RPSC RAS 2026', subtitle: 'Rajasthan Administrative Service',
+    icon: '⚖️', color: '#ec4899', cardClass: 'rpsc-card',
+    examDate: new Date('2026-05-15'), category: 'state_psc',
+    vacancies: '~500+', pattern: 'Pre + Mains + Interview (New Syllabus 2026)',
+    getSyllabus: () => syl_rpsc_ras,
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':4,
+      'SCIENCE':4,'CURRENT':4,'RAJASTHAN':5,'CULTURE':5,'ETHICS':4,
+      'REASONING':3,'MATHEMATICS':2,'LANGUAGE':1,'HINDI':2,'ENGLISH':1
+    }
+  },
+
+  // ── MPSC Rajyaseva 2026 ──────────────────────────────────────
+  mpsc_2026: {
+    id: 'mpsc_2026', title: 'MPSC Rajyaseva 2026', subtitle: 'Maharashtra Public Service Commission',
+    icon: '⚖️', color: '#06b6d4', cardClass: 'mpsc-card',
+    examDate: new Date('2026-03-29'), category: 'state_psc',
+    vacancies: '79 (Group A & B)', pattern: 'Pre + Mains + Interview',
+    getSyllabus: () => syl_mpsc,
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':4,
+      'SCIENCE':4,'CURRENT':4,'MAHARASHTRA':5,'MARATHI':3,'ETHICS':4,
+      'REASONING':3,'MATHEMATICS':2,'LANGUAGE':1,'ENGLISH':2
+    }
+  }
+
+});
+
+// ═══ chunks/c20.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c20.js — NEET UG 2026 Syllabus
+// By Er. Sangam Krishna | ParikshaSathi
+// ═══════════════════════════════════════════════════════════════
+
+const syl_neet = {
+
+  'Physics — Class 11': {
+    marks: 90, color: '#3b82f6',
+    topics: [
+      { name: 'Physical World & Measurement', hindi: 'भौतिक जगत और मापन', micro: ['Units & Dimensions','Errors in Measurement','Significant Figures'] },
+      { name: 'Kinematics', hindi: 'गतिकी', micro: ['Motion in a Straight Line','Motion in a Plane','Projectile Motion','Relative Motion'] },
+      { name: 'Laws of Motion', hindi: 'गति के नियम', micro: ['Newton\'s Laws','Friction','Circular Motion','Pseudo Force'] },
+      { name: 'Work, Energy & Power', hindi: 'कार्य, ऊर्जा और शक्ति', micro: ['Work-Energy Theorem','Conservative Forces','Collisions','Power'] },
+      { name: 'System of Particles & Rotational Motion', hindi: 'कणों का निकाय और घूर्णन गति', micro: ['Centre of Mass','Torque','Moment of Inertia','Rolling Motion'] },
+      { name: 'Gravitation', hindi: 'गुरुत्वाकर्षण', micro: ['Kepler\'s Laws','Gravitational Potential','Satellites','Escape Velocity'] },
+      { name: 'Properties of Bulk Matter', hindi: 'स्थूल पदार्थ के गुण', micro: ['Elasticity','Fluid Pressure','Viscosity','Surface Tension'] },
+      { name: 'Thermodynamics', hindi: 'ऊष्मागतिकी', micro: ['Laws of Thermodynamics','Carnot Engine','Entropy','Heat Transfer'] },
+      { name: 'Behaviour of Perfect Gas & Kinetic Theory', hindi: 'आदर्श गैस और गतिज सिद्धांत', micro: ['Kinetic Theory','Gas Laws','Degrees of Freedom','Mean Free Path'] },
+      { name: 'Oscillations & Waves', hindi: 'दोलन और तरंगें', micro: ['SHM','Damped Oscillations','Wave Motion','Doppler Effect'] }
+    ]
+  },
+
+  'Physics — Class 12': {
+    marks: 90, color: '#3b82f6',
+    topics: [
+      { name: 'Electrostatics', hindi: 'स्थिरवैद्युतिकी', micro: ['Coulomb\'s Law','Electric Field','Gauss\'s Law','Capacitors'] },
+      { name: 'Current Electricity', hindi: 'विद्युत धारा', micro: ['Ohm\'s Law','Kirchhoff\'s Laws','Wheatstone Bridge','Potentiometer'] },
+      { name: 'Magnetic Effects of Current & Magnetism', hindi: 'धारा का चुंबकीय प्रभाव', micro: ['Biot-Savart Law','Ampere\'s Law','Moving Coil Galvanometer','Magnetism'] },
+      { name: 'Electromagnetic Induction & AC', hindi: 'विद्युत चुंबकीय प्रेरण', micro: ['Faraday\'s Laws','Lenz\'s Law','AC Circuits','Transformers'] },
+      { name: 'Electromagnetic Waves', hindi: 'विद्युत चुंबकीय तरंगें', micro: ['EM Spectrum','Properties of EM Waves'] },
+      { name: 'Optics', hindi: 'प्रकाशिकी', micro: ['Ray Optics','Wave Optics','Interference','Diffraction','Polarization'] },
+      { name: 'Dual Nature of Matter & Radiation', hindi: 'द्रव्य और विकिरण की द्वैत प्रकृति', micro: ['Photoelectric Effect','de Broglie Wavelength','Davisson-Germer'] },
+      { name: 'Atoms & Nuclei', hindi: 'परमाणु और नाभिक', micro: ['Bohr Model','Nuclear Reactions','Radioactivity','Binding Energy'] },
+      { name: 'Electronic Devices', hindi: 'इलेक्ट्रॉनिक युक्तियाँ', micro: ['Semiconductors','p-n Junction','Transistors','Logic Gates'] }
+    ]
+  },
+
+  'Chemistry — Class 11': {
+    marks: 90, color: '#10b981',
+    topics: [
+      { name: 'Basic Concepts of Chemistry', hindi: 'रसायन की मूल अवधारणाएं', micro: ['Mole Concept','Stoichiometry','Limiting Reagent'] },
+      { name: 'Structure of Atom', hindi: 'परमाणु की संरचना', micro: ['Bohr Model','Quantum Numbers','Orbitals','Electronic Configuration'] },
+      { name: 'Classification of Elements & Periodicity', hindi: 'तत्वों का वर्गीकरण', micro: ['Periodic Table','Periodic Trends','Ionization Energy'] },
+      { name: 'Chemical Bonding & Molecular Structure', hindi: 'रासायनिक आबंधन', micro: ['VSEPR','Hybridization','Molecular Orbital Theory','Hydrogen Bond'] },
+      { name: 'States of Matter', hindi: 'पदार्थ की अवस्थाएं', micro: ['Gas Laws','Kinetic Theory','Liquefaction','Solid State'] },
+      { name: 'Thermodynamics', hindi: 'ऊष्मागतिकी', micro: ['Enthalpy','Entropy','Gibbs Energy','Hess\'s Law'] },
+      { name: 'Equilibrium', hindi: 'साम्यावस्था', micro: ['Chemical Equilibrium','Le Chatelier\'s Principle','Ionic Equilibrium','pH'] },
+      { name: 'Redox Reactions', hindi: 'रेडॉक्स अभिक्रियाएं', micro: ['Oxidation State','Balancing Redox','Electrochemistry Basics'] },
+      { name: 'Hydrogen', hindi: 'हाइड्रोजन', micro: ['Properties','Hydrides','Water','Hydrogen Peroxide'] },
+      { name: 's-Block Elements', hindi: 's-ब्लॉक तत्व', micro: ['Alkali Metals','Alkaline Earth Metals','Compounds'] },
+      { name: 'p-Block Elements (Group 13–14)', hindi: 'p-ब्लॉक तत्व', micro: ['Boron Family','Carbon Family','Allotropes'] },
+      { name: 'Organic Chemistry Basics', hindi: 'कार्बनिक रसायन की मूल बातें', micro: ['IUPAC Nomenclature','Isomerism','Reaction Mechanisms','Inductive Effect'] },
+      { name: 'Hydrocarbons', hindi: 'हाइड्रोकार्बन', micro: ['Alkanes','Alkenes','Alkynes','Aromatic Compounds'] }
+    ]
+  },
+
+  'Chemistry — Class 12': {
+    marks: 90, color: '#10b981',
+    topics: [
+      { name: 'Solid State', hindi: 'ठोस अवस्था', micro: ['Crystal Systems','Defects','Electrical Properties'] },
+      { name: 'Solutions', hindi: 'विलयन', micro: ['Colligative Properties','Raoult\'s Law','Osmosis','Van\'t Hoff Factor'] },
+      { name: 'Electrochemistry', hindi: 'विद्युत रसायन', micro: ['Galvanic Cells','Nernst Equation','Electrolysis','Corrosion'] },
+      { name: 'Chemical Kinetics', hindi: 'रासायनिक बलगतिकी', micro: ['Rate Laws','Activation Energy','Arrhenius Equation','Catalysis'] },
+      { name: 'Surface Chemistry', hindi: 'पृष्ठ रसायन', micro: ['Adsorption','Colloids','Emulsions','Catalysis'] },
+      { name: 'd & f Block Elements', hindi: 'd और f ब्लॉक तत्व', micro: ['Transition Metals','Lanthanides','Actinides','Coordination Compounds'] },
+      { name: 'Coordination Compounds', hindi: 'उपसहसंयोजन यौगिक', micro: ['IUPAC Naming','Isomerism','Bonding Theories','Stability'] },
+      { name: 'Haloalkanes & Haloarenes', hindi: 'हैलोऐल्केन और हैलोऐरीन', micro: ['Nucleophilic Substitution','Elimination','Reactions'] },
+      { name: 'Alcohols, Phenols & Ethers', hindi: 'ऐल्कोहॉल, फीनॉल और ईथर', micro: ['Preparation','Properties','Reactions'] },
+      { name: 'Aldehydes, Ketones & Carboxylic Acids', hindi: 'ऐल्डिहाइड, कीटोन और कार्बोक्सिलिक अम्ल', micro: ['Nucleophilic Addition','Aldol Condensation','Reactions'] },
+      { name: 'Amines', hindi: 'ऐमीन', micro: ['Classification','Preparation','Reactions','Diazonium Salts'] },
+      { name: 'Biomolecules', hindi: 'जैव अणु', micro: ['Carbohydrates','Proteins','Nucleic Acids','Vitamins','Enzymes'] },
+      { name: 'Polymers', hindi: 'बहुलक', micro: ['Addition Polymers','Condensation Polymers','Rubber','Plastics'] },
+      { name: 'Chemistry in Everyday Life', hindi: 'दैनिक जीवन में रसायन', micro: ['Drugs','Food Additives','Cleansing Agents'] }
+    ]
+  },
+
+  'Biology — Botany (Class 11)': {
+    marks: 90, color: '#22c55e',
+    topics: [
+      { name: 'The Living World', hindi: 'जीव जगत', micro: ['Taxonomy','Nomenclature','Classification Systems'] },
+      { name: 'Biological Classification', hindi: 'जीवों का वर्गीकरण', micro: ['Five Kingdom Classification','Monera','Protista','Fungi','Plantae','Animalia'] },
+      { name: 'Plant Kingdom', hindi: 'पादप जगत', micro: ['Algae','Bryophytes','Pteridophytes','Gymnosperms','Angiosperms'] },
+      { name: 'Morphology of Flowering Plants', hindi: 'पुष्पी पादपों की आकारिकी', micro: ['Root','Stem','Leaf','Flower','Fruit','Seed'] },
+      { name: 'Anatomy of Flowering Plants', hindi: 'पुष्पी पादपों की शारीरिकी', micro: ['Meristems','Tissues','Secondary Growth'] },
+      { name: 'Cell: The Unit of Life', hindi: 'कोशिका: जीवन की इकाई', micro: ['Cell Theory','Prokaryotic Cell','Eukaryotic Cell','Cell Organelles'] },
+      { name: 'Cell Cycle & Cell Division', hindi: 'कोशिका चक्र और कोशिका विभाजन', micro: ['Mitosis','Meiosis','Cell Cycle Regulation'] },
+      { name: 'Transport in Plants', hindi: 'पादपों में परिवहन', micro: ['Osmosis','Plasmolysis','Transpiration','Phloem Transport'] },
+      { name: 'Mineral Nutrition', hindi: 'खनिज पोषण', micro: ['Essential Elements','Nitrogen Fixation','Deficiency Symptoms'] },
+      { name: 'Photosynthesis', hindi: 'प्रकाश संश्लेषण', micro: ['Light Reactions','Calvin Cycle','C4 Pathway','CAM Plants'] },
+      { name: 'Respiration in Plants', hindi: 'पादपों में श्वसन', micro: ['Glycolysis','Krebs Cycle','Electron Transport Chain','Fermentation'] },
+      { name: 'Plant Growth & Development', hindi: 'पादप वृद्धि और विकास', micro: ['Growth Regulators','Auxins','Gibberellins','Cytokinins','Photoperiodism'] }
+    ]
+  },
+
+  'Biology — Zoology (Class 11)': {
+    marks: 90, color: '#22c55e',
+    topics: [
+      { name: 'Animal Kingdom', hindi: 'प्राणि जगत', micro: ['Classification Basis','Phyla','Chordates','Non-Chordates'] },
+      { name: 'Structural Organisation in Animals', hindi: 'प्राणियों में संरचनात्मक संगठन', micro: ['Tissues','Organ Systems','Earthworm','Cockroach','Frog'] },
+      { name: 'Biomolecules', hindi: 'जैव अणु', micro: ['Carbohydrates','Proteins','Lipids','Nucleic Acids','Enzymes'] },
+      { name: 'Digestion & Absorption', hindi: 'पाचन और अवशोषण', micro: ['Alimentary Canal','Digestive Enzymes','Absorption','Disorders'] },
+      { name: 'Breathing & Exchange of Gases', hindi: 'श्वास और गैसों का विनिमय', micro: ['Respiratory Organs','Mechanism of Breathing','Transport of Gases','Disorders'] },
+      { name: 'Body Fluids & Circulation', hindi: 'शरीर द्रव और परिसंचरण', micro: ['Blood','Lymph','Heart','Cardiac Cycle','ECG','Disorders'] },
+      { name: 'Excretory Products & Elimination', hindi: 'उत्सर्जी उत्पाद और उनका निष्कासन', micro: ['Kidney','Urine Formation','Tubular Reabsorption','Disorders'] },
+      { name: 'Locomotion & Movement', hindi: 'गमन और संचलन', micro: ['Muscle Types','Skeletal System','Joints','Disorders'] },
+      { name: 'Neural Control & Coordination', hindi: 'तंत्रिका नियंत्रण और समन्वय', micro: ['Neuron','Nerve Impulse','Brain','Spinal Cord','Sense Organs'] },
+      { name: 'Chemical Coordination & Integration', hindi: 'रासायनिक समन्वय और एकीकरण', micro: ['Endocrine Glands','Hormones','Feedback Mechanisms'] }
+    ]
+  },
+
+  'Biology — Botany (Class 12)': {
+    marks: 90, color: '#16a34a',
+    topics: [
+      { name: 'Reproduction in Organisms', hindi: 'जीवों में जनन', micro: ['Asexual Reproduction','Sexual Reproduction','Life Cycles'] },
+      { name: 'Sexual Reproduction in Flowering Plants', hindi: 'पुष्पी पादपों में लैंगिक जनन', micro: ['Flower Structure','Pollination','Fertilization','Embryo Development'] },
+      { name: 'Principles of Inheritance & Variation', hindi: 'वंशागति और विविधता के सिद्धांत', micro: ['Mendel\'s Laws','Chromosomal Theory','Linkage','Mutation'] },
+      { name: 'Molecular Basis of Inheritance', hindi: 'वंशागति का आणविक आधार', micro: ['DNA Structure','Replication','Transcription','Translation','Gene Regulation'] },
+      { name: 'Microbes in Human Welfare', hindi: 'मानव कल्याण में सूक्ष्मजीव', micro: ['Fermentation','Antibiotics','Biogas','Sewage Treatment'] },
+      { name: 'Biotechnology: Principles & Processes', hindi: 'जैव प्रौद्योगिकी: सिद्धांत और प्रक्रम', micro: ['Recombinant DNA','PCR','Gel Electrophoresis','Cloning Vectors'] },
+      { name: 'Biotechnology & Its Applications', hindi: 'जैव प्रौद्योगिकी और उसके उपयोग', micro: ['Bt Crops','Gene Therapy','Insulin Production','Ethical Issues'] }
+    ]
+  },
+
+  'Biology — Zoology (Class 12)': {
+    marks: 90, color: '#16a34a',
+    topics: [
+      { name: 'Human Reproduction', hindi: 'मानव जनन', micro: ['Male Reproductive System','Female Reproductive System','Gametogenesis','Fertilization','Pregnancy'] },
+      { name: 'Reproductive Health', hindi: 'जनन स्वास्थ्य', micro: ['Contraception','STDs','Infertility','MTP','Population Control'] },
+      { name: 'Evolution', hindi: 'विकास', micro: ['Origin of Life','Darwin\'s Theory','Natural Selection','Hardy-Weinberg','Human Evolution'] },
+      { name: 'Human Health & Disease', hindi: 'मानव स्वास्थ्य और रोग', micro: ['Immunity','Vaccines','AIDS','Cancer','Drugs & Alcohol'] },
+      { name: 'Strategies for Enhancement in Food Production', hindi: 'खाद्य उत्पादन में वृद्धि की कार्यनीति', micro: ['Animal Husbandry','Plant Breeding','Tissue Culture','Biofortification'] },
+      { name: 'Organisms & Populations', hindi: 'जीव और समष्टियाँ', micro: ['Ecology','Population Attributes','Population Growth','Interactions'] },
+      { name: 'Ecosystem', hindi: 'पारितंत्र', micro: ['Food Chains','Energy Flow','Nutrient Cycling','Ecological Pyramids'] },
+      { name: 'Biodiversity & Conservation', hindi: 'जैव विविधता और संरक्षण', micro: ['Biodiversity Types','Threats','Conservation Methods','Hotspots'] },
+      { name: 'Environmental Issues', hindi: 'पर्यावरणीय मुद्दे', micro: ['Air Pollution','Water Pollution','Ozone Depletion','Global Warming','Biomagnification'] }
+    ]
+  }
+};
+
+// ═══ chunks/c21.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c21.js — JEE Main 2026 + JEE Advanced 2026 Syllabuses
+// By Er. Sangam Krishna | ParikshaSathi
+// ═══════════════════════════════════════════════════════════════
+
+const syl_jee_main = {
+
+  'Mathematics': {
+    marks: 100, color: '#3b82f6',
+    topics: [
+      { name: 'Sets, Relations & Functions', hindi: 'समुच्चय, संबंध और फलन', micro: ['Sets','Relations','Functions','Inverse Functions'] },
+      { name: 'Complex Numbers & Quadratic Equations', hindi: 'सम्मिश्र संख्याएं और द्विघात समीकरण', micro: ['Argand Plane','Modulus','Roots of Quadratic','Discriminant'] },
+      { name: 'Matrices & Determinants', hindi: 'आव्यूह और सारणिक', micro: ['Matrix Operations','Determinants','Inverse','Cramer\'s Rule'] },
+      { name: 'Permutations & Combinations', hindi: 'क्रमचय और संचय', micro: ['Fundamental Principle','nPr','nCr','Circular Permutations'] },
+      { name: 'Mathematical Induction & Binomial Theorem', hindi: 'गणितीय आगमन और द्विपद प्रमेय', micro: ['Principle of Induction','Binomial Expansion','General Term','Middle Term'] },
+      { name: 'Sequences & Series', hindi: 'अनुक्रम और श्रेणी', micro: ['AP','GP','HP','Sum of Series','AM-GM Inequality'] },
+      { name: 'Limit, Continuity & Differentiability', hindi: 'सीमा, सांतत्य और अवकलनीयता', micro: ['Limits','L\'Hopital Rule','Continuity','Differentiability'] },
+      { name: 'Integral Calculus', hindi: 'समाकल कलन', micro: ['Indefinite Integration','Definite Integration','Area Under Curves','Differential Equations'] },
+      { name: 'Differential Equations', hindi: 'अवकल समीकरण', micro: ['Order & Degree','Variable Separable','Linear DE','Homogeneous DE'] },
+      { name: 'Coordinate Geometry', hindi: 'निर्देशांक ज्यामिति', micro: ['Straight Lines','Circles','Parabola','Ellipse','Hyperbola'] },
+      { name: 'Three Dimensional Geometry', hindi: 'त्रिविमीय ज्यामिति', micro: ['Direction Cosines','Lines in 3D','Planes','Distance Formula'] },
+      { name: 'Vector Algebra', hindi: 'सदिश बीजगणित', micro: ['Vectors','Dot Product','Cross Product','Scalar Triple Product'] },
+      { name: 'Statistics & Probability', hindi: 'सांख्यिकी और प्रायिकता', micro: ['Mean','Variance','Probability','Bayes Theorem','Distributions'] },
+      { name: 'Trigonometry', hindi: 'त्रिकोणमिति', micro: ['Trigonometric Functions','Identities','Inverse Trig','Heights & Distances'] },
+      { name: 'Mathematical Reasoning', hindi: 'गणितीय तर्क', micro: ['Statements','Connectives','Tautology','Contradiction'] }
+    ]
+  },
+
+  'Physics': {
+    marks: 100, color: '#f59e0b',
+    topics: [
+      { name: 'Mechanics — Kinematics & Laws of Motion', hindi: 'यांत्रिकी — गतिकी और गति के नियम', micro: ['Projectile Motion','Newton\'s Laws','Friction','Circular Motion'] },
+      { name: 'Work, Energy, Power & Rotational Motion', hindi: 'कार्य, ऊर्जा, शक्ति और घूर्णन', micro: ['Work-Energy Theorem','Collisions','Moment of Inertia','Rolling'] },
+      { name: 'Gravitation & Properties of Matter', hindi: 'गुरुत्वाकर्षण और पदार्थ के गुण', micro: ['Kepler\'s Laws','Satellites','Elasticity','Fluid Mechanics'] },
+      { name: 'Thermodynamics & Kinetic Theory', hindi: 'ऊष्मागतिकी और गतिज सिद्धांत', micro: ['Laws of Thermodynamics','Carnot Engine','Kinetic Theory','Gas Laws'] },
+      { name: 'Oscillations & Waves', hindi: 'दोलन और तरंगें', micro: ['SHM','Damped Oscillations','Wave Motion','Doppler Effect','Beats'] },
+      { name: 'Electrostatics & Current Electricity', hindi: 'स्थिरवैद्युतिकी और विद्युत धारा', micro: ['Coulomb\'s Law','Capacitors','Ohm\'s Law','Kirchhoff\'s Laws','Wheatstone Bridge'] },
+      { name: 'Magnetic Effects & Electromagnetic Induction', hindi: 'चुंबकीय प्रभाव और विद्युत चुंबकीय प्रेरण', micro: ['Biot-Savart','Ampere\'s Law','Faraday\'s Laws','AC Circuits'] },
+      { name: 'Optics', hindi: 'प्रकाशिकी', micro: ['Ray Optics','Wave Optics','Interference','Diffraction','Polarization'] },
+      { name: 'Modern Physics', hindi: 'आधुनिक भौतिकी', micro: ['Photoelectric Effect','Bohr Model','Radioactivity','Nuclear Reactions','Semiconductors'] }
+    ]
+  },
+
+  'Chemistry': {
+    marks: 100, color: '#10b981',
+    topics: [
+      { name: 'Physical Chemistry — Basics', hindi: 'भौतिक रसायन — मूल बातें', micro: ['Mole Concept','Stoichiometry','Atomic Structure','Chemical Bonding'] },
+      { name: 'States of Matter & Thermodynamics', hindi: 'पदार्थ की अवस्थाएं और ऊष्मागतिकी', micro: ['Gas Laws','Liquid State','Thermodynamics','Hess\'s Law'] },
+      { name: 'Equilibrium & Electrochemistry', hindi: 'साम्यावस्था और विद्युत रसायन', micro: ['Chemical Equilibrium','Ionic Equilibrium','Electrochemical Cells','Electrolysis'] },
+      { name: 'Chemical Kinetics & Surface Chemistry', hindi: 'रासायनिक बलगतिकी और पृष्ठ रसायन', micro: ['Rate Laws','Activation Energy','Catalysis','Colloids'] },
+      { name: 'Inorganic Chemistry — s & p Block', hindi: 'अकार्बनिक रसायन — s और p ब्लॉक', micro: ['Alkali Metals','Alkaline Earth','Boron Family','Carbon Family','Nitrogen Family','Oxygen Family','Halogens','Noble Gases'] },
+      { name: 'Inorganic Chemistry — d, f Block & Coordination', hindi: 'd, f ब्लॉक और उपसहसंयोजन', micro: ['Transition Metals','Lanthanides','Coordination Compounds','Isomerism'] },
+      { name: 'Organic Chemistry — Basics & Hydrocarbons', hindi: 'कार्बनिक रसायन — मूल बातें और हाइड्रोकार्बन', micro: ['IUPAC','Isomerism','Reaction Mechanisms','Alkanes','Alkenes','Alkynes','Benzene'] },
+      { name: 'Organic Chemistry — Functional Groups', hindi: 'कार्यात्मक समूह', micro: ['Alcohols','Aldehydes','Ketones','Carboxylic Acids','Amines','Polymers','Biomolecules'] }
+    ]
+  }
+};
+
+const syl_jee_advanced = {
+
+  'Mathematics (Advanced)': {
+    marks: 120, color: '#3b82f6',
+    topics: [
+      { name: 'Algebra — Complex Numbers & Polynomials', hindi: 'बीजगणित — सम्मिश्र संख्याएं और बहुपद', micro: ['Complex Number Geometry','Roots of Unity','Polynomial Equations','Vieta\'s Formulas'] },
+      { name: 'Algebra — Matrices & Determinants', hindi: 'आव्यूह और सारणिक', micro: ['Matrix Algebra','Eigenvalues','System of Equations','Rank'] },
+      { name: 'Algebra — Probability & Statistics', hindi: 'प्रायिकता और सांख्यिकी', micro: ['Conditional Probability','Bayes Theorem','Distributions','Expectation'] },
+      { name: 'Trigonometry & Inverse Trig', hindi: 'त्रिकोणमिति', micro: ['Trigonometric Equations','Inverse Functions','Properties of Triangles'] },
+      { name: 'Analytical Geometry — 2D', hindi: 'विश्लेषणात्मक ज्यामिति — 2D', micro: ['Conics','Tangents','Normals','Chord of Contact','Locus Problems'] },
+      { name: 'Analytical Geometry — 3D', hindi: 'विश्लेषणात्मक ज्यामिति — 3D', micro: ['Lines & Planes','Skew Lines','Angle Between Planes','Distance Formulas'] },
+      { name: 'Differential Calculus', hindi: 'अवकल कलन', micro: ['Limits','Continuity','Differentiability','Rolle\'s Theorem','LMVT','Maxima-Minima'] },
+      { name: 'Integral Calculus', hindi: 'समाकल कलन', micro: ['Integration Techniques','Definite Integrals','Area','Differential Equations'] },
+      { name: 'Vectors', hindi: 'सदिश', micro: ['Vector Algebra','Dot & Cross Product','Triple Products','Applications'] }
+    ]
+  },
+
+  'Physics (Advanced)': {
+    marks: 120, color: '#f59e0b',
+    topics: [
+      { name: 'Mechanics — Kinematics, NLM & Friction', hindi: 'यांत्रिकी — गतिकी, NLM और घर्षण', micro: ['Relative Motion','Constraint Motion','Pseudo Force','Friction Types'] },
+      { name: 'Mechanics — Work, Energy & Rotational Dynamics', hindi: 'कार्य, ऊर्जा और घूर्णन गतिकी', micro: ['Work-Energy Theorem','Collisions','Moment of Inertia','Angular Momentum','Rolling'] },
+      { name: 'Mechanics — Gravitation & Fluid Mechanics', hindi: 'गुरुत्वाकर्षण और तरल यांत्रिकी', micro: ['Orbital Mechanics','Bernoulli\'s Theorem','Viscosity','Surface Tension'] },
+      { name: 'Thermal Physics', hindi: 'ऊष्मीय भौतिकी', micro: ['Calorimetry','Heat Transfer','Thermodynamic Processes','Carnot Cycle','Kinetic Theory'] },
+      { name: 'Waves & Oscillations', hindi: 'तरंगें और दोलन', micro: ['SHM','Superposition','Standing Waves','Doppler Effect','Resonance'] },
+      { name: 'Electricity & Magnetism', hindi: 'विद्युत और चुंबकत्व', micro: ['Gauss\'s Law','Capacitors','RC Circuits','Biot-Savart','Faraday\'s Law','LCR Circuits'] },
+      { name: 'Optics (Advanced)', hindi: 'प्रकाशिकी (उन्नत)', micro: ['Geometrical Optics','Wave Optics','Interference','Diffraction','Polarization'] },
+      { name: 'Modern Physics', hindi: 'आधुनिक भौतिकी', micro: ['Photoelectric Effect','Bohr Model','X-Rays','Nuclear Physics','Radioactivity','Semiconductors'] }
+    ]
+  },
+
+  'Chemistry (Advanced)': {
+    marks: 120, color: '#10b981',
+    topics: [
+      { name: 'Physical Chemistry — Atomic Structure & Bonding', hindi: 'परमाणु संरचना और आबंधन', micro: ['Quantum Numbers','Orbital Shapes','VSEPR','MO Theory','Hybridization'] },
+      { name: 'Physical Chemistry — Thermodynamics & Equilibrium', hindi: 'ऊष्मागतिकी और साम्यावस्था', micro: ['Hess\'s Law','Gibbs Energy','Equilibrium Constants','Le Chatelier'] },
+      { name: 'Physical Chemistry — Electrochemistry & Kinetics', hindi: 'विद्युत रसायन और बलगतिकी', micro: ['Nernst Equation','Electrolysis','Rate Laws','Arrhenius Equation'] },
+      { name: 'Inorganic Chemistry — Periodic Table & s,p Block', hindi: 'आवर्त सारणी और s,p ब्लॉक', micro: ['Periodic Trends','Anomalous Properties','Compounds of s,p Block'] },
+      { name: 'Inorganic Chemistry — d Block & Coordination', hindi: 'd ब्लॉक और उपसहसंयोजन', micro: ['Transition Metal Properties','Crystal Field Theory','Coordination Isomerism'] },
+      { name: 'Organic Chemistry — Mechanisms & Reactions', hindi: 'कार्बनिक रसायन — क्रियाविधि और अभिक्रियाएं', micro: ['SN1/SN2','E1/E2','Electrophilic Addition','Electrophilic Aromatic Substitution'] },
+      { name: 'Organic Chemistry — Named Reactions & Synthesis', hindi: 'नामित अभिक्रियाएं और संश्लेषण', micro: ['Aldol Condensation','Cannizzaro','Grignard','Diels-Alder','Retrosynthesis'] },
+      { name: 'Organic Chemistry — Biomolecules & Polymers', hindi: 'जैव अणु और बहुलक', micro: ['Carbohydrates','Amino Acids','Nucleic Acids','Polymers'] }
+    ]
+  }
+};
+
+// ═══ chunks/c22.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c22.js — State PSC Syllabuses: UPPSC, MPPSC, RPSC RAS, MPSC
+// By Er. Sangam Krishna | ParikshaSathi
+// ═══════════════════════════════════════════════════════════════
+
+const syl_uppsc = {
+  'General Studies I — History, Art & Culture': {
+    marks: 200, color: '#8b5cf6',
+    topics: [
+      { name: 'Ancient India', hindi: 'प्राचीन भारत', micro: ['Indus Valley Civilization','Vedic Period','Maurya Empire','Gupta Period','South Indian Kingdoms'] },
+      { name: 'Medieval India', hindi: 'मध्यकालीन भारत', micro: ['Delhi Sultanate','Mughal Empire','Bhakti & Sufi Movement','Vijayanagara','Maratha'] },
+      { name: 'Modern India & Freedom Struggle', hindi: 'आधुनिक भारत और स्वतंत्रता संग्राम', micro: ['British Rule','1857 Revolt','Congress','Gandhi','Partition'] },
+      { name: 'Art, Culture & Heritage', hindi: 'कला, संस्कृति और विरासत', micro: ['Architecture','Painting','Music','Dance','UNESCO Sites'] },
+      { name: 'UP History & Culture', hindi: 'उत्तर प्रदेश का इतिहास और संस्कृति', micro: ['UP in Freedom Struggle','Fairs & Festivals','Folk Arts','Religious Sites'] },
+      { name: 'World History', hindi: 'विश्व इतिहास', micro: ['French Revolution','Industrial Revolution','World Wars','Cold War','Decolonization'] }
+    ]
+  },
+  'General Studies II — Geography': {
+    marks: 200, color: '#8b5cf6',
+    topics: [
+      { name: 'Physical Geography', hindi: 'भौतिक भूगोल', micro: ['Geomorphology','Climatology','Oceanography','Biogeography'] },
+      { name: 'Indian Geography', hindi: 'भारतीय भूगोल', micro: ['Physiography','Climate','Rivers','Natural Resources','Agriculture'] },
+      { name: 'UP Geography', hindi: 'उत्तर प्रदेश का भूगोल', micro: ['Physical Features','Rivers','Climate','Agriculture','Industries','Population'] },
+      { name: 'Economic Geography', hindi: 'आर्थिक भूगोल', micro: ['Agriculture','Industries','Trade','Transport','Energy Resources'] },
+      { name: 'Human Geography', hindi: 'मानव भूगोल', micro: ['Population','Migration','Urbanization','Human Development'] }
+    ]
+  },
+  'General Studies III — Indian Polity & Governance': {
+    marks: 200, color: '#8b5cf6',
+    topics: [
+      { name: 'Indian Constitution', hindi: 'भारतीय संविधान', micro: ['Preamble','Fundamental Rights','DPSP','Fundamental Duties','Amendments'] },
+      { name: 'Union Government', hindi: 'केंद्र सरकार', micro: ['Parliament','President','Prime Minister','Cabinet','Supreme Court'] },
+      { name: 'State Government & UP Administration', hindi: 'राज्य सरकार और UP प्रशासन', micro: ['Governor','CM','State Legislature','High Court','UP Panchayati Raj'] },
+      { name: 'Local Self Government', hindi: 'स्थानीय स्वशासन', micro: ['73rd Amendment','74th Amendment','Panchayati Raj','Urban Local Bodies'] },
+      { name: 'Governance & Public Policy', hindi: 'शासन और लोक नीति', micro: ['E-Governance','RTI','CAG','UPSC','Welfare Schemes'] }
+    ]
+  },
+  'General Studies IV — Economy': {
+    marks: 200, color: '#8b5cf6',
+    topics: [
+      { name: 'Indian Economy', hindi: 'भारतीय अर्थव्यवस्था', micro: ['Planning','GDP','Inflation','Fiscal Policy','Monetary Policy'] },
+      { name: 'Agriculture & Rural Development', hindi: 'कृषि और ग्रामीण विकास', micro: ['Green Revolution','Land Reforms','Irrigation','MNREGA','PM-KISAN'] },
+      { name: 'Industry & Infrastructure', hindi: 'उद्योग और बुनियादी ढांचा', micro: ['Industrial Policy','MSMEs','SEZ','Transport','Energy'] },
+      { name: 'UP Economy', hindi: 'उत्तर प्रदेश की अर्थव्यवस्था', micro: ['Agriculture in UP','Industries','One District One Product','Expressways','Investment'] },
+      { name: 'Banking & Finance', hindi: 'बैंकिंग और वित्त', micro: ['RBI','Commercial Banks','NBFCs','Capital Markets','Insurance'] }
+    ]
+  },
+  'General Studies V — Science & Technology': {
+    marks: 200, color: '#8b5cf6',
+    topics: [
+      { name: 'General Science', hindi: 'सामान्य विज्ञान', micro: ['Physics Basics','Chemistry Basics','Biology Basics','Everyday Science'] },
+      { name: 'Science & Technology', hindi: 'विज्ञान और प्रौद्योगिकी', micro: ['Space Technology','Defence Technology','Biotechnology','IT & AI','Nuclear Technology'] },
+      { name: 'Environment & Ecology', hindi: 'पर्यावरण और पारिस्थितिकी', micro: ['Biodiversity','Climate Change','Pollution','Conservation','Environmental Laws'] },
+      { name: 'Current Affairs & Miscellaneous', hindi: 'समसामयिक घटनाएं', micro: ['National Events','International Events','Awards','Sports','Books & Authors'] }
+    ]
+  },
+  'CSAT (Qualifying)': {
+    marks: 200, color: '#6b7280',
+    topics: [
+      { name: 'Comprehension & Communication', hindi: 'बोध और संचार', micro: ['Reading Comprehension','Interpersonal Skills','Communication'] },
+      { name: 'Logical Reasoning & Analytical Ability', hindi: 'तार्किक तर्क और विश्लेषणात्मक क्षमता', micro: ['Logical Reasoning','Analytical Ability','Decision Making'] },
+      { name: 'Basic Numeracy', hindi: 'मूल संख्यात्मकता', micro: ['Numbers','Percentages','Ratio','Data Interpretation'] }
+    ]
+  }
+};
+
+const syl_mppsc = {
+  'General Studies I — History, Culture & Geography': {
+    marks: 300, color: '#f97316',
+    topics: [
+      { name: 'MP History & Culture', hindi: 'मध्य प्रदेश का इतिहास और संस्कृति', micro: ['Ancient MP','Medieval MP','Freedom Struggle in MP','Tribal History','Art & Architecture'] },
+      { name: 'Indian History', hindi: 'भारतीय इतिहास', micro: ['Ancient India','Medieval India','Modern India','Freedom Movement'] },
+      { name: 'MP Geography', hindi: 'मध्य प्रदेश का भूगोल', micro: ['Physical Features','Rivers','Climate','Natural Resources','Wildlife Sanctuaries'] },
+      { name: 'Indian Geography', hindi: 'भारतीय भूगोल', micro: ['Physiography','Climate','Agriculture','Industries','Transport'] },
+      { name: 'World Geography', hindi: 'विश्व भूगोल', micro: ['Continents','Oceans','Climate Zones','Natural Resources'] }
+    ]
+  },
+  'General Studies II — Polity, Economy & Science': {
+    marks: 300, color: '#f97316',
+    topics: [
+      { name: 'Indian Polity & Constitution', hindi: 'भारतीय राजव्यवस्था और संविधान', micro: ['Constitution','Parliament','Judiciary','Federalism','Local Government'] },
+      { name: 'MP Polity & Administration', hindi: 'मध्य प्रदेश की राजव्यवस्था', micro: ['MP Legislature','Governor','CM','High Court','Panchayati Raj in MP'] },
+      { name: 'Indian Economy', hindi: 'भारतीय अर्थव्यवस्था', micro: ['Planning','Agriculture','Industry','Banking','Fiscal Policy'] },
+      { name: 'MP Economy', hindi: 'मध्य प्रदेश की अर्थव्यवस्था', micro: ['Agriculture in MP','Industries','Mineral Resources','Tourism','Schemes'] },
+      { name: 'Science & Technology', hindi: 'विज्ञान और प्रौद्योगिकी', micro: ['General Science','Space','Defence','IT','Biotechnology','Environment'] }
+    ]
+  },
+  'General Aptitude Test (Qualifying)': {
+    marks: 200, color: '#6b7280',
+    topics: [
+      { name: 'Comprehension & Reasoning', hindi: 'बोध और तर्क', micro: ['Reading Comprehension','Logical Reasoning','Analytical Ability'] },
+      { name: 'Basic Mathematics', hindi: 'मूल गणित', micro: ['Arithmetic','Algebra','Data Interpretation','Graphs'] },
+      { name: 'General Mental Ability', hindi: 'सामान्य मानसिक योग्यता', micro: ['Decision Making','Problem Solving','Interpersonal Skills'] }
+    ]
+  }
+};
+
+const syl_rpsc_ras = {
+  'General Studies I — History, Art & Culture': {
+    marks: 200, color: '#ec4899',
+    topics: [
+      { name: 'Rajasthan History & Culture', hindi: 'राजस्थान का इतिहास और संस्कृति', micro: ['Ancient Rajasthan','Medieval Rajputana','Freedom Struggle in Rajasthan','Art & Architecture','Fairs & Festivals'] },
+      { name: 'Indian History', hindi: 'भारतीय इतिहास', micro: ['Ancient India','Medieval India','Modern India','National Movement'] },
+      { name: 'World History', hindi: 'विश्व इतिहास', micro: ['Renaissance','Industrial Revolution','World Wars','Cold War'] },
+      { name: 'Art, Culture & Heritage', hindi: 'कला, संस्कृति और विरासत', micro: ['Rajasthani Painting','Music','Dance','Handicrafts','UNESCO Sites'] }
+    ]
+  },
+  'General Studies II — Geography': {
+    marks: 200, color: '#ec4899',
+    topics: [
+      { name: 'Rajasthan Geography', hindi: 'राजस्थान का भूगोल', micro: ['Physical Features','Thar Desert','Rivers','Climate','Natural Resources','Wildlife'] },
+      { name: 'Indian Geography', hindi: 'भारतीय भूगोल', micro: ['Physiography','Climate','Agriculture','Industries','Transport'] },
+      { name: 'World Geography', hindi: 'विश्व भूगोल', micro: ['Physical Geography','Economic Geography','Human Geography'] }
+    ]
+  },
+  'General Studies III — Polity, Economy & Science': {
+    marks: 200, color: '#ec4899',
+    topics: [
+      { name: 'Indian Polity & Constitution', hindi: 'भारतीय राजव्यवस्था', micro: ['Constitution','Parliament','Judiciary','Federalism','Elections'] },
+      { name: 'Rajasthan Polity & Administration', hindi: 'राजस्थान की राजव्यवस्था', micro: ['Rajasthan Legislature','Governor','CM','High Court','Panchayati Raj in Rajasthan'] },
+      { name: 'Indian & Rajasthan Economy', hindi: 'भारतीय और राजस्थान की अर्थव्यवस्था', micro: ['Planning','Agriculture','Industry','Banking','Rajasthan Budget','Schemes'] },
+      { name: 'Science & Technology', hindi: 'विज्ञान और प्रौद्योगिकी', micro: ['General Science','Space','Defence','IT','Environment','Biotechnology'] },
+      { name: 'Current Affairs', hindi: 'समसामयिक घटनाएं', micro: ['National','International','Rajasthan Specific','Awards','Sports'] }
+    ]
+  },
+  'General Studies IV — Ethics & Reasoning': {
+    marks: 200, color: '#ec4899',
+    topics: [
+      { name: 'Ethics & Human Interface', hindi: 'नैतिकता और मानवीय संपर्क', micro: ['Ethics Basics','Integrity','Attitude','Emotional Intelligence','Moral Thinkers'] },
+      { name: 'Aptitude & Reasoning', hindi: 'अभिरुचि और तर्क', micro: ['Logical Reasoning','Analytical Ability','Decision Making','Problem Solving'] },
+      { name: 'Basic Numeracy', hindi: 'मूल संख्यात्मकता', micro: ['Arithmetic','Data Interpretation','Graphs','Statistics'] }
+    ]
+  }
+};
+
+const syl_mpsc = {
+  'General Studies I — History, Geography & Culture': {
+    marks: 250, color: '#06b6d4',
+    topics: [
+      { name: 'Maharashtra History & Culture', hindi: 'महाराष्ट्र का इतिहास और संस्कृति', micro: ['Ancient Maharashtra','Maratha Empire','Freedom Struggle in Maharashtra','Social Reform Movements','Art & Culture'] },
+      { name: 'Indian History', hindi: 'भारतीय इतिहास', micro: ['Ancient India','Medieval India','Modern India','National Movement'] },
+      { name: 'Maharashtra Geography', hindi: 'महाराष्ट्र का भूगोल', micro: ['Physical Features','Rivers','Climate','Agriculture','Industries','Natural Resources'] },
+      { name: 'Indian Geography', hindi: 'भारतीय भूगोल', micro: ['Physiography','Climate','Agriculture','Industries','Transport'] }
+    ]
+  },
+  'General Studies II — Polity & Governance': {
+    marks: 250, color: '#06b6d4',
+    topics: [
+      { name: 'Indian Constitution & Polity', hindi: 'भारतीय संविधान और राजव्यवस्था', micro: ['Constitution','Parliament','Judiciary','Federalism','Elections','Local Government'] },
+      { name: 'Maharashtra Polity & Administration', hindi: 'महाराष्ट्र की राजव्यवस्था', micro: ['Maharashtra Legislature','Governor','CM','High Court','Panchayati Raj in Maharashtra','Mumbai Municipal Corporation'] },
+      { name: 'Governance & Public Policy', hindi: 'शासन और लोक नीति', micro: ['E-Governance','RTI','CAG','Welfare Schemes','Maharashtra Schemes'] }
+    ]
+  },
+  'General Studies III — Economy & Science': {
+    marks: 250, color: '#06b6d4',
+    topics: [
+      { name: 'Indian Economy', hindi: 'भारतीय अर्थव्यवस्था', micro: ['Planning','GDP','Inflation','Fiscal Policy','Monetary Policy','Banking'] },
+      { name: 'Maharashtra Economy', hindi: 'महाराष्ट्र की अर्थव्यवस्था', micro: ['Agriculture in Maharashtra','Industries','IT Sector','Tourism','Maharashtra Budget'] },
+      { name: 'Science & Technology', hindi: 'विज्ञान और प्रौद्योगिकी', micro: ['General Science','Space','Defence','IT','Biotechnology','Environment'] },
+      { name: 'Current Affairs', hindi: 'समसामयिक घटनाएं', micro: ['National','International','Maharashtra Specific','Awards','Sports'] }
+    ]
+  },
+  'Marathi Language (Qualifying)': {
+    marks: 100, color: '#6b7280',
+    topics: [
+      { name: 'Marathi Grammar & Comprehension', hindi: 'मराठी व्याकरण और बोध', micro: ['Grammar','Comprehension','Essay Writing','Letter Writing'] },
+      { name: 'Marathi Literature', hindi: 'मराठी साहित्य', micro: ['Classical Literature','Modern Literature','Poets & Writers'] }
+    ]
+  },
+  'English Language (Qualifying)': {
+    marks: 100, color: '#6b7280',
+    topics: [
+      { name: 'English Grammar & Comprehension', hindi: 'अंग्रेजी व्याकरण और बोध', micro: ['Grammar','Comprehension','Essay Writing','Precis Writing'] }
+    ]
+  }
+};
