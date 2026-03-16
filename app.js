@@ -1868,6 +1868,12 @@ function renderPlan() {
     <div id="tabPYQ" class="tab-content">${generatePYQsHTML()}</div>
     <div id="tabInfo" class="tab-content">${generateExamInfoHTML()}</div>
   `;
+  // Inject checklist, streak, reschedule features after DOM is ready
+  setTimeout(() => {
+    if (typeof injectPlanHeaderExtras === 'function') injectPlanHeaderExtras();
+    if (typeof patchDayCards === 'function') patchDayCards();
+    if (typeof initFeatures === 'function') initFeatures();
+  }, 0);
 }
 
 const SLOT_META = {
@@ -4686,15 +4692,4 @@ function patchDayCards() {
   });
 }
 
-// Override renderPlan globally after all chunks load
-window.addEventListener('DOMContentLoaded', () => {
-  const origRP = window.renderPlan;
-  if (origRP) {
-    window.renderPlan = function() {
-      origRP();
-      injectPlanHeaderExtras();
-      patchDayCards();
-      initFeatures();
-    };
-  }
-});
+// c23 features are injected directly from renderPlan() in c09.js via setTimeout

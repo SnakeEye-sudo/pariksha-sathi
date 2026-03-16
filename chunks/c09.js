@@ -42,6 +42,12 @@ function renderPlan() {
     <div id="tabPYQ" class="tab-content">${generatePYQsHTML()}</div>
     <div id="tabInfo" class="tab-content">${generateExamInfoHTML()}</div>
   `;
+  // Inject checklist, streak, reschedule features after DOM is ready
+  setTimeout(() => {
+    if (typeof injectPlanHeaderExtras === 'function') injectPlanHeaderExtras();
+    if (typeof patchDayCards === 'function') patchDayCards();
+    if (typeof initFeatures === 'function') initFeatures();
+  }, 0);
 }
 
 const SLOT_META = {

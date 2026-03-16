@@ -412,15 +412,5 @@ function patchDayCards() {
   });
 }
 
-// Override renderPlan globally after all chunks load
-window.addEventListener('DOMContentLoaded', () => {
-  const origRP = window.renderPlan;
-  if (origRP) {
-    window.renderPlan = function() {
-      origRP();
-      injectPlanHeaderExtras();
-      patchDayCards();
-      initFeatures();
-    };
-  }
-});
+// c23 features are injected directly from renderPlan() in c09.js via setTimeout
+
