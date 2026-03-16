@@ -105,6 +105,8 @@ function generatePlan() {
   savePlanToStorage();
   renderPlan();
   showScreen('planScreen');
+  // Auto-save to cloud after plan generation
+  if (typeof window.psSaveToCloud === 'function') window.psSaveToCloud();
 }
 
 // Subject priority weights by exam type

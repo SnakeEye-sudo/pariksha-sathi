@@ -363,6 +363,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .ptb-edit:hover{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 4px 16px rgba(16,185,129,.3)}
 .ptb-reset{background:rgba(239,68,68,.07);color:#f87171;border-color:rgba(239,68,68,.18);pointer-events:auto!important}
 .ptb-reset:hover{background:rgba(239,68,68,.15);color:#fff;border-color:rgba(239,68,68,.5)}
+.ptb-logout{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.25);display:none;align-items:center;gap:4px;}
+.ptb-logout:hover{background:rgba(239,68,68,.85);color:#fff;border-color:rgba(239,68,68,.8);box-shadow:0 4px 14px rgba(239,68,68,.3)}
 .ptb-tg{background:rgba(37,211,102,.1);color:#25d366;border-color:rgba(37,211,102,.25)}
 
 /* Plan hero */

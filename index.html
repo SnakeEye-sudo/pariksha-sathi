@@ -54,6 +54,8 @@
     window.psSignOut = async function() {
       await signOut(auth);
       updateAuthUI(null);
+      // Go back to welcome screen
+      if (typeof showScreen === 'function') showScreen('welcomeScreen');
     };
     async function saveUserToFirestore(user) {
       const userRef = doc(db, 'users', user.uid);
@@ -101,9 +103,11 @@ function updateAuthUI(user) {
       const avName = document.getElementById('uAvName');
       const menuName = document.getElementById('menuUserName');
       const menuEmail = document.getElementById('menuUserEmail');
+      const ptbLogout = document.getElementById('ptbLogoutBtn');
       if(user) {
         if(gate) gate.style.display='none';
         if(avatarBtn) avatarBtn.style.display='block';
+        if(ptbLogout) ptbLogout.style.display='inline-flex';
         if(avPhoto && user.photoURL) { avPhoto.src=user.photoURL; avPhoto.style.display='block'; if(avInitial) avInitial.style.display='none'; }
         else { if(avPhoto) avPhoto.style.display='none'; if(avInitial) { avInitial.style.display='flex'; avInitial.textContent=(user.displayName||user.email||'U')[0].toUpperCase(); } }
         const firstName = user.displayName ? user.displayName.split(' ')[0] : (user.email||'').split('@')[0];
@@ -115,6 +119,7 @@ function updateAuthUI(user) {
       } else {
         if(gate) gate.style.display='flex';
         if(avatarBtn) avatarBtn.style.display='none';
+        if(ptbLogout) ptbLogout.style.display='none';
       }
     }
     window.toggleUserMenu = function() {
@@ -794,6 +799,7 @@ function updateAuthUI(user) {
       <button class="ptb-btn ptb-download" onclick="downloadPDF()"><span data-i18n="pdfBtn">⬇️ PDF</span></button>
       <button class="ptb-btn ptb-edit" onclick="showScreen('formScreen')"><span data-i18n="editBtn">✏️ Edit</span></button>
       <button class="ptb-btn ptb-reset" onclick="confirmResetPlan()"><span data-i18n="resetBtn">🔄 Naya Plan</span></button>
+      <button class="ptb-btn ptb-logout" id="ptbLogoutBtn" onclick="psSignOut()" style="display:none;">🚪 Logout</button>
     </div>
   </div>
 

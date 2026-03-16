@@ -60,6 +60,8 @@ function toggleSlotCheck(dateStr, slotIdx, el) {
   if (typeof refreshC24Widgets === 'function') refreshC24Widgets();
   // Animate the checkbox
   if (el) el.classList.toggle('checked', !!cl[key]);
+  // Auto-save to cloud on topic check
+  if (typeof window.psSaveToCloud === 'function') window.psSaveToCloud();
 }
 
 function getDayProgress(dateStr, totalSlots) {
