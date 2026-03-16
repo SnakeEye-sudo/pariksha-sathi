@@ -58,6 +58,8 @@ function initCanvas() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initCanvas();
+  // Apply saved language preference
+  applyLang();
   // Set default start date to today
   const today = new Date().toISOString().split('T')[0];
   const sd = document.getElementById('startDate');

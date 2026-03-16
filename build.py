@@ -5,6 +5,7 @@
 import os
 
 chunks = [
+    'chunks/c00.js',
     'chunks/c01.js',
     'chunks/c02.js',
     'chunks/c03.js',

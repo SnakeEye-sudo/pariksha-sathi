@@ -38,15 +38,14 @@ function getSubjectsList() {
 }
 
 function getExamDate() {
-  return userData.exam === 'bpsc'
-    ? new Date('2026-09-22')
-    : new Date('2027-05-16');
+  if (userData.exam === 'bpsc') return new Date('2026-09-22');
+  return userData.upscYear === '2026' ? new Date('2026-05-17') : new Date('2027-05-16');
 }
 
 function generatePlan() {
   const name = document.getElementById('userName').value.trim();
   const startDate = document.getElementById('startDate').value;
-  if (!name || !startDate) { alert('कृपया नाम और तारीख भरें!'); return; }
+  if (!name || !startDate) { alert(lang === 'en' ? 'Please fill in your name and start date!' : 'कृपया नाम और तारीख भरें!'); return; }
 
   const hoursEl = document.querySelector('input[name="studyHours"]:checked');
   const hours = hoursEl ? parseInt(hoursEl.value) : 4;
@@ -54,16 +53,18 @@ function generatePlan() {
   const slots = [];
   document.querySelectorAll('input[name="slot"]:checked').forEach(s => slots.push(s.value));
 
-  let bpscClass = '', optionalSubject = '';
+  let bpscClass = '', optionalSubject = '', upscYear = '2027';
   if (selectedExam === 'bpsc') {
     const bc = document.querySelector('input[name="bpscClass"]:checked');
     bpscClass = bc ? bc.value : '1-5';
   } else {
     const optEl = document.getElementById('upscOptional');
     optionalSubject = optEl ? optEl.value : '';
+    const yrEl = document.querySelector('input[name="upscYear"]:checked');
+    upscYear = yrEl ? yrEl.value : '2027';
   }
 
-  userData = { name, exam: selectedExam, bpscClass, optionalSubject, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
+  userData = { name, exam: selectedExam, bpscClass, optionalSubject, upscYear, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
   studyPlan = buildPlan();
   savePlanToStorage();
   renderPlan();

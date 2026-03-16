@@ -6,17 +6,20 @@ function renderPlan() {
     anthropology: 'Anthropology', philosophy: 'Philosophy',
     psychology: 'Psychology', economics: 'Economics', law: 'Law'
   };
+  const yr = userData.upscYear || '2027';
   const examLabel = userData.exam === 'bpsc'
     ? (userData.bpscClass === '1-5' ? 'BPSC TRE 4.0 — Class 1–5 (PRT)'
       : userData.bpscClass === '6-8' ? 'BPSC TRE 4.0 — Class 6–8 (TGT)'
       : 'BPSC TRE 4.0 — Class 1–5 & 6–8')
     : userData.optionalSubject
-      ? `UPSC CSE 2027 • ${optionalNames[userData.optionalSubject] || userData.optionalSubject} Optional`
-      : 'UPSC CSE 2027';
+      ? `UPSC CSE ${yr} • ${optionalNames[userData.optionalSubject] || userData.optionalSubject} Optional`
+      : `UPSC CSE ${yr}`;
 
-  document.getElementById('planTitle').textContent = `${userData.name} का Study Plan`;
+  const daysUnit = lang === 'en' ? 'days' : 'दिन';
+  const hrsUnit  = lang === 'en' ? 'hrs/day' : 'घंटे/दिन';
+  document.getElementById('planTitle').textContent = `${userData.name} ${t('planTitle')}`;
   document.getElementById('planSubtitle').textContent =
-    `${examLabel} • ${studyPlan.length} दिन • ${userData.studyHours} घंटे/दिन`;
+    `${examLabel} • ${studyPlan.length} ${daysUnit} • ${userData.studyHours} ${hrsUnit}`;
 
   const now = new Date();
   const pct = Math.min(100, Math.max(0, Math.round(
@@ -25,14 +28,14 @@ function renderPlan() {
   document.getElementById('planProgressBar').style.width = Math.max(2, pct) + '%';
   const daysLeft = Math.max(0, Math.ceil((getExamDate() - now) / 86400000));
   document.getElementById('planProgressLabel').textContent =
-    `${pct}% Complete • परीक्षा में ${daysLeft} दिन बाकी`;
+    `${pct}% ${t('complete')} • ${lang === 'en' ? 'Exam in' : 'परीक्षा में'} ${daysLeft} ${t('daysLeft')}`;
 
   document.getElementById('planBody').innerHTML = `
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="showTab('tabPlan')">📅 Day Plan</button>
-      <button class="tab-btn" onclick="showTab('tabSyllabus')">📚 Syllabus</button>
-      <button class="tab-btn" onclick="showTab('tabPYQ')">📝 PYQ Tips</button>
-      <button class="tab-btn" onclick="showTab('tabInfo')">ℹ️ Exam Info</button>
+      <button class="tab-btn active" onclick="showTab('tabPlan')">${t('tabPlan')}</button>
+      <button class="tab-btn" onclick="showTab('tabSyllabus')">${t('tabSyllabus')}</button>
+      <button class="tab-btn" onclick="showTab('tabPYQ')">${t('tabPYQ')}</button>
+      <button class="tab-btn" onclick="showTab('tabInfo')">${t('tabInfo')}</button>
     </div>
     <div id="tabPlan" class="tab-content active">${generateDayPlanHTML()}</div>
     <div id="tabSyllabus" class="tab-content">${generateSyllabusHTML()}</div>
@@ -55,6 +58,7 @@ function generateDayPlanHTML() {
   const todayStr = new Date().toDateString();
   const weeks = [];
   for (let i = 0; i < studyPlan.length; i += 7) weeks.push(studyPlan.slice(i, i + 7));
+  const locale = lang === 'en' ? 'en-IN' : 'hi-IN';
 
   return weeks.map((week, wi) => {
     const wStart = week[0].date.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
@@ -63,7 +67,7 @@ function generateDayPlanHTML() {
 
     const daysHTML = week.map(day => {
       const isToday = day.date.toDateString() === todayStr;
-      const dateStr = day.date.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+      const dateStr = day.date.toLocaleDateString(locale, { weekday:'long', day:'numeric', month:'long' });
 
       let dayClass = 'day-card';
       if (isToday) dayClass += ' today-card';
@@ -71,11 +75,11 @@ function generateDayPlanHTML() {
       else if (day.isRevision) dayClass += ' revision-day';
 
       const badge = isToday
-        ? '<span class="day-badge badge-today">⚡ Today</span>'
+        ? `<span class="day-badge badge-today">${t('todayBadge')}</span>`
         : day.isMock
-          ? '<span class="day-badge badge-mock">🎯 Mock Test</span>'
+          ? `<span class="day-badge badge-mock">${t('mockBadge')}</span>`
           : day.isRevision
-            ? '<span class="day-badge badge-revision">🔄 Revision Day</span>'
+            ? `<span class="day-badge badge-revision">${t('revBadge')}</span>`
             : '';
 
       const slotsHTML = day.slots.map(slot => {
@@ -87,8 +91,8 @@ function generateDayPlanHTML() {
               <span class="slot-type-badge" style="background:rgba(239,68,68,.15);color:#f87171;border-color:rgba(239,68,68,.3)">🎯 Mock Test</span>
               <span class="slot-duration">2–3 hrs</span>
             </div>
-            <div class="slot-card-title">Full Syllabus Mock Test</div>
-            <div class="slot-card-sub">सभी topics का full-length practice test दें। Time management practice करें।</div>
+            <div class="slot-card-title">${t('mockTitle')}</div>
+            <div class="slot-card-sub">${t('mockSub')}</div>
           </div>`;
         }
 
@@ -98,26 +102,28 @@ function generateDayPlanHTML() {
               <span class="slot-type-badge" style="background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.2)">📰 Current Affairs</span>
               <span class="slot-duration">30 min</span>
             </div>
-            <div class="slot-card-title">Daily News + Monthly Magazine</div>
-            <div class="slot-card-sub">The Hindu / Dainik Jagran पढ़ें। Important events note करें।</div>
+            <div class="slot-card-title">${t('caTitle')}</div>
+            <div class="slot-card-sub">${t('caSub')}</div>
           </div>`;
         }
 
         if (slot.type === 'revision') {
           const revList = Array.isArray(slot.microTopics) && slot.microTopics.length
-            ? slot.microTopics.slice(0, 4).map(t => `<span class="rev-tag">${t}</span>`).join('')
+            ? slot.microTopics.slice(0, 4).map(t2 => `<span class="rev-tag">${t2}</span>`).join('')
             : `<span class="rev-tag">${slot.topic}</span>`;
           return `<div class="slot-card rev-slot-card">
             <div class="slot-card-header">
-              <span class="slot-type-badge" style="background:rgba(245,158,11,.1);color:#fbbf24;border-color:rgba(245,158,11,.25)">🔄 Revision</span>
+              <span class="slot-type-badge" style="background:rgba(245,158,11,.1);color:#fbbf24;border-color:rgba(245,158,11,.25)">🔄 ${t('revTitle')}</span>
               <span class="slot-duration">1 hr</span>
             </div>
-            <div class="slot-card-title">Quick Revision</div>
+            <div class="slot-card-title">${t('revTitle')}</div>
             <div class="rev-tags-wrap">${revList}</div>
           </div>`;
         }
 
-        // Normal subject slot
+        // Normal subject slot — show topic name based on lang
+        const topicDisplay = (lang === 'hi' && slot.hindiTopic) ? slot.hindiTopic : slot.topic;
+        const topicSub     = (lang === 'hi' && slot.hindiTopic) ? slot.topic : (slot.hindiTopic || '');
         const micros = (slot.microTopics || []).slice(0, 4);
         const microsHTML = micros.length
           ? `<ul class="slot-micro-list">${micros.map(m => `<li>${m}</li>`).join('')}</ul>`
@@ -131,8 +137,8 @@ function generateDayPlanHTML() {
             <span class="slot-duration">${meta.time}</span>
           </div>
           <div class="slot-part-label">${subjectShort}</div>
-          <div class="slot-card-title">${slot.topic}</div>
-          ${slot.hindiTopic ? `<div class="slot-card-hindi">${slot.hindiTopic}</div>` : ''}
+          <div class="slot-card-title">${topicDisplay}</div>
+          ${topicSub ? `<div class="slot-card-hindi">${topicSub}</div>` : ''}
           ${microsHTML}
         </div>`;
       }).join('');
@@ -141,7 +147,7 @@ function generateDayPlanHTML() {
         <div class="day-header">
           <div class="day-header-left">
             <div class="day-num-circle${isToday ? ' today-circle' : ''}">
-              <span class="day-num-label">Day</span>
+              <span class="day-num-label">${t('dayLabel')}</span>
               <span class="day-num-val">${day.day}</span>
             </div>
             <div class="day-date-info">
@@ -149,17 +155,18 @@ function generateDayPlanHTML() {
               ${badge}
             </div>
           </div>
-          <div class="day-slots-count">${day.slots.filter(s=>s.type==='subject').length} subjects</div>
+          <div class="day-slots-count">${day.slots.filter(s=>s.type==='subject').length} ${t('subjectsCount')}</div>
         </div>
         <div class="slots-grid">${slotsHTML}</div>
       </div>`;
     }).join('');
 
+    const weekLabel = lang === 'en' ? `Week ${wi + 1}` : `सप्ताह ${wi + 1}`;
     return `<div class="week-block${isCurrentWeek ? ' current-week' : ''}">
       <div class="week-header">
-        <span class="week-title">Week ${wi + 1}</span>
+        <span class="week-title">${weekLabel}</span>
         <span class="week-range">${wStart} – ${wEnd}</span>
-        ${isCurrentWeek ? '<span class="week-now-badge">Current Week</span>' : ''}
+        ${isCurrentWeek ? `<span class="week-now-badge">${lang === 'en' ? 'Current Week' : 'इस सप्ताह'}</span>` : ''}
       </div>
       <div class="week-days">${daysHTML}</div>
     </div>`;

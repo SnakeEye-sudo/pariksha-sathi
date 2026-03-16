@@ -3,6 +3,197 @@
 // DO NOT EDIT DIRECTLY — edit chunks/ files and run build.py
 
 
+// ═══ chunks/c00.js ═══
+// ── Language System — ParikshaSathi ──────────────────────────
+// lang: 'hi' (default) | 'en'
+let lang = localStorage.getItem('ps_lang') || 'hi';
+
+function setLang(l) {
+  lang = l;
+  localStorage.setItem('ps_lang', l);
+  applyLang();
+  // Re-render plan if on plan screen
+  if (document.getElementById('planScreen').classList.contains('active') && studyPlan.length) {
+    renderPlan();
+  }
+}
+
+function t(key) { return (T[lang] && T[lang][key]) ? T[lang][key] : (T['hi'][key] || key); }
+
+// ── All UI strings ────────────────────────────────────────────
+const T = {
+  hi: {
+    // Hero
+    badge:          '🎯 Er. Sangam Krishna — 100% Free Study Planner',
+    heroTitle1:     'आपकी परीक्षा,',
+    heroTitle2:     'आपका Plan',
+    heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
+    chooseLabel:    'अपना Exam चुनें 👇',
+    statExams:      'Exams',
+    statVacancies:  'BPSC Vacancies',
+    statFree:       'Free',
+    statPlans:      'Plans',
+    // Exam cards
+    bpscTitle:      'BPSC TRE 4.0',
+    bpscSub:        'Bihar Primary/Middle Teacher',
+    bpscDate:       'Exam: Sep 2026 (Tentative)',
+    bpscVac:        '46,595 Vacancies',
+    bpscClass:      'Class 1–5 (PRT) & 6–8 (TGT)',
+    bpscBtn:        'Plan बनाएं',
+    upscTitle:      'UPSC CSE 2026/27',
+    upscSub:        'Civil Services Examination',
+    upscDate:       'Prelims: May 2026 or 2027',
+    upscService:    'IAS / IPS / IFS',
+    upscPattern:    'Pre + Mains + Interview',
+    upscBtn:        'Plan बनाएं',
+    ribbon:         'Most Popular',
+    // Footer note
+    footerNote:     'Er. Sangam Krishna ने ParikshaSathi इसलिए बनाया क्योंकि उनका मानना है कि हर aspirant को एक बराबर मौका मिलना चाहिए — चाहे उनकी आर्थिक स्थिति कुछ भी हो। किसी की तैयारी पैसों की वजह से नहीं रुकनी चाहिए। इसीलिए यह tool हमेशा 100% Free रहेगा।',
+    footerBy:       'Made with ❤️ by',
+    footerSub:      'BPSC TRE 4.0: Sep 2026 (Tentative) | UPSC CSE 2026/2027: May 2026/2027',
+    // Form
+    backBtn:        '← वापस',
+    formTitleBpsc:  'BPSC TRE 4.0 — जानकारी भरें',
+    formSubBpsc:    'Class 1-5 (PRT) या 6-8 (TGT) चुनें और plan पाएं',
+    formTitleUpsc:  'UPSC CSE — जानकारी भरें',
+    formSubUpsc:    'Prelims + Mains + Optional का personalized plan पाएं',
+    bpscClassQ:     'किस Class का Syllabus चाहिए?',
+    upscYearQ:      'आप UPSC CSE किस साल दे रहे हैं?',
+    optionalQ:      'Optional Subject चुनें',
+    optionalHint:   'Optional subject 500 marks का होता है — plan में शामिल होगा',
+    optionalTip:    'Popular choices: Anthropology, PSIR, Geography, Sociology, Public Administration — अपने graduation background के हिसाब से चुनें',
+    nameQ:          'आपका नाम',
+    namePlaceholder:'जैसे: Rahul Kumar',
+    dateQ:          'पढ़ाई शुरू करने की तारीख',
+    hoursQ:         'रोज़ कितने घंटे पढ़ सकते हैं?',
+    slotsQ:         'आप किस समय पढ़ सकते हैं?',
+    slotsHint:      'इससे आपका plan और personalized बनेगा',
+    generateBtn:    'Plan Generate करें',
+    // Plan screen
+    pdfBtn:         '⬇️ PDF',
+    editBtn:        '✏️ Edit',
+    resetBtn:       '🔄 Naya Plan',
+    planTitle:      'का Study Plan',
+    daysLeft:       'दिन बाकी',
+    complete:       'Complete',
+    tabPlan:        '📅 Day Plan',
+    tabSyllabus:    '📚 Syllabus',
+    tabPYQ:         '📝 PYQ Tips',
+    tabInfo:        'ℹ️ Exam Info',
+    // Day plan
+    dayLabel:       'Day',
+    todayBadge:     '⚡ Today',
+    mockBadge:      '🎯 Mock Test',
+    revBadge:       '🔄 Revision Day',
+    subjectsCount:  'subjects',
+    mockTitle:      'Full Syllabus Mock Test',
+    mockSub:        'सभी topics का full-length practice test दें। Time management practice करें।',
+    caTitle:        'Daily News + Monthly Magazine',
+    caSub:          'The Hindu / Dainik Jagran पढ़ें। Important events note करें।',
+    revTitle:       'Quick Revision',
+    // Syllabus
+    sylHeading:     '📚 Complete Syllabus',
+    marksLabel:     'Marks',
+    // Lang toggle
+    langToggleHi:   'हिंदी',
+    langToggleEn:   'English',
+  },
+  en: {
+    // Hero
+    badge:          '🎯 Er. Sangam Krishna — 100% Free Study Planner',
+    heroTitle1:     'Your Exam,',
+    heroTitle2:     'Your Plan',
+    heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
+    chooseLabel:    'Choose Your Exam 👇',
+    statExams:      'Exams',
+    statVacancies:  'BPSC Vacancies',
+    statFree:       'Free',
+    statPlans:      'Plans',
+    // Exam cards
+    bpscTitle:      'BPSC TRE 4.0',
+    bpscSub:        'Bihar Primary/Middle Teacher',
+    bpscDate:       'Exam: Sep 2026 (Tentative)',
+    bpscVac:        '46,595 Vacancies',
+    bpscClass:      'Class 1–5 (PRT) & 6–8 (TGT)',
+    bpscBtn:        'Build My Plan',
+    upscTitle:      'UPSC CSE 2026/27',
+    upscSub:        'Civil Services Examination',
+    upscDate:       'Prelims: May 2026 or 2027',
+    upscService:    'IAS / IPS / IFS',
+    upscPattern:    'Pre + Mains + Interview',
+    upscBtn:        'Build My Plan',
+    ribbon:         'Most Popular',
+    // Footer note
+    footerNote:     'Er. Sangam Krishna built ParikshaSathi because he believes every aspirant deserves a fair shot — regardless of their financial background. Quality preparation guidance should never be a privilege. That\'s why this tool is, and will always remain, 100% Free.',
+    footerBy:       'Made with ❤️ by',
+    footerSub:      'BPSC TRE 4.0: Sep 2026 (Tentative) | UPSC CSE 2026/2027: May 2026/2027',
+    // Form
+    backBtn:        '← Back',
+    formTitleBpsc:  'BPSC TRE 4.0 — Fill Details',
+    formSubBpsc:    'Choose Class 1-5 (PRT) or 6-8 (TGT) and get your plan',
+    formTitleUpsc:  'UPSC CSE — Fill Details',
+    formSubUpsc:    'Get a personalized plan for Prelims + Mains + Optional',
+    bpscClassQ:     'Which Class Syllabus do you need?',
+    upscYearQ:      'Which year are you appearing for UPSC CSE?',
+    optionalQ:      'Choose Optional Subject',
+    optionalHint:   'Optional subject carries 500 marks — it will be included in your plan',
+    optionalTip:    'Popular choices: Anthropology, PSIR, Geography, Sociology, Public Administration — choose based on your graduation background',
+    nameQ:          'Your Name',
+    namePlaceholder:'e.g. Rahul Kumar',
+    dateQ:          'Study Start Date',
+    hoursQ:         'How many hours can you study daily?',
+    slotsQ:         'When can you study?',
+    slotsHint:      'This will make your plan more personalized',
+    generateBtn:    'Generate My Plan',
+    // Plan screen
+    pdfBtn:         '⬇️ PDF',
+    editBtn:        '✏️ Edit',
+    resetBtn:       '🔄 New Plan',
+    planTitle:      '\'s Study Plan',
+    daysLeft:       'days left',
+    complete:       'Complete',
+    tabPlan:        '📅 Day Plan',
+    tabSyllabus:    '📚 Syllabus',
+    tabPYQ:         '📝 PYQ Tips',
+    tabInfo:        'ℹ️ Exam Info',
+    // Day plan
+    dayLabel:       'Day',
+    todayBadge:     '⚡ Today',
+    mockBadge:      '🎯 Mock Test',
+    revBadge:       '🔄 Revision Day',
+    subjectsCount:  'subjects',
+    mockTitle:      'Full Syllabus Mock Test',
+    mockSub:        'Attempt a full-length practice test covering all topics. Focus on time management.',
+    caTitle:        'Daily News + Monthly Magazine',
+    caSub:          'Read The Hindu / Indian Express. Note important events.',
+    revTitle:       'Quick Revision',
+    // Syllabus
+    sylHeading:     '📚 Complete Syllabus',
+    marksLabel:     'Marks',
+    // Lang toggle
+    langToggleHi:   'हिंदी',
+    langToggleEn:   'English',
+  }
+};
+
+// ── Apply language to all data-i18n elements ──────────────────
+function applyLang() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (T[lang] && T[lang][key] !== undefined) el.textContent = T[lang][key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (T[lang] && T[lang][key] !== undefined) el.placeholder = T[lang][key];
+  });
+  // Update lang toggle button state
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+  });
+  // Update html lang attribute
+  document.documentElement.lang = lang === 'hi' ? 'hi' : 'en';
+}
+
 // ═══ chunks/c01.js ═══
 // ParikshaSathi — Smart Study Planner | By Er. Sangam Krishna
 let selectedExam='',userData={},studyPlan=[];
@@ -57,9 +248,10 @@ function selectExam(exam){
   if(exam==='bpsc'){
     bg.classList.remove('hidden');
     og.classList.add('hidden');
+    document.getElementById('upscYearGroup').classList.add('hidden');
     document.getElementById('formHeaderIcon').textContent='🏫';
-    document.getElementById('formTitle').textContent='BPSC TRE 4.0 — जानकारी भरें';
-    document.getElementById('formSubtitle').textContent='Class 1-5 (PRT) या 6-8 (TGT) चुनें और plan पाएं';
+    document.getElementById('formTitle').textContent=t('formTitleBpsc');
+    document.getElementById('formSubtitle').textContent=t('formSubBpsc');
     document.getElementById('nameNum').textContent='02';
     document.getElementById('dateNum').textContent='03';
     document.getElementById('hoursNum').textContent='04';
@@ -67,13 +259,14 @@ function selectExam(exam){
   } else {
     bg.classList.add('hidden');
     og.classList.remove('hidden');
+    document.getElementById('upscYearGroup').classList.remove('hidden');
     document.getElementById('formHeaderIcon').textContent='🏛️';
-    document.getElementById('formTitle').textContent='UPSC CSE 2027 — जानकारी भरें';
-    document.getElementById('formSubtitle').textContent='Prelims + Mains + Optional का personalized plan पाएं';
-    document.getElementById('nameNum').textContent='02';
-    document.getElementById('dateNum').textContent='03';
-    document.getElementById('hoursNum').textContent='04';
-    document.getElementById('slotNum').textContent='05';
+    document.getElementById('formTitle').textContent=t('formTitleUpsc');
+    document.getElementById('formSubtitle').textContent=t('formSubUpsc');
+    document.getElementById('nameNum').textContent='03';
+    document.getElementById('dateNum').textContent='04';
+    document.getElementById('hoursNum').textContent='05';
+    document.getElementById('slotNum').textContent='06';
   }
   showScreen('formScreen');
 }
@@ -1339,15 +1532,14 @@ function getSubjectsList() {
 }
 
 function getExamDate() {
-  return userData.exam === 'bpsc'
-    ? new Date('2026-09-22')
-    : new Date('2027-05-16');
+  if (userData.exam === 'bpsc') return new Date('2026-09-22');
+  return userData.upscYear === '2026' ? new Date('2026-05-17') : new Date('2027-05-16');
 }
 
 function generatePlan() {
   const name = document.getElementById('userName').value.trim();
   const startDate = document.getElementById('startDate').value;
-  if (!name || !startDate) { alert('कृपया नाम और तारीख भरें!'); return; }
+  if (!name || !startDate) { alert(lang === 'en' ? 'Please fill in your name and start date!' : 'कृपया नाम और तारीख भरें!'); return; }
 
   const hoursEl = document.querySelector('input[name="studyHours"]:checked');
   const hours = hoursEl ? parseInt(hoursEl.value) : 4;
@@ -1355,16 +1547,18 @@ function generatePlan() {
   const slots = [];
   document.querySelectorAll('input[name="slot"]:checked').forEach(s => slots.push(s.value));
 
-  let bpscClass = '', optionalSubject = '';
+  let bpscClass = '', optionalSubject = '', upscYear = '2027';
   if (selectedExam === 'bpsc') {
     const bc = document.querySelector('input[name="bpscClass"]:checked');
     bpscClass = bc ? bc.value : '1-5';
   } else {
     const optEl = document.getElementById('upscOptional');
     optionalSubject = optEl ? optEl.value : '';
+    const yrEl = document.querySelector('input[name="upscYear"]:checked');
+    upscYear = yrEl ? yrEl.value : '2027';
   }
 
-  userData = { name, exam: selectedExam, bpscClass, optionalSubject, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
+  userData = { name, exam: selectedExam, bpscClass, optionalSubject, upscYear, startDate: new Date(startDate), studyHours: hours, timeSlots: slots };
   studyPlan = buildPlan();
   savePlanToStorage();
   renderPlan();
@@ -1584,17 +1778,20 @@ function renderPlan() {
     anthropology: 'Anthropology', philosophy: 'Philosophy',
     psychology: 'Psychology', economics: 'Economics', law: 'Law'
   };
+  const yr = userData.upscYear || '2027';
   const examLabel = userData.exam === 'bpsc'
     ? (userData.bpscClass === '1-5' ? 'BPSC TRE 4.0 — Class 1–5 (PRT)'
       : userData.bpscClass === '6-8' ? 'BPSC TRE 4.0 — Class 6–8 (TGT)'
       : 'BPSC TRE 4.0 — Class 1–5 & 6–8')
     : userData.optionalSubject
-      ? `UPSC CSE 2027 • ${optionalNames[userData.optionalSubject] || userData.optionalSubject} Optional`
-      : 'UPSC CSE 2027';
+      ? `UPSC CSE ${yr} • ${optionalNames[userData.optionalSubject] || userData.optionalSubject} Optional`
+      : `UPSC CSE ${yr}`;
 
-  document.getElementById('planTitle').textContent = `${userData.name} का Study Plan`;
+  const daysUnit = lang === 'en' ? 'days' : 'दिन';
+  const hrsUnit  = lang === 'en' ? 'hrs/day' : 'घंटे/दिन';
+  document.getElementById('planTitle').textContent = `${userData.name} ${t('planTitle')}`;
   document.getElementById('planSubtitle').textContent =
-    `${examLabel} • ${studyPlan.length} दिन • ${userData.studyHours} घंटे/दिन`;
+    `${examLabel} • ${studyPlan.length} ${daysUnit} • ${userData.studyHours} ${hrsUnit}`;
 
   const now = new Date();
   const pct = Math.min(100, Math.max(0, Math.round(
@@ -1603,14 +1800,14 @@ function renderPlan() {
   document.getElementById('planProgressBar').style.width = Math.max(2, pct) + '%';
   const daysLeft = Math.max(0, Math.ceil((getExamDate() - now) / 86400000));
   document.getElementById('planProgressLabel').textContent =
-    `${pct}% Complete • परीक्षा में ${daysLeft} दिन बाकी`;
+    `${pct}% ${t('complete')} • ${lang === 'en' ? 'Exam in' : 'परीक्षा में'} ${daysLeft} ${t('daysLeft')}`;
 
   document.getElementById('planBody').innerHTML = `
     <div class="tab-bar">
-      <button class="tab-btn active" onclick="showTab('tabPlan')">📅 Day Plan</button>
-      <button class="tab-btn" onclick="showTab('tabSyllabus')">📚 Syllabus</button>
-      <button class="tab-btn" onclick="showTab('tabPYQ')">📝 PYQ Tips</button>
-      <button class="tab-btn" onclick="showTab('tabInfo')">ℹ️ Exam Info</button>
+      <button class="tab-btn active" onclick="showTab('tabPlan')">${t('tabPlan')}</button>
+      <button class="tab-btn" onclick="showTab('tabSyllabus')">${t('tabSyllabus')}</button>
+      <button class="tab-btn" onclick="showTab('tabPYQ')">${t('tabPYQ')}</button>
+      <button class="tab-btn" onclick="showTab('tabInfo')">${t('tabInfo')}</button>
     </div>
     <div id="tabPlan" class="tab-content active">${generateDayPlanHTML()}</div>
     <div id="tabSyllabus" class="tab-content">${generateSyllabusHTML()}</div>
@@ -1633,6 +1830,7 @@ function generateDayPlanHTML() {
   const todayStr = new Date().toDateString();
   const weeks = [];
   for (let i = 0; i < studyPlan.length; i += 7) weeks.push(studyPlan.slice(i, i + 7));
+  const locale = lang === 'en' ? 'en-IN' : 'hi-IN';
 
   return weeks.map((week, wi) => {
     const wStart = week[0].date.toLocaleDateString('en-IN', { day:'numeric', month:'short' });
@@ -1641,7 +1839,7 @@ function generateDayPlanHTML() {
 
     const daysHTML = week.map(day => {
       const isToday = day.date.toDateString() === todayStr;
-      const dateStr = day.date.toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long' });
+      const dateStr = day.date.toLocaleDateString(locale, { weekday:'long', day:'numeric', month:'long' });
 
       let dayClass = 'day-card';
       if (isToday) dayClass += ' today-card';
@@ -1649,11 +1847,11 @@ function generateDayPlanHTML() {
       else if (day.isRevision) dayClass += ' revision-day';
 
       const badge = isToday
-        ? '<span class="day-badge badge-today">⚡ Today</span>'
+        ? `<span class="day-badge badge-today">${t('todayBadge')}</span>`
         : day.isMock
-          ? '<span class="day-badge badge-mock">🎯 Mock Test</span>'
+          ? `<span class="day-badge badge-mock">${t('mockBadge')}</span>`
           : day.isRevision
-            ? '<span class="day-badge badge-revision">🔄 Revision Day</span>'
+            ? `<span class="day-badge badge-revision">${t('revBadge')}</span>`
             : '';
 
       const slotsHTML = day.slots.map(slot => {
@@ -1665,8 +1863,8 @@ function generateDayPlanHTML() {
               <span class="slot-type-badge" style="background:rgba(239,68,68,.15);color:#f87171;border-color:rgba(239,68,68,.3)">🎯 Mock Test</span>
               <span class="slot-duration">2–3 hrs</span>
             </div>
-            <div class="slot-card-title">Full Syllabus Mock Test</div>
-            <div class="slot-card-sub">सभी topics का full-length practice test दें। Time management practice करें।</div>
+            <div class="slot-card-title">${t('mockTitle')}</div>
+            <div class="slot-card-sub">${t('mockSub')}</div>
           </div>`;
         }
 
@@ -1676,26 +1874,28 @@ function generateDayPlanHTML() {
               <span class="slot-type-badge" style="background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.2)">📰 Current Affairs</span>
               <span class="slot-duration">30 min</span>
             </div>
-            <div class="slot-card-title">Daily News + Monthly Magazine</div>
-            <div class="slot-card-sub">The Hindu / Dainik Jagran पढ़ें। Important events note करें।</div>
+            <div class="slot-card-title">${t('caTitle')}</div>
+            <div class="slot-card-sub">${t('caSub')}</div>
           </div>`;
         }
 
         if (slot.type === 'revision') {
           const revList = Array.isArray(slot.microTopics) && slot.microTopics.length
-            ? slot.microTopics.slice(0, 4).map(t => `<span class="rev-tag">${t}</span>`).join('')
+            ? slot.microTopics.slice(0, 4).map(t2 => `<span class="rev-tag">${t2}</span>`).join('')
             : `<span class="rev-tag">${slot.topic}</span>`;
           return `<div class="slot-card rev-slot-card">
             <div class="slot-card-header">
-              <span class="slot-type-badge" style="background:rgba(245,158,11,.1);color:#fbbf24;border-color:rgba(245,158,11,.25)">🔄 Revision</span>
+              <span class="slot-type-badge" style="background:rgba(245,158,11,.1);color:#fbbf24;border-color:rgba(245,158,11,.25)">🔄 ${t('revTitle')}</span>
               <span class="slot-duration">1 hr</span>
             </div>
-            <div class="slot-card-title">Quick Revision</div>
+            <div class="slot-card-title">${t('revTitle')}</div>
             <div class="rev-tags-wrap">${revList}</div>
           </div>`;
         }
 
-        // Normal subject slot
+        // Normal subject slot — show topic name based on lang
+        const topicDisplay = (lang === 'hi' && slot.hindiTopic) ? slot.hindiTopic : slot.topic;
+        const topicSub     = (lang === 'hi' && slot.hindiTopic) ? slot.topic : (slot.hindiTopic || '');
         const micros = (slot.microTopics || []).slice(0, 4);
         const microsHTML = micros.length
           ? `<ul class="slot-micro-list">${micros.map(m => `<li>${m}</li>`).join('')}</ul>`
@@ -1709,8 +1909,8 @@ function generateDayPlanHTML() {
             <span class="slot-duration">${meta.time}</span>
           </div>
           <div class="slot-part-label">${subjectShort}</div>
-          <div class="slot-card-title">${slot.topic}</div>
-          ${slot.hindiTopic ? `<div class="slot-card-hindi">${slot.hindiTopic}</div>` : ''}
+          <div class="slot-card-title">${topicDisplay}</div>
+          ${topicSub ? `<div class="slot-card-hindi">${topicSub}</div>` : ''}
           ${microsHTML}
         </div>`;
       }).join('');
@@ -1719,7 +1919,7 @@ function generateDayPlanHTML() {
         <div class="day-header">
           <div class="day-header-left">
             <div class="day-num-circle${isToday ? ' today-circle' : ''}">
-              <span class="day-num-label">Day</span>
+              <span class="day-num-label">${t('dayLabel')}</span>
               <span class="day-num-val">${day.day}</span>
             </div>
             <div class="day-date-info">
@@ -1727,17 +1927,18 @@ function generateDayPlanHTML() {
               ${badge}
             </div>
           </div>
-          <div class="day-slots-count">${day.slots.filter(s=>s.type==='subject').length} subjects</div>
+          <div class="day-slots-count">${day.slots.filter(s=>s.type==='subject').length} ${t('subjectsCount')}</div>
         </div>
         <div class="slots-grid">${slotsHTML}</div>
       </div>`;
     }).join('');
 
+    const weekLabel = lang === 'en' ? `Week ${wi + 1}` : `सप्ताह ${wi + 1}`;
     return `<div class="week-block${isCurrentWeek ? ' current-week' : ''}">
       <div class="week-header">
-        <span class="week-title">Week ${wi + 1}</span>
+        <span class="week-title">${weekLabel}</span>
         <span class="week-range">${wStart} – ${wEnd}</span>
-        ${isCurrentWeek ? '<span class="week-now-badge">Current Week</span>' : ''}
+        ${isCurrentWeek ? `<span class="week-now-badge">${lang === 'en' ? 'Current Week' : 'इस सप्ताह'}</span>` : ''}
       </div>
       <div class="week-days">${daysHTML}</div>
     </div>`;
@@ -1751,10 +1952,14 @@ function generateSyllabusHTML() {
   const parts = Object.entries(syl).map(([partName, partData]) => {
     const color = partData.color || 'var(--amber)';
     const topics = (partData.topics || []).map(topic => {
+      // In Hindi mode: show hindi name as title, English as subtitle
+      // In English mode: show English name as title, hindi as subtitle
+      const titleText = (lang === 'hi' && topic.hindi) ? topic.hindi : topic.name;
+      const subText   = (lang === 'hi' && topic.hindi) ? topic.name : (topic.hindi || '');
       const micros = (topic.micro || []).map(m => `<li>${m}</li>`).join('');
       return `<div class="subtopic">
-        <div class="subtopic-name">${topic.name}</div>
-        <div class="subtopic-hindi">${topic.hindi || ''}</div>
+        <div class="subtopic-name">${titleText}</div>
+        ${subText ? `<div class="subtopic-hindi">${subText}</div>` : ''}
         <ul class="micro-list">${micros}</ul>
       </div>`;
     }).join('');
@@ -1765,7 +1970,7 @@ function generateSyllabusHTML() {
           <span class="syl-head-title">${partName}</span>
         </div>
         <div class="syl-head-right">
-          <span class="syl-marks">${partData.marks} Marks</span>
+          <span class="syl-marks">${partData.marks} ${t('marksLabel')}</span>
           <span class="syl-arrow">▼</span>
         </div>
       </div>
@@ -1774,67 +1979,68 @@ function generateSyllabusHTML() {
   }).join('');
 
   return `<div class="section-block">
-    <h3>📚 Complete Syllabus</h3>
+    <h3>${t('sylHeading')}</h3>
     ${parts}
   </div>`;
 }
 
 // ═══ chunks/c11.js ═══
-// generatePYQsHTML() + generateExamInfoHTML()
+// generatePYQsHTML() + generateExamInfoHTML() — lang-aware
 function generatePYQsHTML() {
   const isBpsc = userData.exam === 'bpsc';
+  const isEn = lang === 'en';
   if (isBpsc) {
     return `<div class="section-block">
       <h3>📝 BPSC TRE — PYQ Analysis & Tips</h3>
       <div class="pyq-grid">
         <div class="pyq-card">
-          <h5>🔢 Mathematics (Most Asked)</h5>
+          <h5>🔢 ${isEn ? 'Mathematics (Most Asked)' : 'गणित (सबसे ज़्यादा पूछे जाते हैं)'}</h5>
           <ul>
-            <li>Percentage & Profit-Loss (8–10 Qs)</li>
-            <li>Time & Work, Speed-Distance (6–8 Qs)</li>
-            <li>Number System & Simplification</li>
-            <li>Mensuration — Area, Volume</li>
-            <li>Average, Ratio & Proportion</li>
+            <li>${isEn ? 'Percentage & Profit-Loss (8–10 Qs)' : 'प्रतिशत एवं लाभ-हानि (8–10 प्रश्न)'}</li>
+            <li>${isEn ? 'Time & Work, Speed-Distance (6–8 Qs)' : 'समय-कार्य, चाल-दूरी (6–8 प्रश्न)'}</li>
+            <li>${isEn ? 'Number System & Simplification' : 'संख्या पद्धति एवं सरलीकरण'}</li>
+            <li>${isEn ? 'Mensuration — Area, Volume' : 'क्षेत्रमिति — क्षेत्रफल, आयतन'}</li>
+            <li>${isEn ? 'Average, Ratio & Proportion' : 'औसत, अनुपात एवं समानुपात'}</li>
           </ul>
         </div>
         <div class="pyq-card">
-          <h5>🧠 Reasoning (High Scoring)</h5>
+          <h5>🧠 ${isEn ? 'Reasoning (High Scoring)' : 'तर्कशक्ति (उच्च अंक)'}</h5>
           <ul>
-            <li>Series — Number & Letter (5–6 Qs)</li>
-            <li>Blood Relations (3–4 Qs)</li>
-            <li>Coding-Decoding (3–4 Qs)</li>
-            <li>Direction Sense (2–3 Qs)</li>
-            <li>Syllogism & Venn Diagram</li>
+            <li>${isEn ? 'Series — Number & Letter (5–6 Qs)' : 'श्रृंखला — संख्या एवं अक्षर (5–6 प्रश्न)'}</li>
+            <li>${isEn ? 'Blood Relations (3–4 Qs)' : 'रक्त संबंध (3–4 प्रश्न)'}</li>
+            <li>${isEn ? 'Coding-Decoding (3–4 Qs)' : 'कूट भाषा (3–4 प्रश्न)'}</li>
+            <li>${isEn ? 'Direction Sense (2–3 Qs)' : 'दिशा ज्ञान (2–3 प्रश्न)'}</li>
+            <li>${isEn ? 'Syllogism & Venn Diagram' : 'न्यायवाक्य एवं वेन आरेख'}</li>
           </ul>
         </div>
         <div class="pyq-card">
-          <h5>🌍 GS — History & Polity</h5>
+          <h5>🌍 ${isEn ? 'GS — History & Polity' : 'सामान्य अध्ययन — इतिहास एवं राजव्यवस्था'}</h5>
           <ul>
-            <li>Freedom Movement — Gandhi, INC</li>
-            <li>Bihar History — Champaran, JP</li>
-            <li>Constitution — FR, DPSP, Amendments</li>
-            <li>Panchayati Raj (73rd, 74th)</li>
-            <li>President, PM, Parliament</li>
+            <li>${isEn ? 'Freedom Movement — Gandhi, INC' : 'स्वतंत्रता संग्राम — गांधी, INC'}</li>
+            <li>${isEn ? 'Bihar History — Champaran, JP' : 'बिहार इतिहास — चंपारण, जेपी'}</li>
+            <li>${isEn ? 'Constitution — FR, DPSP, Amendments' : 'संविधान — मौलिक अधिकार, DPSP, संशोधन'}</li>
+            <li>${isEn ? 'Panchayati Raj (73rd, 74th)' : 'पंचायती राज (73वां, 74वां संशोधन)'}</li>
+            <li>${isEn ? 'President, PM, Parliament' : 'राष्ट्रपति, प्रधानमंत्री, संसद'}</li>
           </ul>
         </div>
         <div class="pyq-card">
-          <h5>🔬 Science (Easy Marks)</h5>
+          <h5>🔬 ${isEn ? 'Science (Easy Marks)' : 'विज्ञान (आसान अंक)'}</h5>
           <ul>
-            <li>Biology — Diseases, Vitamins, Cells</li>
-            <li>Physics — Force, Motion, Light</li>
-            <li>Chemistry — Acids, Metals, Reactions</li>
-            <li>Environment — Pollution, Ecosystem</li>
-            <li>Current Science News</li>
+            <li>${isEn ? 'Biology — Diseases, Vitamins, Cells' : 'जीव विज्ञान — रोग, विटामिन, कोशिका'}</li>
+            <li>${isEn ? 'Physics — Force, Motion, Light' : 'भौतिकी — बल, गति, प्रकाश'}</li>
+            <li>${isEn ? 'Chemistry — Acids, Metals, Reactions' : 'रसायन — अम्ल, धातु, अभिक्रियाएं'}</li>
+            <li>${isEn ? 'Environment — Pollution, Ecosystem' : 'पर्यावरण — प्रदूषण, पारिस्थितिकी'}</li>
+            <li>${isEn ? 'Current Science News' : 'विज्ञान की समसामयिक घटनाएं'}</li>
           </ul>
         </div>
       </div>
       <div class="ca-box">
-        <h4>📰 Daily Current Affairs Strategy</h4>
+        <h4>📰 ${isEn ? 'Daily Current Affairs Strategy' : 'दैनिक समसामयिकी रणनीति'}</h4>
         <ul>
-          <li>The Hindu / Dainik Jagran — 30 min daily</li>
-          <li>Monthly Magazine: Pratiyogita Darpan / Arihant</li>
-          <li>Bihar Current Affairs — Prabhat Khabar</li>
-          <li>Government Schemes — PIB.gov.in</li>
+          <li>${isEn ? 'The Hindu / Dainik Jagran — 30 min daily' : 'The Hindu / दैनिक जागरण — रोज़ 30 मिनट'}</li>
+          <li>${isEn ? 'Monthly Magazine: Pratiyogita Darpan / Arihant' : 'मासिक पत्रिका: प्रतियोगिता दर्पण / अरिहंत'}</li>
+          <li>${isEn ? 'Bihar Current Affairs — Prabhat Khabar' : 'बिहार समसामयिकी — प्रभात खबर'}</li>
+          <li>${isEn ? 'Government Schemes — PIB.gov.in' : 'सरकारी योजनाएं — PIB.gov.in'}</li>
         </ul>
       </div>
     </div>`;
@@ -1843,43 +2049,43 @@ function generatePYQsHTML() {
     <h3>📝 UPSC CSE — PYQ Analysis & Tips</h3>
     <div class="pyq-grid">
       <div class="pyq-card">
-        <h5>🏛️ Polity & Governance (Prelims)</h5>
+        <h5>🏛️ ${isEn ? 'Polity & Governance (Prelims)' : 'राजव्यवस्था एवं शासन (प्रारंभिक)'}</h5>
         <ul>
-          <li>Constitution — Articles, Amendments (8–10 Qs)</li>
-          <li>Parliament, President, PM (5–6 Qs)</li>
-          <li>Constitutional Bodies (4–5 Qs)</li>
-          <li>Panchayati Raj, Local Bodies</li>
-          <li>Recent SC Judgements</li>
+          <li>${isEn ? 'Constitution — Articles, Amendments (8–10 Qs)' : 'संविधान — अनुच्छेद, संशोधन (8–10 प्रश्न)'}</li>
+          <li>${isEn ? 'Parliament, President, PM (5–6 Qs)' : 'संसद, राष्ट्रपति, प्रधानमंत्री (5–6 प्रश्न)'}</li>
+          <li>${isEn ? 'Constitutional Bodies (4–5 Qs)' : 'संवैधानिक निकाय (4–5 प्रश्न)'}</li>
+          <li>${isEn ? 'Panchayati Raj, Local Bodies' : 'पंचायती राज, स्थानीय निकाय'}</li>
+          <li>${isEn ? 'Recent SC Judgements' : 'सर्वोच्च न्यायालय के हालिया निर्णय'}</li>
         </ul>
       </div>
       <div class="pyq-card">
-        <h5>🌿 Environment & Ecology</h5>
+        <h5>🌿 ${isEn ? 'Environment & Ecology' : 'पर्यावरण एवं पारिस्थितिकी'}</h5>
         <ul>
-          <li>Biodiversity — IUCN, Ramsar, CITES (5–7 Qs)</li>
-          <li>Climate Change — Paris, COP (4–5 Qs)</li>
-          <li>National Parks & Sanctuaries</li>
-          <li>Environmental Laws</li>
-          <li>Pollution & Disaster Management</li>
+          <li>${isEn ? 'Biodiversity — IUCN, Ramsar, CITES (5–7 Qs)' : 'जैव विविधता — IUCN, रामसर, CITES (5–7 प्रश्न)'}</li>
+          <li>${isEn ? 'Climate Change — Paris, COP (4–5 Qs)' : 'जलवायु परिवर्तन — पेरिस, COP (4–5 प्रश्न)'}</li>
+          <li>${isEn ? 'National Parks & Sanctuaries' : 'राष्ट्रीय उद्यान एवं अभयारण्य'}</li>
+          <li>${isEn ? 'Environmental Laws' : 'पर्यावरण कानून'}</li>
+          <li>${isEn ? 'Pollution & Disaster Management' : 'प्रदूषण एवं आपदा प्रबंधन'}</li>
         </ul>
       </div>
       <div class="pyq-card">
-        <h5>📜 History & Culture</h5>
+        <h5>📜 ${isEn ? 'History & Culture' : 'इतिहास एवं संस्कृति'}</h5>
         <ul>
-          <li>Ancient India — Indus, Maurya, Gupta (5–6 Qs)</li>
-          <li>Medieval — Mughal, Bhakti-Sufi (4–5 Qs)</li>
-          <li>Modern — Freedom Movement (6–8 Qs)</li>
-          <li>Art & Architecture (3–4 Qs)</li>
-          <li>UNESCO Heritage Sites</li>
+          <li>${isEn ? 'Ancient India — Indus, Maurya, Gupta (5–6 Qs)' : 'प्राचीन भारत — सिंधु, मौर्य, गुप्त (5–6 प्रश्न)'}</li>
+          <li>${isEn ? 'Medieval — Mughal, Bhakti-Sufi (4–5 Qs)' : 'मध्यकालीन — मुगल, भक्ति-सूफी (4–5 प्रश्न)'}</li>
+          <li>${isEn ? 'Modern — Freedom Movement (6–8 Qs)' : 'आधुनिक — स्वतंत्रता संग्राम (6–8 प्रश्न)'}</li>
+          <li>${isEn ? 'Art & Architecture (3–4 Qs)' : 'कला एवं स्थापत्य (3–4 प्रश्न)'}</li>
+          <li>${isEn ? 'UNESCO Heritage Sites' : 'UNESCO विश्व धरोहर स्थल'}</li>
         </ul>
       </div>
       <div class="pyq-card">
-        <h5>💰 Economy (Trending)</h5>
+        <h5>💰 ${isEn ? 'Economy (Trending)' : 'अर्थव्यवस्था (ट्रेंडिंग)'}</h5>
         <ul>
-          <li>Budget — Fiscal Deficit, Taxes (4–5 Qs)</li>
-          <li>RBI, Monetary Policy, Inflation</li>
-          <li>Agriculture — MSP, e-NAM, FCI</li>
-          <li>International — WTO, IMF, World Bank</li>
-          <li>Government Schemes — PLI, PM-KISAN</li>
+          <li>${isEn ? 'Budget — Fiscal Deficit, Taxes (4–5 Qs)' : 'बजट — राजकोषीय घाटा, कर (4–5 प्रश्न)'}</li>
+          <li>${isEn ? 'RBI, Monetary Policy, Inflation' : 'RBI, मौद्रिक नीति, मुद्रास्फीति'}</li>
+          <li>${isEn ? 'Agriculture — MSP, e-NAM, FCI' : 'कृषि — MSP, e-NAM, FCI'}</li>
+          <li>${isEn ? 'International — WTO, IMF, World Bank' : 'अंतर्राष्ट्रीय — WTO, IMF, विश्व बैंक'}</li>
+          <li>${isEn ? 'Government Schemes — PLI, PM-KISAN' : 'सरकारी योजनाएं — PLI, PM-KISAN'}</li>
         </ul>
       </div>
     </div>
@@ -1888,12 +2094,12 @@ function generatePYQsHTML() {
       <a class="pyq-link" href="https://www.insightsonindia.com/upsc-previous-year-question-papers/" target="_blank">📚 Insights PYQ Analysis</a>
     </div>
     <div class="ca-box">
-      <h4>📰 Daily Current Affairs Strategy</h4>
+      <h4>📰 ${isEn ? 'Daily Current Affairs Strategy' : 'दैनिक समसामयिकी रणनीति'}</h4>
       <ul>
-        <li>The Hindu + Indian Express — 1 hr daily</li>
-        <li>PIB.gov.in — Government press releases</li>
-        <li>Monthly: Vision IAS / Insights Current Affairs</li>
-        <li>Yojana & Kurukshetra — Monthly magazines</li>
+        <li>${isEn ? 'The Hindu + Indian Express — 1 hr daily' : 'The Hindu + Indian Express — रोज़ 1 घंटा'}</li>
+        <li>${isEn ? 'PIB.gov.in — Government press releases' : 'PIB.gov.in — सरकारी प्रेस विज्ञप्तियां'}</li>
+        <li>${isEn ? 'Monthly: Vision IAS / Insights Current Affairs' : 'मासिक: Vision IAS / Insights समसामयिकी'}</li>
+        <li>${isEn ? 'Yojana & Kurukshetra — Monthly magazines' : 'योजना एवं कुरुक्षेत्र — मासिक पत्रिकाएं'}</li>
       </ul>
     </div>
   </div>`;
@@ -1901,100 +2107,113 @@ function generatePYQsHTML() {
 
 function generateExamInfoHTML() {
   const isBpsc = userData.exam === 'bpsc';
+  const isEn = lang === 'en';
   if (isBpsc) {
     const cls = userData.bpscClass;
     return `<div class="section-block">
-      <h3>ℹ️ BPSC TRE 4.0 — Exam Information</h3>
+      <h3>ℹ️ BPSC TRE 4.0 — ${isEn ? 'Exam Information' : 'परीक्षा जानकारी'}</h3>
       <div class="info-grid">
         <div class="info-card">
-          <h4>📅 Important Dates</h4>
-          <p><strong>Exam Date:</strong> Sep 2026 (Tentative)</p>
-          <p><strong>Notification:</strong> BPSC Official</p>
-          <p><strong>Plan Ends:</strong> 15 days before exam</p>
+          <h4>📅 ${isEn ? 'Important Dates' : 'महत्वपूर्ण तिथियां'}</h4>
+          <p><strong>${isEn ? 'Exam Date:' : 'परीक्षा तिथि:'}</strong> Sep 2026 (${isEn ? 'Tentative' : 'संभावित'})</p>
+          <p><strong>${isEn ? 'Notification:' : 'अधिसूचना:'}</strong> BPSC Official</p>
+          <p><strong>${isEn ? 'Plan Ends:' : 'Plan समाप्त:'}</strong> ${isEn ? '15 days before exam' : 'परीक्षा से 15 दिन पहले'}</p>
         </div>
         <div class="info-card">
-          <h4>📝 Exam Pattern</h4>
+          <h4>📝 ${isEn ? 'Exam Pattern' : 'परीक्षा पैटर्न'}</h4>
           ${cls === '1-5' || cls === 'both' ? `<p><strong>Class 1–5 (PRT):</strong></p>
-          <p>Part I Language: 30 marks</p>
-          <p>Part II GS: 120 marks</p>
-          <p><strong>Total: 150 marks</strong></p>` : ''}
+          <p>${isEn ? 'Part I Language: 30 marks' : 'भाग I भाषा: 30 अंक'}</p>
+          <p>${isEn ? 'Part II GS: 120 marks' : 'भाग II सामान्य अध्ययन: 120 अंक'}</p>
+          <p><strong>${isEn ? 'Total: 150 marks' : 'कुल: 150 अंक'}</strong></p>` : ''}
           ${cls === '6-8' || cls === 'both' ? `<p><strong>Class 6–8 (TGT):</strong></p>
-          <p>Part I Language: 30 marks</p>
-          <p>Part II GS: 40 marks</p>
-          <p>Part III Subject: 80 marks</p>
-          <p><strong>Total: 150 marks</strong></p>` : ''}
+          <p>${isEn ? 'Part I Language: 30 marks' : 'भाग I भाषा: 30 अंक'}</p>
+          <p>${isEn ? 'Part II GS: 40 marks' : 'भाग II सामान्य अध्ययन: 40 अंक'}</p>
+          <p>${isEn ? 'Part III Subject: 80 marks' : 'भाग III विषय: 80 अंक'}</p>
+          <p><strong>${isEn ? 'Total: 150 marks' : 'कुल: 150 अंक'}</strong></p>` : ''}
         </div>
         <div class="info-card">
-          <h4>✅ Key Rules</h4>
-          <p>❌ No Negative Marking</p>
-          <p>⏱️ Duration: 2.5 hours</p>
-          <p>📋 MCQ format</p>
-          <p>🏫 46,595 Total Vacancies</p>
+          <h4>✅ ${isEn ? 'Key Rules' : 'मुख्य नियम'}</h4>
+          <p>❌ ${isEn ? 'No Negative Marking' : 'नकारात्मक अंकन नहीं'}</p>
+          <p>⏱️ ${isEn ? 'Duration: 2.5 hours' : 'अवधि: 2.5 घंटे'}</p>
+          <p>📋 ${isEn ? 'MCQ format' : 'बहुविकल्पीय प्रश्न'}</p>
+          <p>🏫 ${isEn ? '46,595 Total Vacancies' : '46,595 कुल रिक्तियां'}</p>
         </div>
         <div class="info-card">
-          <h4>📚 Best Books</h4>
-          <p>• NCERT Class 6–10 (all subjects)</p>
+          <h4>📚 ${isEn ? 'Best Books' : 'सर्वश्रेष्ठ पुस्तकें'}</h4>
+          <p>• NCERT Class 6–10 (${isEn ? 'all subjects' : 'सभी विषय'})</p>
           <p>• Lucent's GK (Hindi/English)</p>
           <p>• Arihant BPSC TRE Guide</p>
-          <p>• R.S. Aggarwal — Maths & Reasoning</p>
+          <p>• R.S. Aggarwal — ${isEn ? 'Maths & Reasoning' : 'गणित एवं तर्कशक्ति'}</p>
         </div>
       </div>
     </div>`;
   }
+  const yr = userData.upscYear || '2027';
+  const mainYr = parseInt(yr);
+  const intYr = mainYr + 1;
+  const optNames = {
+    history: isEn ? 'History' : 'History (इतिहास)',
+    geography: isEn ? 'Geography' : 'Geography (भूगोल)',
+    pub_admin: isEn ? 'Public Administration' : 'Public Administration (लोक प्रशासन)',
+    sociology: isEn ? 'Sociology' : 'Sociology (समाजशास्त्र)',
+    pol_sci: isEn ? 'Political Science & IR' : 'Political Science & IR (राजनीति विज्ञान)',
+    anthropology: isEn ? 'Anthropology' : 'Anthropology (मानवशास्त्र)',
+    philosophy: isEn ? 'Philosophy' : 'Philosophy (दर्शनशास्त्र)',
+    psychology: isEn ? 'Psychology' : 'Psychology (मनोविज्ञान)',
+    economics: isEn ? 'Economics' : 'Economics (अर्थशास्त्र)',
+    law: isEn ? 'Law' : 'Law (विधि)'
+  };
+  const optNote = userData.optionalSubject && optNames[userData.optionalSubject]
+    ? `<div class="optional-note selected">
+        <h4>✅ ${isEn ? 'Optional Subject Selected' : 'Optional Subject चुना गया'}</h4>
+        <p>${isEn
+          ? `You have selected <strong>${optNames[userData.optionalSubject]}</strong> as your Optional Subject. Both Paper I &amp; Paper II are included in your plan. Optional carries <strong>500 marks</strong> and is a key rank determinant.`
+          : `आपने <strong>${optNames[userData.optionalSubject]}</strong> Optional Subject चुना है। इसका syllabus आपके plan में शामिल है — Paper I + Paper II दोनों। Optional में <strong>500 marks</strong> होते हैं जो rank निर्धारित करते हैं।`
+        }</p>
+      </div>`
+    : `<div class="optional-note">
+        <h4>⚠️ ${isEn ? 'No Optional Subject Selected' : 'Optional Subject नहीं चुना'}</h4>
+        <p>${isEn
+          ? 'You have not selected an Optional Subject yet. Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science &amp; IR, Anthropology, Philosophy, Psychology</strong>. Choose based on your graduation background and interest. Come back and regenerate your plan after selecting.'
+          : 'आपने अभी तक Optional Subject नहीं चुना है। Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science &amp; IR, Anthropology, Philosophy, Psychology</strong>. अपने graduation background और interest के हिसाब से चुनें। Optional चुनने के बाद वापस आकर plan generate करें।'
+        }</p>
+      </div>`;
   return `<div class="section-block">
-    <h3>ℹ️ UPSC CSE 2027 — Exam Information</h3>
+    <h3>ℹ️ UPSC CSE ${yr} — ${isEn ? 'Exam Information' : 'परीक्षा जानकारी'}</h3>
     <div class="info-grid">
       <div class="info-card">
-        <h4>📅 Important Dates</h4>
-        <p><strong>Prelims:</strong> May 2027</p>
-        <p><strong>Mains:</strong> Sep–Oct 2027</p>
-        <p><strong>Interview:</strong> Jan–Apr 2028</p>
-        <p><strong>Plan Ends:</strong> 15 days before Prelims</p>
+        <h4>📅 ${isEn ? 'Important Dates' : 'महत्वपूर्ण तिथियां'}</h4>
+        <p><strong>${isEn ? 'Prelims:' : 'प्रारंभिक:'}</strong> May ${yr}</p>
+        <p><strong>${isEn ? 'Mains:' : 'मुख्य:'}</strong> Sep–Oct ${mainYr}</p>
+        <p><strong>${isEn ? 'Interview:' : 'साक्षात्कार:'}</strong> Jan–Apr ${intYr}</p>
+        <p><strong>${isEn ? 'Plan Ends:' : 'Plan समाप्त:'}</strong> ${isEn ? '15 days before Prelims' : 'Prelims से 15 दिन पहले'}</p>
       </div>
       <div class="info-card">
-        <h4>📝 Prelims Pattern</h4>
-        <p>GS Paper I: 200 marks (100 Qs)</p>
-        <p>CSAT Paper II: 200 marks (qualifying 33%)</p>
-        <p>Negative marking: -0.66 per wrong</p>
-        <p>Duration: 2 hrs each paper</p>
+        <h4>📝 ${isEn ? 'Prelims Pattern' : 'प्रारंभिक पैटर्न'}</h4>
+        <p>GS Paper I: 200 ${isEn ? 'marks (100 Qs)' : 'अंक (100 प्रश्न)'}</p>
+        <p>CSAT Paper II: 200 ${isEn ? 'marks (qualifying 33%)' : 'अंक (33% अर्हक)'}</p>
+        <p>${isEn ? 'Negative marking: -0.66 per wrong' : 'नकारात्मक अंकन: -0.66 प्रति गलत'}</p>
+        <p>${isEn ? 'Duration: 2 hrs each paper' : 'अवधि: प्रत्येक पेपर 2 घंटे'}</p>
       </div>
       <div class="info-card">
-        <h4>📝 Mains Pattern</h4>
-        <p>Qualifying: Paper A + B (300+300)</p>
-        <p>Essay: 250 marks</p>
-        <p>GS I–IV: 250×4 = 1000 marks</p>
-        <p>Optional I+II: 250×2 = 500 marks</p>
-        <p>Interview: 275 marks</p>
-        <p><strong>Total Merit: 2025 marks</strong></p>
+        <h4>📝 ${isEn ? 'Mains Pattern' : 'मुख्य परीक्षा पैटर्न'}</h4>
+        <p>${isEn ? 'Qualifying: Paper A + B (300+300)' : 'अर्हक: पेपर A + B (300+300)'}</p>
+        <p>${isEn ? 'Essay: 250 marks' : 'निबंध: 250 अंक'}</p>
+        <p>GS I–IV: 250×4 = 1000 ${isEn ? 'marks' : 'अंक'}</p>
+        <p>${isEn ? 'Optional I+II: 250×2 = 500 marks' : 'Optional I+II: 250×2 = 500 अंक'}</p>
+        <p>${isEn ? 'Interview: 275 marks' : 'साक्षात्कार: 275 अंक'}</p>
+        <p><strong>${isEn ? 'Total Merit: 2025 marks' : 'कुल मेरिट: 2025 अंक'}</strong></p>
       </div>
       <div class="info-card">
-        <h4>📚 Standard Books</h4>
-        <p>• NCERT 6–12 (all subjects)</p>
+        <h4>📚 ${isEn ? 'Standard Books' : 'मानक पुस्तकें'}</h4>
+        <p>• NCERT 6–12 (${isEn ? 'all subjects' : 'सभी विषय'})</p>
         <p>• Laxmikanth — Indian Polity</p>
         <p>• Bipin Chandra — Modern History</p>
         <p>• Ramesh Singh — Indian Economy</p>
         <p>• Shankar IAS — Environment</p>
       </div>
     </div>
-    ${(() => {
-      const optNames = {
-        history: 'History (इतिहास)', geography: 'Geography (भूगोल)',
-        pub_admin: 'Public Administration (लोक प्रशासन)', sociology: 'Sociology (समाजशास्त्र)',
-        pol_sci: 'Political Science & IR (राजनीति विज्ञान)', anthropology: 'Anthropology (मानवशास्त्र)',
-        philosophy: 'Philosophy (दर्शनशास्त्र)', psychology: 'Psychology (मनोविज्ञान)',
-        economics: 'Economics (अर्थशास्त्र)', law: 'Law (विधि)'
-      };
-      if (userData.optionalSubject && optNames[userData.optionalSubject]) {
-        return `<div class="optional-note selected">
-          <h4>✅ Optional Subject चुना गया</h4>
-          <p>आपने <strong>${optNames[userData.optionalSubject]}</strong> Optional Subject चुना है। इसका syllabus आपके plan में शामिल है — Paper I + Paper II दोनों। Optional में <strong>500 marks</strong> होते हैं जो rank निर्धारित करते हैं।</p>
-        </div>`;
-      }
-      return `<div class="optional-note">
-        <h4>⚠️ Optional Subject नहीं चुना</h4>
-        <p>आपने अभी तक Optional Subject नहीं चुना है। Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science & IR, Anthropology, Philosophy, Psychology</strong>. अपने graduation background और interest के हिसाब से चुनें। Optional चुनने के बाद वापस आकर plan generate करें।</p>
-      </div>`;
-    })()}
+    ${optNote}
   </div>`;
 }
 
@@ -2180,6 +2399,8 @@ function initCanvas() {
 
 document.addEventListener('DOMContentLoaded', () => {
   initCanvas();
+  // Apply saved language preference
+  applyLang();
   // Set default start date to today
   const today = new Date().toISOString().split('T')[0];
   const sd = document.getElementById('startDate');
