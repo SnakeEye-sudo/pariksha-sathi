@@ -1858,13 +1858,10 @@ function renderPlan() {
     `${examLabel} • ${studyPlan.length} ${daysUnit} • ${userData.studyHours} ${hrsUnit}`;
 
   const now = new Date();
-  const pct = Math.min(100, Math.max(0, Math.round(
-    ((now - userData.startDate) / (getExamDate() - userData.startDate)) * 100
-  )));
-  document.getElementById('planProgressBar').style.width = Math.max(2, pct) + '%';
   const daysLeft = Math.max(0, Math.ceil((getExamDate() - now) / 86400000));
+  updatePlanProgressBar();
   document.getElementById('planProgressLabel').textContent =
-    `${pct}% ${t('complete')} • ${lang === 'en' ? 'Exam in' : 'परीक्षा में'} ${daysLeft} ${t('daysLeft')}`;
+    `${getPlanChecklistPct()}% ${t('complete')} • ${lang === 'en' ? 'Exam in' : 'परीक्षा में'} ${daysLeft} ${t('daysLeft')}`;
 
   document.getElementById('planBody').innerHTML = `
     <div class="tab-bar">
@@ -4300,6 +4297,34 @@ const LS_STREAK     = 'ps_streak';      // { lastDate, count, longest }
 const LS_RESCHEDULE = 'ps_reschedule';  // { "YYYY-MM-DD": [slot, slot, ...] }
 const LS_NOTIF      = 'ps_notif';       // { enabled: bool, scheduledFor: dateStr }
 
+// ── Overall plan checklist progress ──────────────────────────
+function getPlanChecklistPct() {
+  if (!studyPlan || !studyPlan.length) return 0;
+  const cl = getChecklist();
+  let total = 0, done = 0;
+  studyPlan.forEach(day => {
+    const dateStr = toDateKey(day.date);
+    const subjects = day.slots.filter(s => s.type === 'subject');
+    subjects.forEach((_, idx) => {
+      total++;
+      if (cl[checklistKey(dateStr, idx)]) done++;
+    });
+  });
+  return total ? Math.round((done / total) * 100) : 0;
+}
+
+function updatePlanProgressBar() {
+  const pct = getPlanChecklistPct();
+  const bar = document.getElementById('planProgressBar');
+  const label = document.getElementById('planProgressLabel');
+  if (bar) bar.style.width = Math.max(2, pct) + '%';
+  if (label) {
+    const now = new Date();
+    const daysLeft = Math.max(0, Math.ceil((getExamDate() - now) / 86400000));
+    label.textContent = `${pct}% ${t('complete')} • ${lang === 'en' ? 'Exam in' : 'परीक्षा में'} ${daysLeft} ${t('daysLeft')}`;
+  }
+}
+
 // ── Checklist helpers ─────────────────────────────────────────
 function getChecklist() {
   try { return JSON.parse(localStorage.getItem(LS_CHECKLIST) || '{}'); } catch(e) { return {}; }
@@ -4317,6 +4342,8 @@ function toggleSlotCheck(dateStr, slotIdx, el) {
   updateStreakOnCheck(dateStr);
   // Re-render just the day card's progress
   refreshDayProgress(dateStr);
+  // Update top progress bar
+  updatePlanProgressBar();
   // Refresh c24 widgets
   if (typeof refreshC24Widgets === 'function') refreshC24Widgets();
   // Animate the checkbox

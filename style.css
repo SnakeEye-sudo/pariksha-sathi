@@ -359,6 +359,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .ptb-btn:hover{background:var(--surface2);color:var(--t1);border-color:var(--border3)}
 .ptb-download{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.22);color:var(--green-l)}
 .ptb-download:hover{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 4px 16px rgba(16,185,129,.3)}
+.ptb-edit{background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.3);color:var(--green-l)}
+.ptb-edit:hover{background:var(--green);color:#fff;border-color:var(--green);box-shadow:0 4px 16px rgba(16,185,129,.3)}
 .ptb-reset{background:rgba(239,68,68,.07);color:#f87171;border-color:rgba(239,68,68,.18);pointer-events:auto!important}
 .ptb-reset:hover{background:rgba(239,68,68,.15);color:#fff;border-color:rgba(239,68,68,.5)}
 .ptb-tg{background:rgba(37,211,102,.1);color:#25d366;border-color:rgba(37,211,102,.25)}

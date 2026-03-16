@@ -22,13 +22,10 @@ function renderPlan() {
     `${examLabel} • ${studyPlan.length} ${daysUnit} • ${userData.studyHours} ${hrsUnit}`;
 
   const now = new Date();
-  const pct = Math.min(100, Math.max(0, Math.round(
-    ((now - userData.startDate) / (getExamDate() - userData.startDate)) * 100
-  )));
-  document.getElementById('planProgressBar').style.width = Math.max(2, pct) + '%';
   const daysLeft = Math.max(0, Math.ceil((getExamDate() - now) / 86400000));
+  updatePlanProgressBar();
   document.getElementById('planProgressLabel').textContent =
-    `${pct}% ${t('complete')} • ${lang === 'en' ? 'Exam in' : 'परीक्षा में'} ${daysLeft} ${t('daysLeft')}`;
+    `${getPlanChecklistPct()}% ${t('complete')} • ${lang === 'en' ? 'Exam in' : 'परीक्षा में'} ${daysLeft} ${t('daysLeft')}`;
 
   document.getElementById('planBody').innerHTML = `
     <div class="tab-bar">
