@@ -6461,7 +6461,7 @@ async function injectWeatherWidget() {
 // 2. CURRENT AFFAIRS — GNews API (free, CORS-friendly)
 // ══════════════════════════════════════════════════════════════
 // GNews free tier: 100 req/day, no CORS issues
-const GNEWS_API_KEY = 'a8e5b7c9d2f4e6a1b3c5d7e9f0a2b4c6'; // placeholder — replace with real key from gnews.io
+const GNEWS_API_KEY = 'def2f18d9384efb35cb6217a7659c5f0';
 const NEWS_CATEGORIES = [
   { label: 'India', query: 'India government policy', lang: 'en' },
   { label: 'UPSC', query: 'UPSC civil services exam India', lang: 'en' },
