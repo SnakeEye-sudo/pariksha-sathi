@@ -2608,7 +2608,7 @@ const EXAM_REGISTRY = {
   ssc_cgl: {
     id: 'ssc_cgl', title: 'SSC CGL 2026', subtitle: 'Combined Graduate Level',
     icon: '📋', color: '#3b82f6', cardClass: 'ssc-card',
-    examDate: new Date('2026-05-15'), category: 'ssc',
+    examDate: new Date('2026-05-20'), category: 'ssc',
     vacancies: '~17,000+', pattern: 'Tier 1 + Tier 2 (MCQ)',
     getSyllabus: () => syl_ssc_cgl,
     priorityMap: {
@@ -2662,7 +2662,7 @@ const EXAM_REGISTRY = {
   ibps_clerk: {
     id: 'ibps_clerk', title: 'IBPS Clerk 2026', subtitle: 'Clerical Cadre — Public Sector Banks',
     icon: '📑', color: '#a855f7', cardClass: 'clerk-card',
-    examDate: new Date('2026-12-06'), category: 'banking',
+    examDate: new Date('2026-10-10'), category: 'banking',
     vacancies: '~6000+', pattern: 'Prelims + Mains',
     getSyllabus: () => syl_ibps_clerk,
     priorityMap: {
@@ -3720,8 +3720,8 @@ Object.assign(EXAM_REGISTRY, {
   jee_main_2026: {
     id: 'jee_main_2026', title: 'JEE Main 2026', subtitle: 'Joint Entrance Exam — NITs/IIITs/GFTIs',
     icon: '⚙️', color: '#3b82f6', cardClass: 'jee-card',
-    examDate: new Date('2026-04-05'), category: 'engineering',
-    vacancies: 'NITs / IIITs / GFTIs', pattern: 'CBT • 300 Marks • Session 2: Apr 2026',
+    examDate: new Date('2026-04-02'), category: 'engineering',
+    vacancies: 'NITs / IIITs / GFTIs', pattern: 'CBT • 300 Marks • Session 2: Apr 2–9, 2026',
     getSyllabus: () => syl_jee_main,
     priorityMap: {
       'MATHEMATICS':5,'MATHS':5,'PHYSICS':5,'CHEMISTRY':4,
@@ -3776,7 +3776,7 @@ Object.assign(EXAM_REGISTRY, {
   rpsc_ras_2026: {
     id: 'rpsc_ras_2026', title: 'RPSC RAS 2026', subtitle: 'Rajasthan Administrative Service',
     icon: '⚖️', color: '#ec4899', cardClass: 'rpsc-card',
-    examDate: new Date('2026-05-15'), category: 'state_psc',
+    examDate: new Date('2026-06-15'), category: 'state_psc',
     vacancies: '~500+', pattern: 'Pre + Mains + Interview (New Syllabus 2026)',
     getSyllabus: () => syl_rpsc_ras,
     priorityMap: {

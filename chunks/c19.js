@@ -24,8 +24,8 @@ Object.assign(EXAM_REGISTRY, {
   jee_main_2026: {
     id: 'jee_main_2026', title: 'JEE Main 2026', subtitle: 'Joint Entrance Exam — NITs/IIITs/GFTIs',
     icon: '⚙️', color: '#3b82f6', cardClass: 'jee-card',
-    examDate: new Date('2026-04-05'), category: 'engineering',
-    vacancies: 'NITs / IIITs / GFTIs', pattern: 'CBT • 300 Marks • Session 2: Apr 2026',
+    examDate: new Date('2026-04-02'), category: 'engineering',
+    vacancies: 'NITs / IIITs / GFTIs', pattern: 'CBT • 300 Marks • Session 2: Apr 2–9, 2026',
     getSyllabus: () => syl_jee_main,
     priorityMap: {
       'MATHEMATICS':5,'MATHS':5,'PHYSICS':5,'CHEMISTRY':4,
@@ -80,7 +80,7 @@ Object.assign(EXAM_REGISTRY, {
   rpsc_ras_2026: {
     id: 'rpsc_ras_2026', title: 'RPSC RAS 2026', subtitle: 'Rajasthan Administrative Service',
     icon: '⚖️', color: '#ec4899', cardClass: 'rpsc-card',
-    examDate: new Date('2026-05-15'), category: 'state_psc',
+    examDate: new Date('2026-06-15'), category: 'state_psc',
     vacancies: '~500+', pattern: 'Pre + Mains + Interview (New Syllabus 2026)',
     getSyllabus: () => syl_rpsc_ras,
     priorityMap: {

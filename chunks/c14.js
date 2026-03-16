@@ -86,7 +86,7 @@ const EXAM_REGISTRY = {
   ssc_cgl: {
     id: 'ssc_cgl', title: 'SSC CGL 2026', subtitle: 'Combined Graduate Level',
     icon: '📋', color: '#3b82f6', cardClass: 'ssc-card',
-    examDate: new Date('2026-05-15'), category: 'ssc',
+    examDate: new Date('2026-05-20'), category: 'ssc',
     vacancies: '~17,000+', pattern: 'Tier 1 + Tier 2 (MCQ)',
     getSyllabus: () => syl_ssc_cgl,
     priorityMap: {
@@ -140,7 +140,7 @@ const EXAM_REGISTRY = {
   ibps_clerk: {
     id: 'ibps_clerk', title: 'IBPS Clerk 2026', subtitle: 'Clerical Cadre — Public Sector Banks',
     icon: '📑', color: '#a855f7', cardClass: 'clerk-card',
-    examDate: new Date('2026-12-06'), category: 'banking',
+    examDate: new Date('2026-10-10'), category: 'banking',
     vacancies: '~6000+', pattern: 'Prelims + Mains',
     getSyllabus: () => syl_ibps_clerk,
     priorityMap: {
