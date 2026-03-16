@@ -23,7 +23,7 @@ const T = {
     heroTitle2:     'आपका Plan',
     heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
     chooseLabel:    'अपना Exam चुनें 👇',
-    statExams:      'Exams',
+    statExams:      '11+ Exams',
     statVacancies:  'BPSC Vacancies',
     statFree:       'Free',
     statPlans:      'Plans',
@@ -44,7 +44,7 @@ const T = {
     // Footer note
     footerNote:     'Er. Sangam Krishna ने ParikshaSathi इसलिए बनाया क्योंकि उनका मानना है कि हर aspirant को एक बराबर मौका मिलना चाहिए — चाहे उनकी आर्थिक स्थिति कुछ भी हो। किसी की तैयारी पैसों की वजह से नहीं रुकनी चाहिए। इसीलिए यह tool हमेशा 100% Free रहेगा।',
     footerBy:       'Made with ❤️ by',
-    footerSub:      'BPSC TRE 4.0: Sep 2026 (Tentative) | UPSC CSE 2026/2027: May 2026/2027',
+    footerSub:      'BPSC TRE 4.0 | UPSC CSE 2026/27 | BPSC CCE 71st/72nd | SSC CGL | IBPS PO | SBI PO | IBPS RRB | IBPS Clerk | NDA 2026',
     // Form
     backBtn:        '← वापस',
     formTitleBpsc:  'BPSC TRE 4.0 — जानकारी भरें',
@@ -99,7 +99,7 @@ const T = {
     heroTitle2:     'Your Plan',
     heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
     chooseLabel:    'Choose Your Exam 👇',
-    statExams:      'Exams',
+    statExams:      '11+ Exams',
     statVacancies:  'BPSC Vacancies',
     statFree:       'Free',
     statPlans:      'Plans',
@@ -120,7 +120,7 @@ const T = {
     // Footer note
     footerNote:     'Er. Sangam Krishna built ParikshaSathi because he believes every aspirant deserves a fair shot — regardless of their financial background. Quality preparation guidance should never be a privilege. That\'s why this tool is, and will always remain, 100% Free.',
     footerBy:       'Made with ❤️ by',
-    footerSub:      'BPSC TRE 4.0: Sep 2026 (Tentative) | UPSC CSE 2026/2027: May 2026/2027',
+    footerSub:      'BPSC TRE 4.0 | UPSC CSE 2026/27 | BPSC CCE 71st/72nd | SSC CGL | IBPS PO | SBI PO | IBPS RRB | IBPS Clerk | NDA 2026',
     // Form
     backBtn:        '← Back',
     formTitleBpsc:  'BPSC TRE 4.0 — Fill Details',

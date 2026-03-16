@@ -29,7 +29,7 @@ const T = {
     heroTitle2:     'आपका Plan',
     heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
     chooseLabel:    'अपना Exam चुनें 👇',
-    statExams:      'Exams',
+    statExams:      '11+ Exams',
     statVacancies:  'BPSC Vacancies',
     statFree:       'Free',
     statPlans:      'Plans',
@@ -50,7 +50,7 @@ const T = {
     // Footer note
     footerNote:     'Er. Sangam Krishna ने ParikshaSathi इसलिए बनाया क्योंकि उनका मानना है कि हर aspirant को एक बराबर मौका मिलना चाहिए — चाहे उनकी आर्थिक स्थिति कुछ भी हो। किसी की तैयारी पैसों की वजह से नहीं रुकनी चाहिए। इसीलिए यह tool हमेशा 100% Free रहेगा।',
     footerBy:       'Made with ❤️ by',
-    footerSub:      'BPSC TRE 4.0: Sep 2026 (Tentative) | UPSC CSE 2026/2027: May 2026/2027',
+    footerSub:      'BPSC TRE 4.0 | UPSC CSE 2026/27 | BPSC CCE 71st/72nd | SSC CGL | IBPS PO | SBI PO | IBPS RRB | IBPS Clerk | NDA 2026',
     // Form
     backBtn:        '← वापस',
     formTitleBpsc:  'BPSC TRE 4.0 — जानकारी भरें',
@@ -105,7 +105,7 @@ const T = {
     heroTitle2:     'Your Plan',
     heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
     chooseLabel:    'Choose Your Exam 👇',
-    statExams:      'Exams',
+    statExams:      '11+ Exams',
     statVacancies:  'BPSC Vacancies',
     statFree:       'Free',
     statPlans:      'Plans',
@@ -126,7 +126,7 @@ const T = {
     // Footer note
     footerNote:     'Er. Sangam Krishna built ParikshaSathi because he believes every aspirant deserves a fair shot — regardless of their financial background. Quality preparation guidance should never be a privilege. That\'s why this tool is, and will always remain, 100% Free.',
     footerBy:       'Made with ❤️ by',
-    footerSub:      'BPSC TRE 4.0: Sep 2026 (Tentative) | UPSC CSE 2026/2027: May 2026/2027',
+    footerSub:      'BPSC TRE 4.0 | UPSC CSE 2026/27 | BPSC CCE 71st/72nd | SSC CGL | IBPS PO | SBI PO | IBPS RRB | IBPS Clerk | NDA 2026',
     // Form
     backBtn:        '← Back',
     formTitleBpsc:  'BPSC TRE 4.0 — Fill Details',
@@ -245,29 +245,46 @@ function selectExam(exam){
   selectedExam=exam;
   const bg=document.getElementById('bpscClassGroup');
   const og=document.getElementById('upscOptionalGroup');
-  if(exam==='bpsc'){
+  const yg=document.getElementById('upscYearGroup');
+
+  // Get category from registry or legacy
+  const cfg = getExamConfig(exam);
+  const category = cfg ? cfg.category : (exam === 'bpsc' ? 'teaching' : 'civil_services');
+  const icon = cfg ? cfg.icon : (exam === 'bpsc' ? '🏫' : '🏛️');
+  const title = cfg ? cfg.title : (exam === 'bpsc' ? 'BPSC TRE 4.0' : 'UPSC CSE');
+  const subtitle = cfg ? cfg.subtitle : '';
+
+  // Show/hide form sections based on category
+  if (exam === 'bpsc' || exam === 'bpsc_tre') {
     bg.classList.remove('hidden');
     og.classList.add('hidden');
-    document.getElementById('upscYearGroup').classList.add('hidden');
-    document.getElementById('formHeaderIcon').textContent='🏫';
-    document.getElementById('formTitle').textContent=t('formTitleBpsc');
-    document.getElementById('formSubtitle').textContent=t('formSubBpsc');
+    yg.classList.add('hidden');
     document.getElementById('nameNum').textContent='02';
     document.getElementById('dateNum').textContent='03';
     document.getElementById('hoursNum').textContent='04';
     document.getElementById('slotNum').textContent='05';
-  } else {
+  } else if (category === 'civil_services') {
     bg.classList.add('hidden');
     og.classList.remove('hidden');
-    document.getElementById('upscYearGroup').classList.remove('hidden');
-    document.getElementById('formHeaderIcon').textContent='🏛️';
-    document.getElementById('formTitle').textContent=t('formTitleUpsc');
-    document.getElementById('formSubtitle').textContent=t('formSubUpsc');
+    yg.classList.remove('hidden');
     document.getElementById('nameNum').textContent='03';
     document.getElementById('dateNum').textContent='04';
     document.getElementById('hoursNum').textContent='05';
     document.getElementById('slotNum').textContent='06';
+  } else {
+    // Banking, SSC, Defence, State PSC — no special sub-selections
+    bg.classList.add('hidden');
+    og.classList.add('hidden');
+    yg.classList.add('hidden');
+    document.getElementById('nameNum').textContent='01';
+    document.getElementById('dateNum').textContent='02';
+    document.getElementById('hoursNum').textContent='03';
+    document.getElementById('slotNum').textContent='04';
   }
+
+  document.getElementById('formHeaderIcon').textContent=icon;
+  document.getElementById('formTitle').textContent=title+' — '+(lang==='en'?'Fill Details':'जानकारी भरें');
+  document.getElementById('formSubtitle').textContent=subtitle || (lang==='en'?'Fill in your details to get a personalized plan':'सभी जानकारी भरें और अपना personalized plan पाएं');
   showScreen('formScreen');
 }
 
@@ -1500,6 +1517,7 @@ const syllabusData = {
 };
 
 function getSyllabus() {
+  // Legacy exam IDs (bpsc, upsc) — keep backward compat
   if (userData.exam === 'bpsc') {
     if (userData.bpscClass === 'both') {
       const merged = {};
@@ -1509,13 +1527,18 @@ function getSyllabus() {
     }
     return userData.bpscClass === '1-5' ? syl_bpsc15 : syl_bpsc68;
   }
-  // UPSC: merge prelims + mains + optional (if selected)
-  const base = { ...syl_upsc_pre, ...syl_upsc_mains };
-  if (userData.optionalSubject) {
-    const optSyl = getOptionalSyllabus(userData.optionalSubject);
-    if (optSyl) Object.assign(base, optSyl);
+  if (userData.exam === 'upsc') {
+    const base = { ...syl_upsc_pre, ...syl_upsc_mains };
+    if (userData.optionalSubject) {
+      const optSyl = getOptionalSyllabus(userData.optionalSubject);
+      if (optSyl) Object.assign(base, optSyl);
+    }
+    return base;
   }
-  return base;
+  // New registry-based exams
+  const cfg = getExamConfig(userData.exam);
+  if (cfg && cfg.getSyllabus) return cfg.getSyllabus(userData);
+  return {};
 }
 
 function getSubjectsList() {
@@ -1523,8 +1546,9 @@ function getSubjectsList() {
   const list = Object.entries(syl).map(([name, data]) => ({
     name, marks: data.marks, color: data.color, topics: data.topics
   }));
-  // BPSC: Language is qualifying — schedule last
-  if (userData.exam === 'bpsc') {
+  // BPSC TRE: Language is qualifying — schedule last
+  const exam = userData.exam;
+  if (exam === 'bpsc' || exam === 'bpsc_tre') {
     const langIdx = list.findIndex(s => s.name.includes('Part I') && s.name.includes('Language'));
     if (langIdx > -1) { const [l] = list.splice(langIdx, 1); list.push(l); }
   }
@@ -1532,8 +1556,13 @@ function getSubjectsList() {
 }
 
 function getExamDate() {
+  // Legacy IDs
   if (userData.exam === 'bpsc') return new Date('2026-09-22');
-  return userData.upscYear === '2026' ? new Date('2026-05-17') : new Date('2027-05-16');
+  if (userData.exam === 'upsc') return userData.upscYear === '2026' ? new Date('2026-05-24') : new Date('2027-05-16');
+  // Registry-based
+  const cfg = getExamConfig(userData.exam);
+  if (cfg && cfg.examDate) return new Date(cfg.examDate);
+  return new Date(Date.now() + 365 * 86400000); // fallback: 1 year from now
 }
 
 function generatePlan() {
@@ -1548,10 +1577,15 @@ function generatePlan() {
   document.querySelectorAll('input[name="slot"]:checked').forEach(s => slots.push(s.value));
 
   let bpscClass = '', optionalSubject = '', upscYear = '2027';
-  if (selectedExam === 'bpsc') {
+
+  // Determine exam category from registry or legacy
+  const cfg = getExamConfig(selectedExam);
+  const category = cfg ? cfg.category : (selectedExam === 'bpsc' ? 'teaching' : 'civil_services');
+
+  if (selectedExam === 'bpsc' || selectedExam === 'bpsc_tre') {
     const bc = document.querySelector('input[name="bpscClass"]:checked');
     bpscClass = bc ? bc.value : '1-5';
-  } else {
+  } else if (category === 'civil_services' || selectedExam === 'upsc' || selectedExam === 'upsc_2026' || selectedExam === 'upsc_2027') {
     const optEl = document.getElementById('upscOptional');
     optionalSubject = optEl ? optEl.value : '';
     const yrEl = document.querySelector('input[name="upscYear"]:checked');
@@ -1570,64 +1604,39 @@ function generatePlan() {
 // BPSC TRE & UPSC are ARTS-heavy exams — GS/History/Polity/Geography dominate
 function getSubjectWeights(subjects, exam) {
   const bpscPriority = {
-    // High weight — core GS subjects, max marks
-    'GENERAL STUDIES': 5,
-    'HISTORY': 5,
-    'POLITY': 5,
-    'GEOGRAPHY': 5,
-    'ENVIRONMENT': 4,
-    'ECONOMY': 4,
-    'CHILD DEVELOPMENT': 4,
-    'PEDAGOGY': 4,
-    // Medium — supporting subjects
-    'SCIENCE': 3,
-    'REASONING': 3,
-    'COMPUTER': 2,
-    // Low — maths is small section, language is qualifying
-    'MATHEMATICS': 2,
-    'MATHS': 2,
-    'LANGUAGE': 1,
-    'HINDI': 1,
-    'ENGLISH': 1,
+    'GENERAL STUDIES': 5, 'HISTORY': 5, 'POLITY': 5, 'GEOGRAPHY': 5,
+    'ENVIRONMENT': 4, 'ECONOMY': 4, 'CHILD DEVELOPMENT': 4, 'PEDAGOGY': 4,
+    'SCIENCE': 3, 'REASONING': 3, 'COMPUTER': 2,
+    'MATHEMATICS': 2, 'MATHS': 2, 'LANGUAGE': 1, 'HINDI': 1, 'ENGLISH': 1,
   };
   const upscPriority = {
-    // Very high — core mains subjects
-    'HISTORY': 5,
-    'POLITY': 5,
-    'GEOGRAPHY': 5,
-    'ECONOMY': 5,
-    'ENVIRONMENT': 5,
-    'ETHICS': 5,
-    'OPTIONAL': 5,
-    // High — prelims + IR
-    'PRELIMS': 4,
-    'INTERNATIONAL': 4,
-    'GOVERNANCE': 4,
-    'SOCIAL': 4,
-    // Medium — science & tech, security
-    'SCIENCE': 3,
-    'TECHNOLOGY': 3,
-    'SECURITY': 3,
-    // Low — no maths in UPSC
-    'MATHEMATICS': 1,
-    'MATHS': 1,
-    'LANGUAGE': 1,
+    'HISTORY': 5, 'POLITY': 5, 'GEOGRAPHY': 5, 'ECONOMY': 5,
+    'ENVIRONMENT': 5, 'ETHICS': 5, 'OPTIONAL': 5,
+    'PRELIMS': 4, 'INTERNATIONAL': 4, 'GOVERNANCE': 4, 'SOCIAL': 4,
+    'SCIENCE': 3, 'TECHNOLOGY': 3, 'SECURITY': 3,
+    'MATHEMATICS': 1, 'MATHS': 1, 'LANGUAGE': 1,
   };
 
-  const priorityMap = exam === 'bpsc' ? bpscPriority : upscPriority;
+  // Try registry priorityMap first
+  let priorityMap = null;
+  const cfg = getExamConfig(exam);
+  if (cfg && cfg.priorityMap) {
+    priorityMap = cfg.priorityMap;
+  } else if (exam === 'bpsc') {
+    priorityMap = bpscPriority;
+  } else {
+    priorityMap = upscPriority;
+  }
 
   return subjects.map(subj => {
     const name = subj.name.toUpperCase();
     let weight = 3; // default medium
-    // Match against priority map keys
     for (const [key, w] of Object.entries(priorityMap)) {
-      if (name.includes(key)) {
-        weight = Math.max(weight, w);
-      }
+      if (name.includes(key)) { weight = Math.max(weight, w); }
     }
     // Language/qualifying always lowest regardless
     if (name.includes('LANGUAGE') || name.includes('QUALIFYING') ||
-        name.includes('PART I') && name.includes('LANG')) {
+        (name.includes('PART I') && name.includes('LANG'))) {
       weight = 1;
     }
     return weight;
@@ -1985,228 +1994,409 @@ function generateSyllabusHTML() {
 }
 
 // ═══ chunks/c11.js ═══
-// generatePYQsHTML() + generateExamInfoHTML() — lang-aware
+// generatePYQsHTML() + generateExamInfoHTML() — lang-aware, all exams
 function generatePYQsHTML() {
-  const isBpsc = userData.exam === 'bpsc';
+  const exam = userData.exam;
+  const isBpsc = exam === 'bpsc' || exam === 'bpsc_tre';
+  const isUpsc = exam === 'upsc' || exam === 'upsc_2026' || exam === 'upsc_2027';
   const isEn = lang === 'en';
+
+  // Banking exams
+  if (['ibps_po','sbi_po','ibps_rrb','ibps_clerk'].includes(exam)) {
+    const examName = (getExamConfig(exam)||{}).title || exam.toUpperCase();
+    return `<div class="section-block">
+      <h3>📝 ${examName} — PYQ Analysis & Tips</h3>
+      <div class="pyq-grid">
+        <div class="pyq-card"><h5>🧠 ${isEn?'Reasoning (High Scoring)':'तर्कशक्ति (उच्च अंक)'}</h5><ul>
+          <li>${isEn?'Puzzles & Seating Arrangement (10–15 Qs)':'पहेलियां एवं बैठक व्यवस्था (10–15 प्रश्न)'}</li>
+          <li>${isEn?'Syllogism (3–5 Qs)':'न्यायवाक्य (3–5 प्रश्न)'}</li>
+          <li>${isEn?'Inequality (3–5 Qs)':'असमानता (3–5 प्रश्न)'}</li>
+          <li>${isEn?'Coding-Decoding (3–4 Qs)':'कूट भाषा (3–4 प्रश्न)'}</li>
+          <li>${isEn?'Blood Relations, Direction':'रक्त संबंध, दिशा ज्ञान'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🔢 ${isEn?'Quantitative Aptitude':'संख्यात्मक अभिरुचि'}</h5><ul>
+          <li>${isEn?'Data Interpretation (15–20 Qs)':'आंकड़ा व्याख्या (15–20 प्रश्न)'}</li>
+          <li>${isEn?'Arithmetic — Percentage, SI/CI, Profit-Loss':'अंकगणित — प्रतिशत, ब्याज, लाभ-हानि'}</li>
+          <li>${isEn?'Number Series (5 Qs)':'संख्या श्रृंखला (5 प्रश्न)'}</li>
+          <li>${isEn?'Quadratic Equations (5 Qs)':'द्विघात समीकरण (5 प्रश्न)'}</li>
+          <li>${isEn?'Simplification & Approximation':'सरलीकरण एवं सन्निकटन'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🏦 ${isEn?'Banking Awareness (Key Area)':'बैंकिंग जागरूकता (मुख्य क्षेत्र)'}</h5><ul>
+          <li>${isEn?'RBI — Monetary policy, Rates (5–6 Qs)':'RBI — मौद्रिक नीति, दरें (5–6 प्रश्न)'}</li>
+          <li>${isEn?'Banking terms — NPA, SARFAESI, CIBIL':'बैंकिंग शब्दावली — NPA, SARFAESI, CIBIL'}</li>
+          <li>${isEn?'Government schemes — Jan Dhan, Mudra':'सरकारी योजनाएं — जन धन, मुद्रा'}</li>
+          <li>${isEn?'Financial institutions — NABARD, SIDBI':'वित्तीय संस्थाएं — NABARD, SIDBI'}</li>
+          <li>${isEn?'Current Affairs — last 6 months':'समसामयिकी — पिछले 6 महीने'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>📖 ${isEn?'English Language':'अंग्रेजी भाषा'}</h5><ul>
+          <li>${isEn?'Reading Comprehension (5–7 Qs)':'पठन बोध (5–7 प्रश्न)'}</li>
+          <li>${isEn?'Cloze Test (5–7 Qs)':'क्लोज़ टेस्ट (5–7 प्रश्न)'}</li>
+          <li>${isEn?'Error Detection (3–5 Qs)':'त्रुटि पहचान (3–5 प्रश्न)'}</li>
+          <li>${isEn?'Para Jumbles (5 Qs)':'पैरा जम्बल (5 प्रश्न)'}</li>
+          <li>${isEn?'Sentence Improvement':'वाक्य सुधार'}</li>
+        </ul></div>
+      </div>
+      <div class="ca-box"><h4>📰 ${isEn?'Daily Preparation Strategy':'दैनिक तैयारी रणनीति'}</h4><ul>
+        <li>${isEn?'The Hindu / Economic Times — 30 min daily':'The Hindu / Economic Times — रोज़ 30 मिनट'}</li>
+        <li>${isEn?'Banking Awareness: Oliveboard / Adda247 monthly':'Banking Awareness: Oliveboard / Adda247 मासिक'}</li>
+        <li>${isEn?'Practice 50+ DI sets before exam':'परीक्षा से पहले 50+ DI sets practice करें'}</li>
+        <li>${isEn?'Mock tests: 3–4 per week in last month':'Mock tests: अंतिम महीने में 3–4 प्रति सप्ताह'}</li>
+      </ul></div>
+    </div>`;
+  }
+
+  // SSC CGL
+  if (exam === 'ssc_cgl') {
+    return `<div class="section-block">
+      <h3>📝 SSC CGL 2026 — PYQ Analysis & Tips</h3>
+      <div class="pyq-grid">
+        <div class="pyq-card"><h5>🧠 ${isEn?'Reasoning (25 Qs Tier 1)':'तर्कशक्ति (25 प्रश्न Tier 1)'}</h5><ul>
+          <li>${isEn?'Analogy & Classification (5–6 Qs)':'सादृश्यता एवं वर्गीकरण (5–6 प्रश्न)'}</li>
+          <li>${isEn?'Series — Number & Letter (4–5 Qs)':'श्रृंखला — संख्या एवं अक्षर (4–5 प्रश्न)'}</li>
+          <li>${isEn?'Coding-Decoding (3–4 Qs)':'कूट भाषा (3–4 प्रश्न)'}</li>
+          <li>${isEn?'Matrix & Figure problems (3–4 Qs)':'मैट्रिक्स एवं आकृति (3–4 प्रश्न)'}</li>
+          <li>${isEn?'Venn Diagram, Syllogism':'वेन आरेख, न्यायवाक्य'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🔢 ${isEn?'Quantitative Aptitude (25 Qs)':'संख्यात्मक अभिरुचि (25 प्रश्न)'}</h5><ul>
+          <li>${isEn?'Percentage, Profit-Loss (4–5 Qs)':'प्रतिशत, लाभ-हानि (4–5 प्रश्न)'}</li>
+          <li>${isEn?'Geometry & Mensuration (5–6 Qs)':'ज्यामिति एवं क्षेत्रमिति (5–6 प्रश्न)'}</li>
+          <li>${isEn?'Trigonometry (3–4 Qs)':'त्रिकोणमिति (3–4 प्रश्न)'}</li>
+          <li>${isEn?'Algebra (3–4 Qs)':'बीजगणित (3–4 प्रश्न)'}</li>
+          <li>${isEn?'DI — Table/Bar/Pie (5 Qs)':'DI — तालिका/बार/पाई (5 प्रश्न)'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🌍 ${isEn?'General Awareness (25 Qs)':'सामान्य जागरूकता (25 प्रश्न)'}</h5><ul>
+          <li>${isEn?'History — Modern India (4–5 Qs)':'इतिहास — आधुनिक भारत (4–5 प्रश्न)'}</li>
+          <li>${isEn?'Polity — Constitution, Parliament':'राजव्यवस्था — संविधान, संसद'}</li>
+          <li>${isEn?'Science — Biology, Physics, Chemistry':'विज्ञान — जीव, भौतिकी, रसायन'}</li>
+          <li>${isEn?'Current Affairs — last 6 months':'समसामयिकी — पिछले 6 महीने'}</li>
+          <li>${isEn?'Static GK — Awards, Sports, Books':'स्थैतिक GK — पुरस्कार, खेल, पुस्तकें'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>📖 ${isEn?'English (25 Qs)':'अंग्रेजी (25 प्रश्न)'}</h5><ul>
+          <li>${isEn?'Synonyms & Antonyms (4–5 Qs)':'समानार्थी एवं विलोम (4–5 प्रश्न)'}</li>
+          <li>${isEn?'One Word Substitution (2–3 Qs)':'एक शब्द प्रतिस्थापन (2–3 प्रश्न)'}</li>
+          <li>${isEn?'Idioms & Phrases (2–3 Qs)':'मुहावरे एवं वाक्यांश (2–3 प्रश्न)'}</li>
+          <li>${isEn?'Error Detection (3–4 Qs)':'त्रुटि पहचान (3–4 प्रश्न)'}</li>
+          <li>${isEn?'Reading Comprehension (5 Qs)':'पठन बोध (5 प्रश्न)'}</li>
+        </ul></div>
+      </div>
+      <div class="ca-box"><h4>📰 ${isEn?'Daily Preparation Strategy':'दैनिक तैयारी रणनीति'}</h4><ul>
+        <li>${isEn?'Lucent GK + NCERT 6–10 for GA':'Lucent GK + NCERT 6–10 GA के लिए'}</li>
+        <li>${isEn?'R.S. Aggarwal for Maths & Reasoning':'R.S. Aggarwal गणित एवं तर्कशक्ति के लिए'}</li>
+        <li>${isEn?'Wren & Martin for English Grammar':'Wren & Martin अंग्रेजी व्याकरण के लिए'}</li>
+        <li>${isEn?'50+ mock tests before Tier 1':'Tier 1 से पहले 50+ mock tests'}</li>
+      </ul></div>
+    </div>`;
+  }
+
+  // NDA
+  if (exam === 'nda_2026') {
+    return `<div class="section-block">
+      <h3>📝 NDA 2026 — PYQ Analysis & Tips</h3>
+      <div class="pyq-grid">
+        <div class="pyq-card"><h5>📐 ${isEn?'Mathematics (120 Qs, 300 Marks)':'गणित (120 प्रश्न, 300 अंक)'}</h5><ul>
+          <li>${isEn?'Algebra & Matrices (20–25 Qs)':'बीजगणित एवं मैट्रिक्स (20–25 प्रश्न)'}</li>
+          <li>${isEn?'Trigonometry (15–20 Qs)':'त्रिकोणमिति (15–20 प्रश्न)'}</li>
+          <li>${isEn?'Calculus — Differential & Integral (20–25 Qs)':'कलन — अवकल एवं समाकल (20–25 प्रश्न)'}</li>
+          <li>${isEn?'Analytical Geometry 2D & 3D (15–20 Qs)':'विश्लेषणात्मक ज्यामिति (15–20 प्रश्न)'}</li>
+          <li>${isEn?'Statistics & Probability (10–12 Qs)':'सांख्यिकी एवं प्रायिकता (10–12 प्रश्न)'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>⚡ ${isEn?'Physics (GAT — 25%)':'भौतिकी (GAT — 25%)'}</h5><ul>
+          <li>${isEn?'Mechanics — Newton Laws, Gravitation':'यांत्रिकी — न्यूटन के नियम, गुरुत्वाकर्षण'}</li>
+          <li>${isEn?'Electricity & Magnetism':'विद्युत एवं चुंबकत्व'}</li>
+          <li>${isEn?'Light — Reflection, Refraction, Lenses':'प्रकाश — परावर्तन, अपवर्तन, लेंस'}</li>
+          <li>${isEn?'Modern Physics — Radioactivity, Semiconductors':'आधुनिक भौतिकी — रेडियोधर्मिता, अर्धचालक'}</li>
+          <li>${isEn?'Sound & Thermodynamics':'ध्वनि एवं ऊष्मागतिकी'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🌍 ${isEn?'History & Geography (GAT)':'इतिहास एवं भूगोल (GAT)'}</h5><ul>
+          <li>${isEn?'Freedom Movement — Gandhi, Bose, 1857':'स्वतंत्रता संग्राम — गांधी, बोस, 1857'}</li>
+          <li>${isEn?'World Wars I & II':'विश्व युद्ध I एवं II'}</li>
+          <li>${isEn?'Indian Geography — Rivers, Climate, Soils':'भारतीय भूगोल — नदियां, जलवायु, मिट्टी'}</li>
+          <li>${isEn?'World Geography — Continents, Countries':'विश्व भूगोल — महाद्वीप, देश'}</li>
+          <li>${isEn?'Defence Geography — Strategic locations':'रक्षा भूगोल — रणनीतिक स्थान'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🎖️ ${isEn?'Current Affairs & Defence':'समसामयिकी एवं रक्षा'}</h5><ul>
+          <li>${isEn?'Indian defence — Army, Navy, Air Force':'भारतीय रक्षा — थल, नौ, वायु सेना'}</li>
+          <li>${isEn?'DRDO — Agni, BrahMos, Tejas, INS Vikrant':'DRDO — अग्नि, ब्रह्मोस, तेजस, INS विक्रांत'}</li>
+          <li>${isEn?'ISRO — Chandrayaan-3, Gaganyaan':'ISRO — चंद्रयान-3, गगनयान'}</li>
+          <li>${isEn?'Gallantry awards — PVC, AC, VrC':'वीरता पुरस्कार — PVC, AC, VrC'}</li>
+          <li>${isEn?'International — G20, SCO, QUAD':'अंतर्राष्ट्रीय — G20, SCO, QUAD'}</li>
+        </ul></div>
+      </div>
+      <div class="ca-box"><h4>📰 ${isEn?'NDA Preparation Strategy':'NDA तैयारी रणनीति'}</h4><ul>
+        <li>${isEn?'NCERT Maths 11-12 + R.D. Sharma for Maths paper':'NCERT गणित 11-12 + R.D. Sharma गणित पेपर के लिए'}</li>
+        <li>${isEn?'NCERT Physics, Chemistry, Biology 11-12 for GAT':'NCERT भौतिकी, रसायन, जीव विज्ञान 11-12 GAT के लिए'}</li>
+        <li>${isEn?'Pathfinder NDA/NA by Arihant — comprehensive guide':'Pathfinder NDA/NA by Arihant — व्यापक गाइड'}</li>
+        <li>${isEn?'SSB preparation: GTO, Psychology, Interview':'SSB तैयारी: GTO, मनोविज्ञान, साक्षात्कार'}</li>
+      </ul></div>
+    </div>`;
+  }
+
+  // BPSC CCE (71st/72nd)
+  if (exam === 'bpsc_71' || exam === 'bpsc_72') {
+    const examName = (getExamConfig(exam)||{}).title || 'BPSC CCE';
+    return `<div class="section-block">
+      <h3>📝 ${examName} — PYQ Analysis & Tips</h3>
+      <div class="pyq-grid">
+        <div class="pyq-card"><h5>📜 ${isEn?'History (Most Asked)':'इतिहास (सबसे ज़्यादा पूछा जाता है)'}</h5><ul>
+          <li>${isEn?'Bihar History — Magadha, Champaran, JP (8–10 Qs)':'बिहार इतिहास — मगध, चंपारण, जेपी (8–10 प्रश्न)'}</li>
+          <li>${isEn?'Modern India — Freedom Movement (6–8 Qs)':'आधुनिक भारत — स्वतंत्रता संग्राम (6–8 प्रश्न)'}</li>
+          <li>${isEn?'Ancient India — Maurya, Gupta (4–5 Qs)':'प्राचीन भारत — मौर्य, गुप्त (4–5 प्रश्न)'}</li>
+          <li>${isEn?'Medieval India — Mughal, Bhakti (4–5 Qs)':'मध्यकालीन भारत — मुगल, भक्ति (4–5 प्रश्न)'}</li>
+          <li>${isEn?'World History — World Wars, Cold War':'विश्व इतिहास — विश्व युद्ध, शीत युद्ध'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🗺️ ${isEn?'Geography & Bihar GK':'भूगोल एवं बिहार GK'}</h5><ul>
+          <li>${isEn?'Bihar Geography — Rivers, Districts, Agriculture':'बिहार भूगोल — नदियां, जिले, कृषि'}</li>
+          <li>${isEn?'Indian Geography — Physiography, Climate':'भारतीय भूगोल — भौतिक स्वरूप, जलवायु'}</li>
+          <li>${isEn?'Physical Geography — Plate tectonics, Monsoon':'भौतिक भूगोल — प्लेट विवर्तनिकी, मानसून'}</li>
+          <li>${isEn?'Economic Geography — Agriculture, Industries':'आर्थिक भूगोल — कृषि, उद्योग'}</li>
+          <li>${isEn?'Environment — Biodiversity, Climate change':'पर्यावरण — जैव विविधता, जलवायु परिवर्तन'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>⚖️ ${isEn?'Polity & Governance':'राजव्यवस्था एवं शासन'}</h5><ul>
+          <li>${isEn?'Constitution — FR, DPSP, Amendments (6–8 Qs)':'संविधान — मौलिक अधिकार, DPSP, संशोधन (6–8 प्रश्न)'}</li>
+          <li>${isEn?'Bihar Government — CM, Vidhan Sabha':'बिहार सरकार — CM, विधान सभा'}</li>
+          <li>${isEn?'Panchayati Raj — 73rd, 74th Amendment':'पंचायती राज — 73वां, 74वां संशोधन'}</li>
+          <li>${isEn?'Central Government — President, PM, Parliament':'केंद्र सरकार — राष्ट्रपति, PM, संसद'}</li>
+          <li>${isEn?'Current Affairs — Bihar schemes':'समसामयिकी — बिहार योजनाएं'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>💰 ${isEn?'Economy & Science':'अर्थव्यवस्था एवं विज्ञान'}</h5><ul>
+          <li>${isEn?'Bihar Economy — Agriculture, Industries':'बिहार अर्थव्यवस्था — कृषि, उद्योग'}</li>
+          <li>${isEn?'Indian Economy — GDP, RBI, Budget':'भारतीय अर्थव्यवस्था — GDP, RBI, बजट'}</li>
+          <li>${isEn?'Science — ISRO, DRDO, Health':'विज्ञान — ISRO, DRDO, स्वास्थ्य'}</li>
+          <li>${isEn?'Current Affairs — National & Bihar':'समसामयिकी — राष्ट्रीय एवं बिहार'}</li>
+          <li>${isEn?'Awards, Sports, Important Days':'पुरस्कार, खेल, महत्वपूर्ण दिवस'}</li>
+        </ul></div>
+      </div>
+      <div class="ca-box"><h4>📰 ${isEn?'Daily Preparation Strategy':'दैनिक तैयारी रणनीति'}</h4><ul>
+        <li>${isEn?'Prabhat Khabar / Dainik Jagran — Bihar focus':'प्रभात खबर / दैनिक जागरण — बिहार फोकस'}</li>
+        <li>${isEn?'NCERT 6–12 for History, Geography, Polity':'NCERT 6–12 इतिहास, भूगोल, राजव्यवस्था के लिए'}</li>
+        <li>${isEn?'Spectrum Modern History + Bipin Chandra':'Spectrum Modern History + बिपिन चंद्र'}</li>
+        <li>${isEn?'Bihar Special GK — Arihant / Lucent Bihar':'Bihar Special GK — Arihant / Lucent Bihar'}</li>
+      </ul></div>
+    </div>`;
+  }
+
+  // BPSC TRE
   if (isBpsc) {
     return `<div class="section-block">
       <h3>📝 BPSC TRE — PYQ Analysis & Tips</h3>
       <div class="pyq-grid">
-        <div class="pyq-card">
-          <h5>🔢 ${isEn ? 'Mathematics (Most Asked)' : 'गणित (सबसे ज़्यादा पूछे जाते हैं)'}</h5>
-          <ul>
-            <li>${isEn ? 'Percentage & Profit-Loss (8–10 Qs)' : 'प्रतिशत एवं लाभ-हानि (8–10 प्रश्न)'}</li>
-            <li>${isEn ? 'Time & Work, Speed-Distance (6–8 Qs)' : 'समय-कार्य, चाल-दूरी (6–8 प्रश्न)'}</li>
-            <li>${isEn ? 'Number System & Simplification' : 'संख्या पद्धति एवं सरलीकरण'}</li>
-            <li>${isEn ? 'Mensuration — Area, Volume' : 'क्षेत्रमिति — क्षेत्रफल, आयतन'}</li>
-            <li>${isEn ? 'Average, Ratio & Proportion' : 'औसत, अनुपात एवं समानुपात'}</li>
-          </ul>
-        </div>
-        <div class="pyq-card">
-          <h5>🧠 ${isEn ? 'Reasoning (High Scoring)' : 'तर्कशक्ति (उच्च अंक)'}</h5>
-          <ul>
-            <li>${isEn ? 'Series — Number & Letter (5–6 Qs)' : 'श्रृंखला — संख्या एवं अक्षर (5–6 प्रश्न)'}</li>
-            <li>${isEn ? 'Blood Relations (3–4 Qs)' : 'रक्त संबंध (3–4 प्रश्न)'}</li>
-            <li>${isEn ? 'Coding-Decoding (3–4 Qs)' : 'कूट भाषा (3–4 प्रश्न)'}</li>
-            <li>${isEn ? 'Direction Sense (2–3 Qs)' : 'दिशा ज्ञान (2–3 प्रश्न)'}</li>
-            <li>${isEn ? 'Syllogism & Venn Diagram' : 'न्यायवाक्य एवं वेन आरेख'}</li>
-          </ul>
-        </div>
-        <div class="pyq-card">
-          <h5>🌍 ${isEn ? 'GS — History & Polity' : 'सामान्य अध्ययन — इतिहास एवं राजव्यवस्था'}</h5>
-          <ul>
-            <li>${isEn ? 'Freedom Movement — Gandhi, INC' : 'स्वतंत्रता संग्राम — गांधी, INC'}</li>
-            <li>${isEn ? 'Bihar History — Champaran, JP' : 'बिहार इतिहास — चंपारण, जेपी'}</li>
-            <li>${isEn ? 'Constitution — FR, DPSP, Amendments' : 'संविधान — मौलिक अधिकार, DPSP, संशोधन'}</li>
-            <li>${isEn ? 'Panchayati Raj (73rd, 74th)' : 'पंचायती राज (73वां, 74वां संशोधन)'}</li>
-            <li>${isEn ? 'President, PM, Parliament' : 'राष्ट्रपति, प्रधानमंत्री, संसद'}</li>
-          </ul>
-        </div>
-        <div class="pyq-card">
-          <h5>🔬 ${isEn ? 'Science (Easy Marks)' : 'विज्ञान (आसान अंक)'}</h5>
-          <ul>
-            <li>${isEn ? 'Biology — Diseases, Vitamins, Cells' : 'जीव विज्ञान — रोग, विटामिन, कोशिका'}</li>
-            <li>${isEn ? 'Physics — Force, Motion, Light' : 'भौतिकी — बल, गति, प्रकाश'}</li>
-            <li>${isEn ? 'Chemistry — Acids, Metals, Reactions' : 'रसायन — अम्ल, धातु, अभिक्रियाएं'}</li>
-            <li>${isEn ? 'Environment — Pollution, Ecosystem' : 'पर्यावरण — प्रदूषण, पारिस्थितिकी'}</li>
-            <li>${isEn ? 'Current Science News' : 'विज्ञान की समसामयिक घटनाएं'}</li>
-          </ul>
-        </div>
+        <div class="pyq-card"><h5>🔢 ${isEn?'Mathematics (Most Asked)':'गणित (सबसे ज़्यादा पूछे जाते हैं)'}</h5><ul>
+          <li>${isEn?'Percentage & Profit-Loss (8–10 Qs)':'प्रतिशत एवं लाभ-हानि (8–10 प्रश्न)'}</li>
+          <li>${isEn?'Time & Work, Speed-Distance (6–8 Qs)':'समय-कार्य, चाल-दूरी (6–8 प्रश्न)'}</li>
+          <li>${isEn?'Number System & Simplification':'संख्या पद्धति एवं सरलीकरण'}</li>
+          <li>${isEn?'Mensuration — Area, Volume':'क्षेत्रमिति — क्षेत्रफल, आयतन'}</li>
+          <li>${isEn?'Average, Ratio & Proportion':'औसत, अनुपात एवं समानुपात'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🧠 ${isEn?'Reasoning (High Scoring)':'तर्कशक्ति (उच्च अंक)'}</h5><ul>
+          <li>${isEn?'Series — Number & Letter (5–6 Qs)':'श्रृंखला — संख्या एवं अक्षर (5–6 प्रश्न)'}</li>
+          <li>${isEn?'Blood Relations (3–4 Qs)':'रक्त संबंध (3–4 प्रश्न)'}</li>
+          <li>${isEn?'Coding-Decoding (3–4 Qs)':'कूट भाषा (3–4 प्रश्न)'}</li>
+          <li>${isEn?'Direction Sense (2–3 Qs)':'दिशा ज्ञान (2–3 प्रश्न)'}</li>
+          <li>${isEn?'Syllogism & Venn Diagram':'न्यायवाक्य एवं वेन आरेख'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🌍 ${isEn?'GS — History & Polity':'सामान्य अध्ययन — इतिहास एवं राजव्यवस्था'}</h5><ul>
+          <li>${isEn?'Freedom Movement — Gandhi, INC':'स्वतंत्रता संग्राम — गांधी, INC'}</li>
+          <li>${isEn?'Bihar History — Champaran, JP':'बिहार इतिहास — चंपारण, जेपी'}</li>
+          <li>${isEn?'Constitution — FR, DPSP, Amendments':'संविधान — मौलिक अधिकार, DPSP, संशोधन'}</li>
+          <li>${isEn?'Panchayati Raj (73rd, 74th)':'पंचायती राज (73वां, 74वां संशोधन)'}</li>
+          <li>${isEn?'President, PM, Parliament':'राष्ट्रपति, प्रधानमंत्री, संसद'}</li>
+        </ul></div>
+        <div class="pyq-card"><h5>🔬 ${isEn?'Science (Easy Marks)':'विज्ञान (आसान अंक)'}</h5><ul>
+          <li>${isEn?'Biology — Diseases, Vitamins, Cells':'जीव विज्ञान — रोग, विटामिन, कोशिका'}</li>
+          <li>${isEn?'Physics — Force, Motion, Light':'भौतिकी — बल, गति, प्रकाश'}</li>
+          <li>${isEn?'Chemistry — Acids, Metals, Reactions':'रसायन — अम्ल, धातु, अभिक्रियाएं'}</li>
+          <li>${isEn?'Environment — Pollution, Ecosystem':'पर्यावरण — प्रदूषण, पारिस्थितिकी'}</li>
+          <li>${isEn?'Current Science News':'विज्ञान की समसामयिक घटनाएं'}</li>
+        </ul></div>
       </div>
-      <div class="ca-box">
-        <h4>📰 ${isEn ? 'Daily Current Affairs Strategy' : 'दैनिक समसामयिकी रणनीति'}</h4>
-        <ul>
-          <li>${isEn ? 'The Hindu / Dainik Jagran — 30 min daily' : 'The Hindu / दैनिक जागरण — रोज़ 30 मिनट'}</li>
-          <li>${isEn ? 'Monthly Magazine: Pratiyogita Darpan / Arihant' : 'मासिक पत्रिका: प्रतियोगिता दर्पण / अरिहंत'}</li>
-          <li>${isEn ? 'Bihar Current Affairs — Prabhat Khabar' : 'बिहार समसामयिकी — प्रभात खबर'}</li>
-          <li>${isEn ? 'Government Schemes — PIB.gov.in' : 'सरकारी योजनाएं — PIB.gov.in'}</li>
-        </ul>
-      </div>
+      <div class="ca-box"><h4>📰 ${isEn?'Daily Current Affairs Strategy':'दैनिक समसामयिकी रणनीति'}</h4><ul>
+        <li>${isEn?'The Hindu / Dainik Jagran — 30 min daily':'The Hindu / दैनिक जागरण — रोज़ 30 मिनट'}</li>
+        <li>${isEn?'Monthly Magazine: Pratiyogita Darpan / Arihant':'मासिक पत्रिका: प्रतियोगिता दर्पण / अरिहंत'}</li>
+        <li>${isEn?'Bihar Current Affairs — Prabhat Khabar':'बिहार समसामयिकी — प्रभात खबर'}</li>
+        <li>${isEn?'Government Schemes — PIB.gov.in':'सरकारी योजनाएं — PIB.gov.in'}</li>
+      </ul></div>
     </div>`;
   }
+
+  // UPSC (default)
   return `<div class="section-block">
     <h3>📝 UPSC CSE — PYQ Analysis & Tips</h3>
     <div class="pyq-grid">
-      <div class="pyq-card">
-        <h5>🏛️ ${isEn ? 'Polity & Governance (Prelims)' : 'राजव्यवस्था एवं शासन (प्रारंभिक)'}</h5>
-        <ul>
-          <li>${isEn ? 'Constitution — Articles, Amendments (8–10 Qs)' : 'संविधान — अनुच्छेद, संशोधन (8–10 प्रश्न)'}</li>
-          <li>${isEn ? 'Parliament, President, PM (5–6 Qs)' : 'संसद, राष्ट्रपति, प्रधानमंत्री (5–6 प्रश्न)'}</li>
-          <li>${isEn ? 'Constitutional Bodies (4–5 Qs)' : 'संवैधानिक निकाय (4–5 प्रश्न)'}</li>
-          <li>${isEn ? 'Panchayati Raj, Local Bodies' : 'पंचायती राज, स्थानीय निकाय'}</li>
-          <li>${isEn ? 'Recent SC Judgements' : 'सर्वोच्च न्यायालय के हालिया निर्णय'}</li>
-        </ul>
-      </div>
-      <div class="pyq-card">
-        <h5>🌿 ${isEn ? 'Environment & Ecology' : 'पर्यावरण एवं पारिस्थितिकी'}</h5>
-        <ul>
-          <li>${isEn ? 'Biodiversity — IUCN, Ramsar, CITES (5–7 Qs)' : 'जैव विविधता — IUCN, रामसर, CITES (5–7 प्रश्न)'}</li>
-          <li>${isEn ? 'Climate Change — Paris, COP (4–5 Qs)' : 'जलवायु परिवर्तन — पेरिस, COP (4–5 प्रश्न)'}</li>
-          <li>${isEn ? 'National Parks & Sanctuaries' : 'राष्ट्रीय उद्यान एवं अभयारण्य'}</li>
-          <li>${isEn ? 'Environmental Laws' : 'पर्यावरण कानून'}</li>
-          <li>${isEn ? 'Pollution & Disaster Management' : 'प्रदूषण एवं आपदा प्रबंधन'}</li>
-        </ul>
-      </div>
-      <div class="pyq-card">
-        <h5>📜 ${isEn ? 'History & Culture' : 'इतिहास एवं संस्कृति'}</h5>
-        <ul>
-          <li>${isEn ? 'Ancient India — Indus, Maurya, Gupta (5–6 Qs)' : 'प्राचीन भारत — सिंधु, मौर्य, गुप्त (5–6 प्रश्न)'}</li>
-          <li>${isEn ? 'Medieval — Mughal, Bhakti-Sufi (4–5 Qs)' : 'मध्यकालीन — मुगल, भक्ति-सूफी (4–5 प्रश्न)'}</li>
-          <li>${isEn ? 'Modern — Freedom Movement (6–8 Qs)' : 'आधुनिक — स्वतंत्रता संग्राम (6–8 प्रश्न)'}</li>
-          <li>${isEn ? 'Art & Architecture (3–4 Qs)' : 'कला एवं स्थापत्य (3–4 प्रश्न)'}</li>
-          <li>${isEn ? 'UNESCO Heritage Sites' : 'UNESCO विश्व धरोहर स्थल'}</li>
-        </ul>
-      </div>
-      <div class="pyq-card">
-        <h5>💰 ${isEn ? 'Economy (Trending)' : 'अर्थव्यवस्था (ट्रेंडिंग)'}</h5>
-        <ul>
-          <li>${isEn ? 'Budget — Fiscal Deficit, Taxes (4–5 Qs)' : 'बजट — राजकोषीय घाटा, कर (4–5 प्रश्न)'}</li>
-          <li>${isEn ? 'RBI, Monetary Policy, Inflation' : 'RBI, मौद्रिक नीति, मुद्रास्फीति'}</li>
-          <li>${isEn ? 'Agriculture — MSP, e-NAM, FCI' : 'कृषि — MSP, e-NAM, FCI'}</li>
-          <li>${isEn ? 'International — WTO, IMF, World Bank' : 'अंतर्राष्ट्रीय — WTO, IMF, विश्व बैंक'}</li>
-          <li>${isEn ? 'Government Schemes — PLI, PM-KISAN' : 'सरकारी योजनाएं — PLI, PM-KISAN'}</li>
-        </ul>
-      </div>
+      <div class="pyq-card"><h5>🏛️ ${isEn?'Polity & Governance (Prelims)':'राजव्यवस्था एवं शासन (प्रारंभिक)'}</h5><ul>
+        <li>${isEn?'Constitution — Articles, Amendments (8–10 Qs)':'संविधान — अनुच्छेद, संशोधन (8–10 प्रश्न)'}</li>
+        <li>${isEn?'Parliament, President, PM (5–6 Qs)':'संसद, राष्ट्रपति, प्रधानमंत्री (5–6 प्रश्न)'}</li>
+        <li>${isEn?'Constitutional Bodies (4–5 Qs)':'संवैधानिक निकाय (4–5 प्रश्न)'}</li>
+        <li>${isEn?'Panchayati Raj, Local Bodies':'पंचायती राज, स्थानीय निकाय'}</li>
+        <li>${isEn?'Recent SC Judgements':'सर्वोच्च न्यायालय के हालिया निर्णय'}</li>
+      </ul></div>
+      <div class="pyq-card"><h5>🌿 ${isEn?'Environment & Ecology':'पर्यावरण एवं पारिस्थितिकी'}</h5><ul>
+        <li>${isEn?'Biodiversity — IUCN, Ramsar, CITES (5–7 Qs)':'जैव विविधता — IUCN, रामसर, CITES (5–7 प्रश्न)'}</li>
+        <li>${isEn?'Climate Change — Paris, COP (4–5 Qs)':'जलवायु परिवर्तन — पेरिस, COP (4–5 प्रश्न)'}</li>
+        <li>${isEn?'National Parks & Sanctuaries':'राष्ट्रीय उद्यान एवं अभयारण्य'}</li>
+        <li>${isEn?'Environmental Laws':'पर्यावरण कानून'}</li>
+        <li>${isEn?'Pollution & Disaster Management':'प्रदूषण एवं आपदा प्रबंधन'}</li>
+      </ul></div>
+      <div class="pyq-card"><h5>📜 ${isEn?'History & Culture':'इतिहास एवं संस्कृति'}</h5><ul>
+        <li>${isEn?'Ancient India — Indus, Maurya, Gupta (5–6 Qs)':'प्राचीन भारत — सिंधु, मौर्य, गुप्त (5–6 प्रश्न)'}</li>
+        <li>${isEn?'Medieval — Mughal, Bhakti-Sufi (4–5 Qs)':'मध्यकालीन — मुगल, भक्ति-सूफी (4–5 प्रश्न)'}</li>
+        <li>${isEn?'Modern — Freedom Movement (6–8 Qs)':'आधुनिक — स्वतंत्रता संग्राम (6–8 प्रश्न)'}</li>
+        <li>${isEn?'Art & Architecture (3–4 Qs)':'कला एवं स्थापत्य (3–4 प्रश्न)'}</li>
+        <li>${isEn?'UNESCO Heritage Sites':'UNESCO विश्व धरोहर स्थल'}</li>
+      </ul></div>
+      <div class="pyq-card"><h5>💰 ${isEn?'Economy (Trending)':'अर्थव्यवस्था (ट्रेंडिंग)'}</h5><ul>
+        <li>${isEn?'Budget — Fiscal Deficit, Taxes (4–5 Qs)':'बजट — राजकोषीय घाटा, कर (4–5 प्रश्न)'}</li>
+        <li>${isEn?'RBI, Monetary Policy, Inflation':'RBI, मौद्रिक नीति, मुद्रास्फीति'}</li>
+        <li>${isEn?'Agriculture — MSP, e-NAM, FCI':'कृषि — MSP, e-NAM, FCI'}</li>
+        <li>${isEn?'International — WTO, IMF, World Bank':'अंतर्राष्ट्रीय — WTO, IMF, विश्व बैंक'}</li>
+        <li>${isEn?'Government Schemes — PLI, PM-KISAN':'सरकारी योजनाएं — PLI, PM-KISAN'}</li>
+      </ul></div>
     </div>
     <div class="pyq-links">
       <a class="pyq-link" href="https://upsc.gov.in/examinations/previous-question-papers" target="_blank">📄 UPSC Official PYQs</a>
       <a class="pyq-link" href="https://www.insightsonindia.com/upsc-previous-year-question-papers/" target="_blank">📚 Insights PYQ Analysis</a>
     </div>
-    <div class="ca-box">
-      <h4>📰 ${isEn ? 'Daily Current Affairs Strategy' : 'दैनिक समसामयिकी रणनीति'}</h4>
-      <ul>
-        <li>${isEn ? 'The Hindu + Indian Express — 1 hr daily' : 'The Hindu + Indian Express — रोज़ 1 घंटा'}</li>
-        <li>${isEn ? 'PIB.gov.in — Government press releases' : 'PIB.gov.in — सरकारी प्रेस विज्ञप्तियां'}</li>
-        <li>${isEn ? 'Monthly: Vision IAS / Insights Current Affairs' : 'मासिक: Vision IAS / Insights समसामयिकी'}</li>
-        <li>${isEn ? 'Yojana & Kurukshetra — Monthly magazines' : 'योजना एवं कुरुक्षेत्र — मासिक पत्रिकाएं'}</li>
-      </ul>
-    </div>
+    <div class="ca-box"><h4>📰 ${isEn?'Daily Current Affairs Strategy':'दैनिक समसामयिकी रणनीति'}</h4><ul>
+      <li>${isEn?'The Hindu + Indian Express — 1 hr daily':'The Hindu + Indian Express — रोज़ 1 घंटा'}</li>
+      <li>${isEn?'PIB.gov.in — Government press releases':'PIB.gov.in — सरकारी प्रेस विज्ञप्तियां'}</li>
+      <li>${isEn?'Monthly: Vision IAS / Insights Current Affairs':'मासिक: Vision IAS / Insights समसामयिकी'}</li>
+      <li>${isEn?'Yojana & Kurukshetra — Monthly magazines':'योजना एवं कुरुक्षेत्र — मासिक पत्रिकाएं'}</li>
+    </ul></div>
   </div>`;
 }
 
 function generateExamInfoHTML() {
-  const isBpsc = userData.exam === 'bpsc';
+  const exam = userData.exam;
+  const isBpsc = exam === 'bpsc' || exam === 'bpsc_tre';
   const isEn = lang === 'en';
-  if (isBpsc) {
-    const cls = userData.bpscClass;
+
+  // Generic info for registry-based exams (banking, SSC, NDA, BPSC CCE)
+  if (!isBpsc && exam !== 'upsc' && exam !== 'upsc_2026' && exam !== 'upsc_2027') {
+    const cfg = getExamConfig(exam) || {};
+    const examDate = cfg.examDate ? new Date(cfg.examDate).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : 'TBA';
+    const booksMap = {
+      ssc_cgl: ['NCERT 6–10 (all subjects)','Lucent GK','R.S. Aggarwal — Maths & Reasoning','Wren & Martin — English','Kiran SSC CGL Guide'],
+      ibps_po: ['NCERT 6–10','Oliveboard Banking Awareness','R.S. Aggarwal — Verbal & Non-Verbal','Arihant IBPS PO Guide','Manorama Yearbook'],
+      sbi_po: ['NCERT 6–10','SBI PO Previous Papers','R.S. Aggarwal','Arihant SBI PO Guide','The Hindu for English'],
+      ibps_rrb: ['NCERT 6–10','Oliveboard RRB Guide','R.S. Aggarwal','Arihant IBPS RRB Guide','Rural Banking Awareness'],
+      ibps_clerk: ['NCERT 6–10','Oliveboard Clerk Guide','R.S. Aggarwal','Arihant IBPS Clerk Guide','Banking Awareness by Arihant'],
+      nda_2026: ['NCERT Maths 11–12','R.D. Sharma Maths','NCERT Physics/Chemistry/Biology 11–12','Pathfinder NDA/NA by Arihant','Spectrum Modern History'],
+      bpsc_71: ['NCERT 6–12','Spectrum Modern History','Laxmikanth Polity','Lucent Bihar GK','Arihant BPSC Guide'],
+      bpsc_72: ['NCERT 6–12','Spectrum Modern History','Laxmikanth Polity','Lucent Bihar GK','Arihant BPSC Guide'],
+    };
+    const books = booksMap[exam] || ['NCERT 6–12','Standard reference books','Previous year papers'];
     return `<div class="section-block">
-      <h3>ℹ️ BPSC TRE 4.0 — ${isEn ? 'Exam Information' : 'परीक्षा जानकारी'}</h3>
+      <h3>ℹ️ ${cfg.title||exam.toUpperCase()} — ${isEn?'Exam Information':'परीक्षा जानकारी'}</h3>
       <div class="info-grid">
         <div class="info-card">
-          <h4>📅 ${isEn ? 'Important Dates' : 'महत्वपूर्ण तिथियां'}</h4>
-          <p><strong>${isEn ? 'Exam Date:' : 'परीक्षा तिथि:'}</strong> Sep 2026 (${isEn ? 'Tentative' : 'संभावित'})</p>
-          <p><strong>${isEn ? 'Notification:' : 'अधिसूचना:'}</strong> BPSC Official</p>
-          <p><strong>${isEn ? 'Plan Ends:' : 'Plan समाप्त:'}</strong> ${isEn ? '15 days before exam' : 'परीक्षा से 15 दिन पहले'}</p>
+          <h4>📅 ${isEn?'Important Dates':'महत्वपूर्ण तिथियां'}</h4>
+          <p><strong>${isEn?'Exam Date:':'परीक्षा तिथि:'}</strong> ${examDate}</p>
+          <p><strong>${isEn?'Category:':'श्रेणी:'}</strong> ${cfg.category||''}</p>
+          <p><strong>${isEn?'Vacancies:':'रिक्तियां:'}</strong> ${cfg.vacancies||'TBA'}</p>
+          <p><strong>${isEn?'Plan Ends:':'Plan समाप्त:'}</strong> ${isEn?'15 days before exam':'परीक्षा से 15 दिन पहले'}</p>
         </div>
         <div class="info-card">
-          <h4>📝 ${isEn ? 'Exam Pattern' : 'परीक्षा पैटर्न'}</h4>
-          ${cls === '1-5' || cls === 'both' ? `<p><strong>Class 1–5 (PRT):</strong></p>
-          <p>${isEn ? 'Part I Language: 30 marks' : 'भाग I भाषा: 30 अंक'}</p>
-          <p>${isEn ? 'Part II GS: 120 marks' : 'भाग II सामान्य अध्ययन: 120 अंक'}</p>
-          <p><strong>${isEn ? 'Total: 150 marks' : 'कुल: 150 अंक'}</strong></p>` : ''}
-          ${cls === '6-8' || cls === 'both' ? `<p><strong>Class 6–8 (TGT):</strong></p>
-          <p>${isEn ? 'Part I Language: 30 marks' : 'भाग I भाषा: 30 अंक'}</p>
-          <p>${isEn ? 'Part II GS: 40 marks' : 'भाग II सामान्य अध्ययन: 40 अंक'}</p>
-          <p>${isEn ? 'Part III Subject: 80 marks' : 'भाग III विषय: 80 अंक'}</p>
-          <p><strong>${isEn ? 'Total: 150 marks' : 'कुल: 150 अंक'}</strong></p>` : ''}
+          <h4>📝 ${isEn?'Exam Pattern':'परीक्षा पैटर्न'}</h4>
+          <p>${cfg.pattern||'MCQ Based'}</p>
+          <p>${isEn?'Check official notification for latest pattern':'नवीनतम पैटर्न के लिए आधिकारिक अधिसूचना देखें'}</p>
         </div>
         <div class="info-card">
-          <h4>✅ ${isEn ? 'Key Rules' : 'मुख्य नियम'}</h4>
-          <p>❌ ${isEn ? 'No Negative Marking' : 'नकारात्मक अंकन नहीं'}</p>
-          <p>⏱️ ${isEn ? 'Duration: 2.5 hours' : 'अवधि: 2.5 घंटे'}</p>
-          <p>📋 ${isEn ? 'MCQ format' : 'बहुविकल्पीय प्रश्न'}</p>
-          <p>🏫 ${isEn ? '46,595 Total Vacancies' : '46,595 कुल रिक्तियां'}</p>
+          <h4>✅ ${isEn?'Key Tips':'मुख्य सुझाव'}</h4>
+          <p>📋 ${isEn?'Attempt previous year papers':'पिछले वर्षों के प्रश्नपत्र हल करें'}</p>
+          <p>🎯 ${isEn?'Focus on high-weightage topics':'उच्च भार वाले topics पर ध्यान दें'}</p>
+          <p>⏱️ ${isEn?'Practice time management':'समय प्रबंधन का अभ्यास करें'}</p>
+          <p>📰 ${isEn?'Daily current affairs — 30 min':'दैनिक समसामयिकी — 30 मिनट'}</p>
         </div>
         <div class="info-card">
-          <h4>📚 ${isEn ? 'Best Books' : 'सर्वश्रेष्ठ पुस्तकें'}</h4>
-          <p>• NCERT Class 6–10 (${isEn ? 'all subjects' : 'सभी विषय'})</p>
-          <p>• Lucent's GK (Hindi/English)</p>
-          <p>• Arihant BPSC TRE Guide</p>
-          <p>• R.S. Aggarwal — ${isEn ? 'Maths & Reasoning' : 'गणित एवं तर्कशक्ति'}</p>
+          <h4>📚 ${isEn?'Best Books':'सर्वश्रेष्ठ पुस्तकें'}</h4>
+          ${books.map(b=>`<p>• ${b}</p>`).join('')}
         </div>
       </div>
     </div>`;
   }
+
+  // BPSC TRE
+  if (isBpsc) {
+    const cls = userData.bpscClass;
+    return `<div class="section-block">
+      <h3>ℹ️ BPSC TRE 4.0 — ${isEn?'Exam Information':'परीक्षा जानकारी'}</h3>
+      <div class="info-grid">
+        <div class="info-card">
+          <h4>📅 ${isEn?'Important Dates':'महत्वपूर्ण तिथियां'}</h4>
+          <p><strong>${isEn?'Exam Date:':'परीक्षा तिथि:'}</strong> Sep 2026 (${isEn?'Tentative':'संभावित'})</p>
+          <p><strong>${isEn?'Notification:':'अधिसूचना:'}</strong> BPSC Official</p>
+          <p><strong>${isEn?'Plan Ends:':'Plan समाप्त:'}</strong> ${isEn?'15 days before exam':'परीक्षा से 15 दिन पहले'}</p>
+        </div>
+        <div class="info-card">
+          <h4>📝 ${isEn?'Exam Pattern':'परीक्षा पैटर्न'}</h4>
+          ${cls==='1-5'||cls==='both'?`<p><strong>Class 1–5 (PRT):</strong></p><p>${isEn?'Part I Language: 30 marks':'भाग I भाषा: 30 अंक'}</p><p>${isEn?'Part II GS: 120 marks':'भाग II सामान्य अध्ययन: 120 अंक'}</p><p><strong>${isEn?'Total: 150 marks':'कुल: 150 अंक'}</strong></p>`:''}
+          ${cls==='6-8'||cls==='both'?`<p><strong>Class 6–8 (TGT):</strong></p><p>${isEn?'Part I Language: 30 marks':'भाग I भाषा: 30 अंक'}</p><p>${isEn?'Part II GS: 40 marks':'भाग II सामान्य अध्ययन: 40 अंक'}</p><p>${isEn?'Part III Subject: 80 marks':'भाग III विषय: 80 अंक'}</p><p><strong>${isEn?'Total: 150 marks':'कुल: 150 अंक'}</strong></p>`:''}
+        </div>
+        <div class="info-card">
+          <h4>✅ ${isEn?'Key Rules':'मुख्य नियम'}</h4>
+          <p>❌ ${isEn?'No Negative Marking':'नकारात्मक अंकन नहीं'}</p>
+          <p>⏱️ ${isEn?'Duration: 2.5 hours':'अवधि: 2.5 घंटे'}</p>
+          <p>📋 ${isEn?'MCQ format':'बहुविकल्पीय प्रश्न'}</p>
+          <p>🏫 ${isEn?'46,595 Total Vacancies':'46,595 कुल रिक्तियां'}</p>
+        </div>
+        <div class="info-card">
+          <h4>📚 ${isEn?'Best Books':'सर्वश्रेष्ठ पुस्तकें'}</h4>
+          <p>• NCERT Class 6–10 (${isEn?'all subjects':'सभी विषय'})</p>
+          <p>• Lucent's GK (Hindi/English)</p>
+          <p>• Arihant BPSC TRE Guide</p>
+          <p>• R.S. Aggarwal — ${isEn?'Maths & Reasoning':'गणित एवं तर्कशक्ति'}</p>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // UPSC
   const yr = userData.upscYear || '2027';
   const mainYr = parseInt(yr);
   const intYr = mainYr + 1;
   const optNames = {
-    history: isEn ? 'History' : 'History (इतिहास)',
-    geography: isEn ? 'Geography' : 'Geography (भूगोल)',
-    pub_admin: isEn ? 'Public Administration' : 'Public Administration (लोक प्रशासन)',
-    sociology: isEn ? 'Sociology' : 'Sociology (समाजशास्त्र)',
-    pol_sci: isEn ? 'Political Science & IR' : 'Political Science & IR (राजनीति विज्ञान)',
-    anthropology: isEn ? 'Anthropology' : 'Anthropology (मानवशास्त्र)',
-    philosophy: isEn ? 'Philosophy' : 'Philosophy (दर्शनशास्त्र)',
-    psychology: isEn ? 'Psychology' : 'Psychology (मनोविज्ञान)',
-    economics: isEn ? 'Economics' : 'Economics (अर्थशास्त्र)',
-    law: isEn ? 'Law' : 'Law (विधि)'
+    history: isEn?'History':'History (इतिहास)',
+    geography: isEn?'Geography':'Geography (भूगोल)',
+    pub_admin: isEn?'Public Administration':'Public Administration (लोक प्रशासन)',
+    sociology: isEn?'Sociology':'Sociology (समाजशास्त्र)',
+    pol_sci: isEn?'Political Science & IR':'Political Science & IR (राजनीति विज्ञान)',
+    anthropology: isEn?'Anthropology':'Anthropology (मानवशास्त्र)',
+    philosophy: isEn?'Philosophy':'Philosophy (दर्शनशास्त्र)',
+    psychology: isEn?'Psychology':'Psychology (मनोविज्ञान)',
+    economics: isEn?'Economics':'Economics (अर्थशास्त्र)',
+    law: isEn?'Law':'Law (विधि)'
   };
   const optNote = userData.optionalSubject && optNames[userData.optionalSubject]
-    ? `<div class="optional-note selected">
-        <h4>✅ ${isEn ? 'Optional Subject Selected' : 'Optional Subject चुना गया'}</h4>
-        <p>${isEn
-          ? `You have selected <strong>${optNames[userData.optionalSubject]}</strong> as your Optional Subject. Both Paper I &amp; Paper II are included in your plan. Optional carries <strong>500 marks</strong> and is a key rank determinant.`
-          : `आपने <strong>${optNames[userData.optionalSubject]}</strong> Optional Subject चुना है। इसका syllabus आपके plan में शामिल है — Paper I + Paper II दोनों। Optional में <strong>500 marks</strong> होते हैं जो rank निर्धारित करते हैं।`
-        }</p>
-      </div>`
-    : `<div class="optional-note">
-        <h4>⚠️ ${isEn ? 'No Optional Subject Selected' : 'Optional Subject नहीं चुना'}</h4>
-        <p>${isEn
-          ? 'You have not selected an Optional Subject yet. Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science &amp; IR, Anthropology, Philosophy, Psychology</strong>. Choose based on your graduation background and interest. Come back and regenerate your plan after selecting.'
-          : 'आपने अभी तक Optional Subject नहीं चुना है। Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science &amp; IR, Anthropology, Philosophy, Psychology</strong>. अपने graduation background और interest के हिसाब से चुनें। Optional चुनने के बाद वापस आकर plan generate करें।'
-        }</p>
-      </div>`;
+    ? `<div class="optional-note selected"><h4>✅ ${isEn?'Optional Subject Selected':'Optional Subject चुना गया'}</h4><p>${isEn?`You have selected <strong>${optNames[userData.optionalSubject]}</strong> as your Optional Subject. Both Paper I &amp; Paper II are included in your plan. Optional carries <strong>500 marks</strong> and is a key rank determinant.`:`आपने <strong>${optNames[userData.optionalSubject]}</strong> Optional Subject चुना है। इसका syllabus आपके plan में शामिल है — Paper I + Paper II दोनों। Optional में <strong>500 marks</strong> होते हैं जो rank निर्धारित करते हैं।`}</p></div>`
+    : `<div class="optional-note"><h4>⚠️ ${isEn?'No Optional Subject Selected':'Optional Subject नहीं चुना'}</h4><p>${isEn?'You have not selected an Optional Subject yet. Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science &amp; IR, Anthropology, Philosophy, Psychology</strong>. Choose based on your graduation background and interest.':'आपने अभी तक Optional Subject नहीं चुना है। Popular choices: <strong>History, Geography, Public Administration, Sociology, Political Science &amp; IR, Anthropology, Philosophy, Psychology</strong>. अपने graduation background और interest के हिसाब से चुनें।'}</p></div>`;
   return `<div class="section-block">
-    <h3>ℹ️ UPSC CSE ${yr} — ${isEn ? 'Exam Information' : 'परीक्षा जानकारी'}</h3>
+    <h3>ℹ️ UPSC CSE ${yr} — ${isEn?'Exam Information':'परीक्षा जानकारी'}</h3>
     <div class="info-grid">
       <div class="info-card">
-        <h4>📅 ${isEn ? 'Important Dates' : 'महत्वपूर्ण तिथियां'}</h4>
-        <p><strong>${isEn ? 'Prelims:' : 'प्रारंभिक:'}</strong> May ${yr}</p>
-        <p><strong>${isEn ? 'Mains:' : 'मुख्य:'}</strong> Sep–Oct ${mainYr}</p>
-        <p><strong>${isEn ? 'Interview:' : 'साक्षात्कार:'}</strong> Jan–Apr ${intYr}</p>
-        <p><strong>${isEn ? 'Plan Ends:' : 'Plan समाप्त:'}</strong> ${isEn ? '15 days before Prelims' : 'Prelims से 15 दिन पहले'}</p>
+        <h4>📅 ${isEn?'Important Dates':'महत्वपूर्ण तिथियां'}</h4>
+        <p><strong>${isEn?'Prelims:':'प्रारंभिक:'}</strong> May ${yr}</p>
+        <p><strong>${isEn?'Mains:':'मुख्य:'}</strong> Sep–Oct ${mainYr}</p>
+        <p><strong>${isEn?'Interview:':'साक्षात्कार:'}</strong> Jan–Apr ${intYr}</p>
+        <p><strong>${isEn?'Plan Ends:':'Plan समाप्त:'}</strong> ${isEn?'15 days before Prelims':'Prelims से 15 दिन पहले'}</p>
       </div>
       <div class="info-card">
-        <h4>📝 ${isEn ? 'Prelims Pattern' : 'प्रारंभिक पैटर्न'}</h4>
-        <p>GS Paper I: 200 ${isEn ? 'marks (100 Qs)' : 'अंक (100 प्रश्न)'}</p>
-        <p>CSAT Paper II: 200 ${isEn ? 'marks (qualifying 33%)' : 'अंक (33% अर्हक)'}</p>
-        <p>${isEn ? 'Negative marking: -0.66 per wrong' : 'नकारात्मक अंकन: -0.66 प्रति गलत'}</p>
-        <p>${isEn ? 'Duration: 2 hrs each paper' : 'अवधि: प्रत्येक पेपर 2 घंटे'}</p>
+        <h4>📝 ${isEn?'Prelims Pattern':'प्रारंभिक पैटर्न'}</h4>
+        <p>GS Paper I: 200 ${isEn?'marks (100 Qs)':'अंक (100 प्रश्न)'}</p>
+        <p>CSAT Paper II: 200 ${isEn?'marks (qualifying 33%)':'अंक (33% अर्हक)'}</p>
+        <p>${isEn?'Negative marking: -0.66 per wrong':'नकारात्मक अंकन: -0.66 प्रति गलत'}</p>
+        <p>${isEn?'Duration: 2 hrs each paper':'अवधि: प्रत्येक पेपर 2 घंटे'}</p>
       </div>
       <div class="info-card">
-        <h4>📝 ${isEn ? 'Mains Pattern' : 'मुख्य परीक्षा पैटर्न'}</h4>
-        <p>${isEn ? 'Qualifying: Paper A + B (300+300)' : 'अर्हक: पेपर A + B (300+300)'}</p>
-        <p>${isEn ? 'Essay: 250 marks' : 'निबंध: 250 अंक'}</p>
-        <p>GS I–IV: 250×4 = 1000 ${isEn ? 'marks' : 'अंक'}</p>
-        <p>${isEn ? 'Optional I+II: 250×2 = 500 marks' : 'Optional I+II: 250×2 = 500 अंक'}</p>
-        <p>${isEn ? 'Interview: 275 marks' : 'साक्षात्कार: 275 अंक'}</p>
-        <p><strong>${isEn ? 'Total Merit: 2025 marks' : 'कुल मेरिट: 2025 अंक'}</strong></p>
+        <h4>📝 ${isEn?'Mains Pattern':'मुख्य परीक्षा पैटर्न'}</h4>
+        <p>${isEn?'Qualifying: Paper A + B (300+300)':'अर्हक: पेपर A + B (300+300)'}</p>
+        <p>${isEn?'Essay: 250 marks':'निबंध: 250 अंक'}</p>
+        <p>GS I–IV: 250×4 = 1000 ${isEn?'marks':'अंक'}</p>
+        <p>${isEn?'Optional I+II: 250×2 = 500 marks':'Optional I+II: 250×2 = 500 अंक'}</p>
+        <p>${isEn?'Interview: 275 marks':'साक्षात्कार: 275 अंक'}</p>
+        <p><strong>${isEn?'Total Merit: 2025 marks':'कुल मेरिट: 2025 अंक'}</strong></p>
       </div>
       <div class="info-card">
-        <h4>📚 ${isEn ? 'Standard Books' : 'मानक पुस्तकें'}</h4>
-        <p>• NCERT 6–12 (${isEn ? 'all subjects' : 'सभी विषय'})</p>
+        <h4>📚 ${isEn?'Standard Books':'मानक पुस्तकें'}</h4>
+        <p>• NCERT 6–12 (${isEn?'all subjects':'सभी विषय'})</p>
         <p>• Laxmikanth — Indian Polity</p>
         <p>• Bipin Chandra — Modern History</p>
         <p>• Ramesh Singh — Indian Economy</p>
@@ -2413,3 +2603,1177 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // else: welcomeScreen is already active by default in HTML
 });
+
+// ═══ chunks/c14.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c14.js — Exam Registry: All exams March 2026 – Dec 2027
+// By Er. Sangam Krishna | ParikshaSathi
+// ═══════════════════════════════════════════════════════════════
+
+// ── EXAM REGISTRY ────────────────────────────────────────────
+// Each entry: { id, title, subtitle, icon, color, examDate, category,
+//               vacancies, pattern, cardClass, syllabus }
+const EXAM_REGISTRY = {
+
+  // ── 1. BPSC TRE 4.0 ─────────────────────────────────────────
+  bpsc_tre: {
+    id: 'bpsc_tre', title: 'BPSC TRE 4.0', subtitle: 'Bihar Primary/Middle Teacher',
+    icon: '🏫', color: '#f59e0b', cardClass: 'bpsc-card',
+    examDate: new Date('2026-09-22'), category: 'teaching',
+    vacancies: '46,595', pattern: 'MCQ • 150 Marks • No Negative',
+    ribbon: 'Most Popular',
+    getSyllabus: (ud) => {
+      if (ud.bpscClass === 'both') {
+        const m = {};
+        Object.entries(syl_bpsc15).forEach(([k,v]) => { m['[1-5] '+k] = v; });
+        Object.entries(syl_bpsc68).forEach(([k,v]) => { m['[6-8] '+k] = v; });
+        return m;
+      }
+      return ud.bpscClass === '1-5' ? syl_bpsc15 : syl_bpsc68;
+    },
+    priorityMap: {
+      'GENERAL STUDIES':5,'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,
+      'ENVIRONMENT':4,'ECONOMY':4,'CHILD DEVELOPMENT':4,'PEDAGOGY':4,
+      'SCIENCE':3,'REASONING':3,'COMPUTER':2,'MATHEMATICS':2,'MATHS':2,
+      'LANGUAGE':1,'HINDI':1,'ENGLISH':1
+    }
+  },
+
+  // ── 2. UPSC CSE 2026 ─────────────────────────────────────────
+  upsc_2026: {
+    id: 'upsc_2026', title: 'UPSC CSE 2026', subtitle: 'Civil Services Examination',
+    icon: '🏛️', color: '#10b981', cardClass: 'upsc-card',
+    examDate: new Date('2026-05-24'), category: 'civil_services',
+    vacancies: '~1000+', pattern: 'Pre + Mains + Interview',
+    getSyllabus: (ud) => {
+      const base = { ...syl_upsc_pre, ...syl_upsc_mains };
+      if (ud.optionalSubject) { const o = getOptionalSyllabus(ud.optionalSubject); if (o) Object.assign(base, o); }
+      return base;
+    },
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':5,
+      'ETHICS':5,'OPTIONAL':5,'PRELIMS':4,'INTERNATIONAL':4,'GOVERNANCE':4,
+      'SOCIAL':4,'SCIENCE':3,'TECHNOLOGY':3,'SECURITY':3,'MATHEMATICS':1,'LANGUAGE':1
+    }
+  },
+
+  // ── 3. UPSC CSE 2027 ─────────────────────────────────────────
+  upsc_2027: {
+    id: 'upsc_2027', title: 'UPSC CSE 2027', subtitle: 'Civil Services Examination',
+    icon: '🏛️', color: '#10b981', cardClass: 'upsc-card',
+    examDate: new Date('2027-05-16'), category: 'civil_services',
+    vacancies: '~1000+', pattern: 'Pre + Mains + Interview',
+    getSyllabus: (ud) => {
+      const base = { ...syl_upsc_pre, ...syl_upsc_mains };
+      if (ud.optionalSubject) { const o = getOptionalSyllabus(ud.optionalSubject); if (o) Object.assign(base, o); }
+      return base;
+    },
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':5,
+      'ETHICS':5,'OPTIONAL':5,'PRELIMS':4,'INTERNATIONAL':4,'GOVERNANCE':4,
+      'SOCIAL':4,'SCIENCE':3,'TECHNOLOGY':3,'SECURITY':3,'MATHEMATICS':1,'LANGUAGE':1
+    }
+  },
+
+  // ── 4. BPSC 72nd CCE ─────────────────────────────────────────
+  bpsc_72: {
+    id: 'bpsc_72', title: 'BPSC 72nd CCE', subtitle: 'Bihar Combined Competitive Exam',
+    icon: '⚖️', color: '#8b5cf6', cardClass: 'bpsc72-card',
+    examDate: new Date('2026-07-26'), category: 'state_psc',
+    vacancies: '~1500+', pattern: 'Pre + Mains + Interview',
+    getSyllabus: () => syl_bpsc_cce,
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':4,
+      'SCIENCE':4,'CURRENT':4,'BIHAR':5,'REASONING':3,'MATHEMATICS':3,
+      'LANGUAGE':1,'HINDI':1,'ENGLISH':1
+    }
+  },
+
+  // ── 5. SSC CGL 2026 ──────────────────────────────────────────
+  ssc_cgl: {
+    id: 'ssc_cgl', title: 'SSC CGL 2026', subtitle: 'Combined Graduate Level',
+    icon: '📋', color: '#3b82f6', cardClass: 'ssc-card',
+    examDate: new Date('2026-08-15'), category: 'ssc',
+    vacancies: '~17,000+', pattern: 'Tier 1 + Tier 2 (MCQ)',
+    getSyllabus: () => syl_ssc_cgl,
+    priorityMap: {
+      'GENERAL AWARENESS':5,'HISTORY':4,'POLITY':4,'GEOGRAPHY':4,'ECONOMY':4,
+      'SCIENCE':4,'CURRENT':4,'REASONING':5,'QUANTITATIVE':5,'ENGLISH':4,
+      'MATHEMATICS':5,'MATHS':5,'COMPUTER':3,'STATISTICS':3
+    }
+  },
+
+  // ── 6. IBPS PO 2026 ──────────────────────────────────────────
+  ibps_po: {
+    id: 'ibps_po', title: 'IBPS PO 2026', subtitle: 'Probationary Officer — Public Sector Banks',
+    icon: '🏦', color: '#06b6d4', cardClass: 'ibps-card',
+    examDate: new Date('2026-08-22'), category: 'banking',
+    vacancies: '~4000+', pattern: 'Prelims + Mains + Interview',
+    getSyllabus: () => syl_ibps_po,
+    priorityMap: {
+      'REASONING':5,'QUANTITATIVE':5,'ENGLISH':4,'GENERAL AWARENESS':5,
+      'BANKING':5,'ECONOMY':4,'CURRENT':4,'COMPUTER':3,'MATHEMATICS':5,'MATHS':5
+    }
+  },
+
+  // ── 7. SBI PO 2026 ───────────────────────────────────────────
+  sbi_po: {
+    id: 'sbi_po', title: 'SBI PO 2026', subtitle: 'Probationary Officer — State Bank of India',
+    icon: '🏦', color: '#22c55e', cardClass: 'sbi-card',
+    examDate: new Date('2026-09-15'), category: 'banking',
+    vacancies: '~2000+', pattern: 'Prelims + Mains + Interview',
+    getSyllabus: () => syl_sbi_po,
+    priorityMap: {
+      'REASONING':5,'QUANTITATIVE':5,'ENGLISH':4,'GENERAL AWARENESS':5,
+      'BANKING':5,'ECONOMY':4,'CURRENT':4,'COMPUTER':3,'MATHEMATICS':5,'MATHS':5,
+      'DATA':4,'ANALYSIS':4
+    }
+  },
+
+  // ── 8. IBPS RRB PO 2026 ──────────────────────────────────────
+  ibps_rrb: {
+    id: 'ibps_rrb', title: 'IBPS RRB PO 2026', subtitle: 'Officer Scale-I — Regional Rural Banks',
+    icon: '🌾', color: '#f97316', cardClass: 'rrb-card',
+    examDate: new Date('2026-11-21'), category: 'banking',
+    vacancies: '~8000+', pattern: 'Prelims + Mains',
+    getSyllabus: () => syl_ibps_rrb,
+    priorityMap: {
+      'REASONING':5,'QUANTITATIVE':5,'GENERAL AWARENESS':5,'BANKING':5,
+      'HINDI':3,'ENGLISH':3,'COMPUTER':3,'MATHEMATICS':5,'MATHS':5,'ECONOMY':4
+    }
+  },
+
+  // ── 9. IBPS Clerk 2026 ───────────────────────────────────────
+  ibps_clerk: {
+    id: 'ibps_clerk', title: 'IBPS Clerk 2026', subtitle: 'Clerical Cadre — Public Sector Banks',
+    icon: '📑', color: '#a855f7', cardClass: 'clerk-card',
+    examDate: new Date('2026-12-06'), category: 'banking',
+    vacancies: '~6000+', pattern: 'Prelims + Mains',
+    getSyllabus: () => syl_ibps_clerk,
+    priorityMap: {
+      'REASONING':5,'QUANTITATIVE':5,'ENGLISH':4,'GENERAL AWARENESS':5,
+      'BANKING':4,'COMPUTER':3,'MATHEMATICS':5,'MATHS':5,'CURRENT':4
+    }
+  },
+
+  // ── 10. NDA 2026 (I) ─────────────────────────────────────────
+  nda_2026: {
+    id: 'nda_2026', title: 'NDA 2026 (I)', subtitle: 'National Defence Academy',
+    icon: '⚔️', color: '#ef4444', cardClass: 'nda-card',
+    examDate: new Date('2026-04-19'), category: 'defence',
+    vacancies: '~400+', pattern: 'Maths + GAT (Written) + SSB',
+    getSyllabus: () => syl_nda,
+    priorityMap: {
+      'MATHEMATICS':5,'MATHS':5,'PHYSICS':5,'CHEMISTRY':4,'BIOLOGY':3,
+      'HISTORY':4,'POLITY':4,'GEOGRAPHY':4,'ECONOMY':3,'ENGLISH':4,
+      'REASONING':4,'CURRENT':4,'SCIENCE':4,'GENERAL':4
+    }
+  },
+
+  // ── 11. BPSC 71st CCE Mains ──────────────────────────────────
+  bpsc_71: {
+    id: 'bpsc_71', title: 'BPSC 71st CCE', subtitle: 'Bihar Combined Competitive Exam',
+    icon: '⚖️', color: '#ec4899', cardClass: 'bpsc71-card',
+    examDate: new Date('2026-04-26'), category: 'state_psc',
+    vacancies: '1,298', pattern: 'Mains + Interview',
+    getSyllabus: () => syl_bpsc_cce,
+    priorityMap: {
+      'HISTORY':5,'POLITY':5,'GEOGRAPHY':5,'ECONOMY':5,'ENVIRONMENT':4,
+      'SCIENCE':4,'CURRENT':4,'BIHAR':5,'REASONING':3,'MATHEMATICS':3,
+      'LANGUAGE':1,'HINDI':1,'ENGLISH':1
+    }
+  }
+};
+
+// Helper: get exam config by id
+function getExamConfig(examId) {
+  return EXAM_REGISTRY[examId] || null;
+}
+
+// ═══ chunks/c15.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c15.js — BPSC CCE (71st/72nd) Syllabus
+// ═══════════════════════════════════════════════════════════════
+const syl_bpsc_cce = {
+  'General Studies — History (सामान्य अध्ययन — इतिहास)': {
+    marks: 150, color: '#f59e0b',
+    topics: [
+      { name: 'Ancient India', hindi: 'प्राचीन भारत',
+        micro: ['Indus Valley Civilisation — Harappa, Mohenjo-daro, Lothal',
+                'Vedic Age — Rig Vedic & Later Vedic society',
+                'Jainism & Buddhism — Mahavira, Buddha, Councils',
+                'Mauryan Empire — Chandragupta, Ashoka, Arthashastra',
+                'Gupta Empire — Golden Age, Kalidasa, Aryabhata',
+                'Post-Gupta period — Harsha, Chalukyas, Pallavas'] },
+      { name: 'Medieval India', hindi: 'मध्यकालीन भारत',
+        micro: ['Delhi Sultanate — Slave, Khilji, Tughlaq, Lodi dynasties',
+                'Mughal Empire — Babur to Aurangzeb',
+                'Vijayanagara & Bahmani Kingdoms',
+                'Bhakti & Sufi Movements — Kabir, Mirabai, Chishti order',
+                'Maratha Empire — Shivaji, Peshwas',
+                'Regional kingdoms — Rajputs, Ahoms, Nawabs of Bengal'] },
+      { name: 'Modern India & Freedom Movement', hindi: 'आधुनिक भारत एवं स्वतंत्रता संग्राम',
+        micro: ['British expansion — Plassey, Buxar, Subsidiary Alliance, Doctrine of Lapse',
+                'Economic impact — Drain of wealth, Deindustrialisation, Famines',
+                'Social reforms — Brahmo Samaj, Arya Samaj, Ramakrishna Mission',
+                '1857 Revolt — Causes, centres, consequences',
+                'INC — Moderates, Extremists, Partition of Bengal',
+                'Gandhi — Champaran, Non-Cooperation, Civil Disobedience, Quit India',
+                'Revolutionary movements — Bhagat Singh, Bose & INA',
+                'Partition 1947 & Independence'] },
+      { name: 'Bihar History', hindi: 'बिहार का इतिहास',
+        micro: ['Ancient Bihar — Magadha, Pataliputra, Nalanda, Vikramshila',
+                'Medieval Bihar — Bakhtiyar Khilji, Sher Shah Suri',
+                'Bihar in 1857 — Kunwar Singh',
+                'Bihar in Freedom Movement — Champaran Satyagraha, JP Movement',
+                'Formation of Bihar state — 1912',
+                'Jharkhand separation — 2000'] },
+      { name: 'World History', hindi: 'विश्व इतिहास',
+        micro: ['American Revolution 1776 & French Revolution 1789',
+                'Industrial Revolution — Britain, spread to Europe',
+                'World War I — Causes, events, Treaty of Versailles',
+                'Russian Revolution 1917 — Lenin, Bolsheviks',
+                'World War II — Hitler, Holocaust, Hiroshima, UN formation',
+                'Cold War — USA vs USSR, NAM, Decolonisation'] }
+    ]
+  },
+  'General Studies — Geography (सामान्य अध्ययन — भूगोल)': {
+    marks: 150, color: '#10b981',
+    topics: [
+      { name: 'Physical Geography', hindi: 'भौतिक भूगोल',
+        micro: ['Interior of Earth — Layers, Plate tectonics, Earthquakes, Volcanoes',
+                'Atmosphere — Composition, Layers, Insolation, Pressure belts',
+                'Monsoon — Origin, SW & NE monsoon, El Nino & La Nina',
+                'Ocean currents — Warm & cold, Gulf Stream, Labrador',
+                'Landforms — Mountains, Plateaus, Plains, Deltas, Valleys'] },
+      { name: 'Indian Geography', hindi: 'भारत का भूगोल',
+        micro: ['Physiographic divisions — Himalayas, Northern Plains, Peninsular Plateau, Coastal Plains, Islands',
+                'Rivers — Himalayan (Ganga, Yamuna, Brahmaputra) & Peninsular (Godavari, Krishna, Kaveri)',
+                'Climate — Monsoon, seasons, rainfall distribution, cyclones',
+                'Soils — Alluvial, Black, Red, Laterite, Desert, Mountain',
+                'Natural vegetation — Tropical, Deciduous, Thorn, Alpine',
+                'Agriculture — Kharif, Rabi, Zaid crops; Green Revolution'] },
+      { name: 'Bihar Geography', hindi: 'बिहार का भूगोल',
+        micro: ['Location, extent, districts (38 districts)',
+                'Rivers — Ganga, Gandak, Kosi, Sone, Bagmati',
+                'Climate — Hot summers, monsoon, cold winters',
+                'Agriculture — Rice, Wheat, Maize, Sugarcane, Litchi',
+                'Minerals & Industries — Mica, Coal (Jharkhand border)',
+                'National Parks — Valmiki Tiger Reserve'] },
+      { name: 'Economic Geography', hindi: 'आर्थिक भूगोल',
+        micro: ['World agriculture — Types, major crops, distribution',
+                'Industries — Iron & Steel, Textile, IT — world distribution',
+                'Energy resources — Coal, Petroleum, Natural Gas, Renewable',
+                'Transport — Railways, Roadways, Waterways, Airways',
+                'Trade — Exports, Imports, WTO, India\'s trade partners'] },
+      { name: 'Human Geography & Environment', hindi: 'मानव भूगोल एवं पर्यावरण',
+        micro: ['Population — Distribution, density, growth, migration',
+                'Urbanisation — Smart Cities, Urban problems',
+                'Biodiversity — Hotspots, IUCN Red List, Protected areas',
+                'Climate change — Paris Agreement, NDCs, COP summits',
+                'Pollution — Air, Water, Soil, Noise — causes & control',
+                'Disaster management — NDMA, Sendai Framework'] }
+    ]
+  },
+  'General Studies — Polity & Governance (राजव्यवस्था एवं शासन)': {
+    marks: 150, color: '#3b82f6',
+    topics: [
+      { name: 'Indian Constitution', hindi: 'भारतीय संविधान',
+        micro: ['Making of Constitution — Constituent Assembly, Dr. Ambedkar',
+                'Preamble — Sovereign, Socialist, Secular, Democratic, Republic',
+                'Fundamental Rights — Articles 12–35 (detailed)',
+                'Directive Principles of State Policy (DPSP) — Articles 36–51',
+                'Fundamental Duties — Article 51A',
+                'Important Amendments — 42nd, 44th, 52nd, 73rd, 74th, 86th, 101st'] },
+      { name: 'Union Government', hindi: 'केंद्र सरकार',
+        micro: ['President — Election, Powers, Articles 52–78',
+                'Vice President, Prime Minister, Council of Ministers',
+                'Parliament — Lok Sabha, Rajya Sabha, Legislative process',
+                'Supreme Court — Jurisdiction, Judicial Review, PIL',
+                'Constitutional bodies — Election Commission, CAG, UPSC, Finance Commission',
+                'Non-constitutional bodies — NITI Aayog, CBI, CVC, Lokpal'] },
+      { name: 'State Government & Federalism', hindi: 'राज्य सरकार एवं संघवाद',
+        micro: ['Governor — Powers, Role, Article 153–167',
+                'State Legislature — Vidhan Sabha, Vidhan Parishad',
+                'High Courts — Jurisdiction, Powers',
+                'Centre-State relations — Legislative, Administrative, Financial',
+                'Inter-state disputes — River water, Boundary',
+                'Bihar government — CM, Cabinet, Vidhan Sabha'] },
+      { name: 'Local Government & Governance', hindi: 'स्थानीय शासन',
+        micro: ['Panchayati Raj — 73rd Amendment, 3-tier system, Gram Sabha',
+                'Urban Local Bodies — 74th Amendment, Municipal Corporation',
+                'E-governance — Digital India, MyGov, UMANG, DigiLocker',
+                'RTI Act 2005 — Provisions, Exemptions, CIC',
+                'Citizen Charter, Good governance principles',
+                'Bihar Panchayati Raj — Mukhiya, Panchayat Samiti, Zila Parishad'] },
+      { name: 'Current Affairs & Government Schemes', hindi: 'समसामयिकी एवं सरकारी योजनाएं',
+        micro: ['Central schemes — PM-KISAN, MGNREGA, Ayushman Bharat, PMAY, PM Mudra',
+                'Bihar schemes — Mukhyamantri Kanya Utthan, Har Ghar Bijli, Jal Jeevan Mission',
+                'National current affairs — last 12 months',
+                'International events — summits, agreements, organisations',
+                'Awards — Bharat Ratna, Padma, Nobel, Booker',
+                'Sports — Olympics, CWG, Asian Games, recent events'] }
+    ]
+  },
+  'General Studies — Economy (सामान्य अध्ययन — अर्थव्यवस्था)': {
+    marks: 100, color: '#f97316',
+    topics: [
+      { name: 'Indian Economy — Basics & Planning', hindi: 'भारतीय अर्थव्यवस्था — मूल बातें एवं योजना',
+        micro: ['Types of economy — Capitalist, Socialist, Mixed',
+                'National Income — GDP, GNP, NNP, Per Capita Income',
+                'Economic planning — Five Year Plans, NITI Aayog, SDGs',
+                'Poverty — BPL, Multidimensional Poverty Index, Schemes',
+                'Unemployment — Types, MGNREGA, Skill India',
+                'Inflation — Types, CPI, WPI, RBI\'s role'] },
+      { name: 'Agriculture & Rural Economy', hindi: 'कृषि एवं ग्रामीण अर्थव्यवस्था',
+        micro: ['Cropping patterns — Kharif, Rabi, Zaid',
+                'Green Revolution — Impact, HYV seeds, Irrigation',
+                'Land reforms — Zamindari abolition, Land ceiling',
+                'Food security — PDS, NFSA, FCI, MSP',
+                'Agricultural credit — NABARD, Kisan Credit Card',
+                'Bihar agriculture — Rice, Wheat, Maize, Litchi, Makhana'] },
+      { name: 'Banking & Finance', hindi: 'बैंकिंग एवं वित्त',
+        micro: ['RBI — Functions, Monetary policy, Repo rate, CRR, SLR',
+                'Commercial banks — Types, Functions, NPA',
+                'Budget — Revenue, Capital, Fiscal deficit, FRBM Act',
+                'Taxes — Direct (Income tax, Corporate tax) & Indirect (GST)',
+                'Capital markets — SEBI, Stock exchanges, Mutual funds',
+                'FDI, FII, External debt, BOP'] },
+      { name: 'Industry & Infrastructure', hindi: 'उद्योग एवं अवसंरचना',
+        micro: ['Industrial policy — Make in India, PLI schemes, MSMEs',
+                'Major industries — Iron & Steel, Textile, IT, Pharma',
+                'Infrastructure — Roads (PMGSY), Railways, Ports, Airports',
+                'Energy — Coal, Petroleum, Renewable (Solar, Wind)',
+                'Bihar industries — Sugar, Jute, Leather, IT parks',
+                'Smart Cities Mission, AMRUT, UDAN scheme'] }
+    ]
+  },
+  'General Studies — Science & Technology (विज्ञान एवं प्रौद्योगिकी)': {
+    marks: 100, color: '#06b6d4',
+    topics: [
+      { name: 'Physics & Chemistry', hindi: 'भौतिकी एवं रसायन विज्ञान',
+        micro: ['Motion — Newton\'s Laws, Gravitation, Work-Energy-Power',
+                'Light — Reflection, Refraction, Lenses, Human Eye',
+                'Electricity — Ohm\'s Law, Circuits, Magnetic effects',
+                'Sound — Properties, Echo, Ultrasound, Doppler effect',
+                'Matter — States, Atomic structure, Periodic Table',
+                'Acids, Bases, Salts — pH scale, Neutralisation',
+                'Metals & Non-metals, Carbon compounds, Chemical reactions'] },
+      { name: 'Biology & Health', hindi: 'जीव विज्ञान एवं स्वास्थ्य',
+        micro: ['Cell — Structure, Organelles, Cell division (Mitosis, Meiosis)',
+                'Nutrition — Photosynthesis, Digestion, Vitamins & Minerals',
+                'Respiration, Circulation — Heart, Blood groups',
+                'Nervous system — Brain, Spinal cord, Reflex action',
+                'Reproduction — Asexual, Sexual, Heredity (Mendel\'s laws)',
+                'Diseases — Bacterial, Viral, Protozoan, Deficiency diseases',
+                'Human health — WHO, ICMR, Vaccines, Antibiotics'] },
+      { name: 'Space, Defence & IT', hindi: 'अंतरिक्ष, रक्षा एवं IT',
+        micro: ['ISRO — Chandrayaan-3, Mangalyaan, Gaganyaan, Aditya-L1, PSLV, GSLV',
+                'DRDO — Agni, BrahMos, Tejas, INS Vikrant, ASAT',
+                'Nuclear programme — DAE, BARC, Nuclear doctrine',
+                'AI & ML — Applications, ChatGPT, Generative AI',
+                'Blockchain, Quantum computing, Cybersecurity',
+                'Biotechnology — CRISPR, GMO, Stem cells, Biofuels',
+                'IT Act, CERT-In, Digital India, UPI, BHIM'] }
+    ]
+  }
+};
+
+// ═══ chunks/c16.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c16.js — SSC CGL 2026 Syllabus
+// ═══════════════════════════════════════════════════════════════
+const syl_ssc_cgl = {
+  'Tier 1 — General Intelligence & Reasoning (50 Marks)': {
+    marks: 50, color: '#3b82f6',
+    topics: [
+      { name: 'Verbal Reasoning', hindi: 'मौखिक तर्क',
+        micro: ['Analogy — Word, Number, Letter based',
+                'Classification (Odd one out) — Word, Number, Letter',
+                'Series — Number, Letter, Mixed',
+                'Coding-Decoding — Letter shift, Symbol, Number based',
+                'Blood Relations — Family tree method',
+                'Direction & Distance — Compass, Turns',
+                'Ranking & Order — Position from top/bottom',
+                'Alphabet Test — Dictionary order, Position'] },
+      { name: 'Non-Verbal Reasoning', hindi: 'अशाब्दिक तर्क',
+        micro: ['Mirror Image & Water Image',
+                'Paper Folding & Cutting',
+                'Embedded Figures',
+                'Figure Completion & Matrix',
+                'Counting of Figures — Triangles, Squares',
+                'Venn Diagrams — 2 & 3 circles',
+                'Dice & Cube problems'] },
+      { name: 'Logical Reasoning', hindi: 'तार्किक तर्क',
+        micro: ['Statement & Conclusion',
+                'Statement & Assumption',
+                'Statement & Argument',
+                'Syllogism — All, Some, No type',
+                'Cause & Effect',
+                'Course of Action',
+                'Sitting Arrangement — Linear & Circular',
+                'Puzzles — Box, Floor, Day-based'] }
+    ]
+  },
+  'Tier 1 — Quantitative Aptitude (50 Marks)': {
+    marks: 50, color: '#f59e0b',
+    topics: [
+      { name: 'Number System & Arithmetic', hindi: 'संख्या पद्धति एवं अंकगणित',
+        micro: ['Number System — Natural, Whole, Integer, Rational, Irrational',
+                'LCM & HCF — Shortcut methods',
+                'Divisibility rules (2,3,4,5,6,7,8,9,11)',
+                'Simplification — BODMAS, Fractions, Decimals',
+                'Percentage — Formula, Increase/Decrease, Applications',
+                'Profit & Loss — CP, SP, MP, Discount, Dishonest dealer',
+                'Simple & Compound Interest — All formulas',
+                'Ratio & Proportion — Partnership, Mixture & Alligation'] },
+      { name: 'Algebra & Geometry', hindi: 'बीजगणित एवं रेखागणित',
+        micro: ['Algebraic identities — (a+b)², (a-b)², (a+b)³, (a-b)³',
+                'Linear equations — 1 & 2 variables',
+                'Quadratic equations — Factorisation, Formula',
+                'Lines & Angles — Parallel lines, Transversal',
+                'Triangles — Congruence, Similarity, Pythagoras',
+                'Circles — Chord, Tangent, Secant, Angle properties',
+                'Coordinate Geometry — Distance, Midpoint, Slope'] },
+      { name: 'Mensuration & Trigonometry', hindi: 'क्षेत्रमिति एवं त्रिकोणमिति',
+        micro: ['2D Mensuration — Rectangle, Square, Triangle, Circle, Parallelogram, Trapezium',
+                '3D Mensuration — Cube, Cuboid, Cylinder, Cone, Sphere, Hemisphere',
+                'Trigonometry — sin, cos, tan, cot, sec, cosec',
+                'Trigonometric identities — sin²θ + cos²θ = 1',
+                'Heights & Distances — Angle of elevation/depression',
+                'Data Interpretation — Tables, Bar, Pie, Line graphs'] },
+      { name: 'Time, Work & Speed', hindi: 'समय, कार्य एवं चाल',
+        micro: ['Time & Work — Basic formula, Efficiency method',
+                'Pipes & Cisterns — Filling, Emptying, Combined',
+                'Speed, Distance & Time — Basic formula',
+                'Relative Speed — Same & Opposite direction',
+                'Train problems — Length + Speed',
+                'Boat & Stream — Upstream, Downstream',
+                'Average — Simple, Weighted, Consecutive numbers'] }
+    ]
+  },
+  'Tier 1 — English Language (50 Marks)': {
+    marks: 50, color: '#10b981',
+    topics: [
+      { name: 'Vocabulary & Grammar', hindi: 'शब्दावली एवं व्याकरण',
+        micro: ['Synonyms & Antonyms (5–6 Qs)',
+                'One Word Substitution (2–3 Qs)',
+                'Idioms & Phrases (2–3 Qs)',
+                'Spelling Correction (2–3 Qs)',
+                'Fill in the Blanks — Articles, Prepositions, Conjunctions',
+                'Tenses — All 12 types with usage',
+                'Voice — Active & Passive conversion',
+                'Narration — Direct & Indirect speech'] },
+      { name: 'Comprehension & Error Detection', hindi: 'बोध एवं त्रुटि पहचान',
+        micro: ['Reading Comprehension — 2 passages (5 Qs each)',
+                'Error Detection — Grammatical errors in sentences',
+                'Sentence Improvement — Choose correct option',
+                'Para Jumbles — Rearrange sentences',
+                'Cloze Test — Fill blanks in passage',
+                'Sentence Completion'] }
+    ]
+  },
+  'Tier 1 — General Awareness (50 Marks)': {
+    marks: 50, color: '#8b5cf6',
+    topics: [
+      { name: 'History, Polity & Geography', hindi: 'इतिहास, राजव्यवस्था एवं भूगोल',
+        micro: ['Ancient India — Indus Valley, Maurya, Gupta',
+                'Medieval India — Delhi Sultanate, Mughal, Bhakti-Sufi',
+                'Modern India — Freedom Movement, Gandhi, 1857',
+                'Indian Constitution — FR, DPSP, Amendments, Articles',
+                'Parliament, President, PM, Supreme Court',
+                'Indian Geography — Physiography, Rivers, Climate, Soils',
+                'World Geography — Continents, Countries, Capitals'] },
+      { name: 'Economy, Science & Current Affairs', hindi: 'अर्थव्यवस्था, विज्ञान एवं समसामयिकी',
+        micro: ['Indian Economy — GDP, RBI, Budget, Taxes, Schemes',
+                'Banking — Types, Functions, SEBI, Insurance',
+                'Physics — Motion, Light, Electricity, Sound',
+                'Chemistry — Periodic Table, Acids-Bases, Metals',
+                'Biology — Diseases, Vitamins, Cell, Genetics',
+                'Space — ISRO missions, Satellites',
+                'Current Affairs — National & International (last 6 months)',
+                'Awards, Sports, Books & Authors, Important Days'] }
+    ]
+  },
+  'Tier 2 — Mathematical Abilities (90 Marks)': {
+    marks: 90, color: '#f59e0b',
+    topics: [
+      { name: 'Advanced Mathematics', hindi: 'उन्नत गणित',
+        micro: ['Number Theory — Surds, Indices, Logarithms',
+                'Algebra — Polynomials, Quadratic equations, Inequalities',
+                'Geometry — Triangles, Circles, Quadrilaterals, Polygons',
+                'Mensuration — Advanced 2D & 3D problems',
+                'Trigonometry — Advanced identities, Heights & Distances',
+                'Statistics — Mean, Median, Mode, SD, Variance',
+                'Data Interpretation — Complex tables, Mixed graphs'] }
+    ]
+  },
+  'Tier 2 — Reasoning & General Intelligence (30 Marks)': {
+    marks: 30, color: '#3b82f6',
+    topics: [
+      { name: 'Advanced Reasoning', hindi: 'उन्नत तर्कशक्ति',
+        micro: ['Analytical Reasoning — Complex puzzles',
+                'Critical Thinking — Assumptions, Inferences',
+                'Data Sufficiency',
+                'Input-Output problems',
+                'Advanced Sitting Arrangement',
+                'Logical Deduction'] }
+    ]
+  },
+  'Tier 2 — English Language & Comprehension (45 Marks)': {
+    marks: 45, color: '#10b981',
+    topics: [
+      { name: 'Advanced English', hindi: 'उन्नत अंग्रेजी',
+        micro: ['Advanced Vocabulary — Synonyms, Antonyms, Analogies',
+                'Advanced Grammar — Complex sentence structures',
+                'Reading Comprehension — Long passages',
+                'Essay Writing (for JSO/AAO posts)',
+                'Précis Writing',
+                'Letter Writing'] }
+    ]
+  },
+  'Tier 2 — General Awareness (25 Marks)': {
+    marks: 25, color: '#8b5cf6',
+    topics: [
+      { name: 'Advanced GK & Current Affairs', hindi: 'उन्नत सामान्य ज्ञान',
+        micro: ['Detailed Indian History & Culture',
+                'Advanced Polity — Constitutional provisions',
+                'Advanced Economy — Budget, Monetary policy',
+                'Science & Technology — ISRO, DRDO, AI',
+                'Current Affairs — Last 12 months',
+                'International Relations, Summits, Agreements'] }
+    ]
+  },
+  'Tier 2 — Computer Knowledge (20 Marks)': {
+    marks: 20, color: '#06b6d4',
+    topics: [
+      { name: 'Computer Fundamentals', hindi: 'कंप्यूटर मूल बातें',
+        micro: ['Computer basics — Hardware, Software, Input/Output devices',
+                'Operating Systems — Windows, Linux basics',
+                'MS Office — Word, Excel, PowerPoint',
+                'Internet — Browsers, Email, Search engines',
+                'Networking — LAN, WAN, IP address, Protocols',
+                'Cybersecurity — Virus, Malware, Firewall',
+                'Database basics — SQL, DBMS concepts'] }
+    ]
+  }
+};
+
+// ═══ chunks/c17.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c17.js — Banking Exams Syllabuses: IBPS PO, SBI PO, IBPS RRB, IBPS Clerk
+// ═══════════════════════════════════════════════════════════════
+
+// ── IBPS PO 2026 ─────────────────────────────────────────────
+const syl_ibps_po = {
+  'Prelims — Reasoning Ability (35 Marks)': {
+    marks: 35, color: '#3b82f6',
+    topics: [
+      { name: 'Puzzles & Seating Arrangement', hindi: 'पहेलियां एवं बैठक व्यवस्था',
+        micro: ['Linear Arrangement — Single & Double row',
+                'Circular Arrangement — Facing inside/outside',
+                'Square/Rectangular Arrangement',
+                'Floor-based Puzzles',
+                'Box-based Puzzles',
+                'Day/Month/Year-based Puzzles',
+                'Blood Relation + Seating combined'] },
+      { name: 'Logical Reasoning', hindi: 'तार्किक तर्क',
+        micro: ['Syllogism — All, Some, No, Only some',
+                'Inequality — Direct & Coded',
+                'Blood Relations — Family tree',
+                'Direction & Distance',
+                'Coding-Decoding — New pattern',
+                'Order & Ranking',
+                'Alphanumeric Series'] }
+    ]
+  },
+  'Prelims — Quantitative Aptitude (35 Marks)': {
+    marks: 35, color: '#f59e0b',
+    topics: [
+      { name: 'Arithmetic', hindi: 'अंकगणित',
+        micro: ['Percentage, Profit & Loss, Discount',
+                'Simple & Compound Interest',
+                'Ratio & Proportion, Partnership',
+                'Time & Work, Pipes & Cisterns',
+                'Speed, Distance & Time, Trains, Boats',
+                'Average, Mixture & Alligation',
+                'Number System, LCM & HCF'] },
+      { name: 'Data Interpretation', hindi: 'आंकड़ा व्याख्या',
+        micro: ['Tabular DI — 5 questions per set',
+                'Bar Graph DI',
+                'Pie Chart DI',
+                'Line Graph DI',
+                'Mixed/Caselet DI',
+                'Missing DI',
+                'Quadratic Equations'] }
+    ]
+  },
+  'Prelims — English Language (30 Marks)': {
+    marks: 30, color: '#10b981',
+    topics: [
+      { name: 'English for Banking', hindi: 'बैंकिंग के लिए अंग्रेजी',
+        micro: ['Reading Comprehension — 1 passage (5–7 Qs)',
+                'Cloze Test — 5–7 blanks',
+                'Error Detection — Grammatical errors',
+                'Sentence Improvement',
+                'Para Jumbles — 5 sentences',
+                'Fill in the Blanks — Double/Single',
+                'Word Usage / Vocabulary'] }
+    ]
+  },
+  'Mains — Reasoning & Computer Aptitude (60 Marks)': {
+    marks: 60, color: '#3b82f6',
+    topics: [
+      { name: 'Advanced Reasoning', hindi: 'उन्नत तर्कशक्ति',
+        micro: ['Complex Puzzles — Multi-variable',
+                'Advanced Seating Arrangement',
+                'Input-Output — New pattern',
+                'Logical Reasoning — Critical thinking',
+                'Data Sufficiency',
+                'Course of Action, Cause & Effect'] },
+      { name: 'Computer Aptitude', hindi: 'कंप्यूटर अभिरुचि',
+        micro: ['Computer Fundamentals — Hardware, Software',
+                'Operating Systems — Windows, Linux',
+                'MS Office — Word, Excel, PowerPoint',
+                'Internet & Networking — LAN, WAN, Protocols',
+                'Cybersecurity — Virus, Firewall, Encryption',
+                'Database — SQL basics, DBMS',
+                'Number Systems — Binary, Octal, Hexadecimal'] }
+    ]
+  },
+  'Mains — Data Analysis & Interpretation (60 Marks)': {
+    marks: 60, color: '#f59e0b',
+    topics: [
+      { name: 'Advanced DI & Quant', hindi: 'उन्नत DI एवं गणित',
+        micro: ['Complex Tabular DI',
+                'Caselet DI — Paragraph based',
+                'Mixed DI — 2 types combined',
+                'Probability — Basic & Advanced',
+                'Permutation & Combination',
+                'Data Sufficiency — 2 statements',
+                'Advanced Arithmetic — All topics'] }
+    ]
+  },
+  'Mains — General Economy & Banking Awareness (40 Marks)': {
+    marks: 40, color: '#8b5cf6',
+    topics: [
+      { name: 'Banking & Financial Awareness', hindi: 'बैंकिंग एवं वित्तीय जागरूकता',
+        micro: ['RBI — Functions, Monetary policy, Repo rate, CRR, SLR, MSF',
+                'Types of banks — Commercial, Cooperative, RRB, Payment banks',
+                'Banking terms — NPA, SARFAESI, IBC, CIBIL, SWIFT',
+                'Financial institutions — NABARD, SIDBI, NHB, EXIM Bank',
+                'Capital markets — SEBI, Stock exchanges, Mutual funds, IPO',
+                'Insurance — IRDAI, LIC, Types of insurance',
+                'Government schemes — Jan Dhan, Mudra, Stand-Up India',
+                'Budget — Fiscal deficit, Revenue deficit, FRBM',
+                'GST — Structure, Rates, Input tax credit',
+                'International — IMF, World Bank, ADB, AIIB, SWIFT'] },
+      { name: 'Current Affairs & Static GK', hindi: 'समसामयिकी एवं स्थैतिक GK',
+        micro: ['National current affairs — last 6 months',
+                'International events — Summits, Agreements',
+                'Banking appointments — RBI Governor, Bank CEOs',
+                'Awards — Padma, Nobel, Banking awards',
+                'Sports — Recent events, India\'s performance',
+                'Important days — Banking & Finance related',
+                'Countries, Capitals, Currencies',
+                'Books & Authors — Recent publications'] }
+    ]
+  },
+  'Mains — English Language (40 Marks)': {
+    marks: 40, color: '#10b981',
+    topics: [
+      { name: 'Advanced English for Banking', hindi: 'बैंकिंग के लिए उन्नत अंग्रेजी',
+        micro: ['Reading Comprehension — 2 long passages',
+                'Essay Writing — 200–250 words',
+                'Letter Writing — Formal & Informal',
+                'Précis Writing',
+                'Advanced Vocabulary — Synonyms, Antonyms',
+                'Advanced Grammar — Complex structures',
+                'Sentence Rearrangement — Para jumbles'] }
+    ]
+  }
+};
+
+// ── SBI PO 2026 ──────────────────────────────────────────────
+const syl_sbi_po = {
+  'Prelims — Reasoning Ability (35 Marks)': {
+    marks: 35, color: '#3b82f6',
+    topics: [
+      { name: 'Puzzles & Arrangement', hindi: 'पहेलियां एवं व्यवस्था',
+        micro: ['Linear Seating Arrangement — Single & Double row',
+                'Circular Arrangement — Facing inside/outside',
+                'Floor-based Puzzles — 7/8 floors',
+                'Box-based Puzzles',
+                'Month/Day-based Puzzles',
+                'Blood Relation + Seating combined',
+                'Scheduling Puzzles'] },
+      { name: 'Logical & Verbal Reasoning', hindi: 'तार्किक एवं मौखिक तर्क',
+        micro: ['Syllogism — All types including "Only some"',
+                'Inequality — Direct & Coded',
+                'Blood Relations',
+                'Direction & Distance',
+                'Coding-Decoding — New pattern (SBI specific)',
+                'Alphanumeric Series',
+                'Order & Ranking'] }
+    ]
+  },
+  'Prelims — Quantitative Aptitude (35 Marks)': {
+    marks: 35, color: '#f59e0b',
+    topics: [
+      { name: 'Arithmetic & Number Series', hindi: 'अंकगणित एवं संख्या श्रृंखला',
+        micro: ['Number Series — Missing & Wrong term',
+                'Percentage, Profit & Loss, Discount',
+                'Simple & Compound Interest',
+                'Ratio, Proportion & Partnership',
+                'Time & Work, Pipes & Cisterns',
+                'Speed, Distance & Time',
+                'Average, Mixture & Alligation'] },
+      { name: 'Data Interpretation', hindi: 'आंकड़ा व्याख्या',
+        micro: ['Tabular DI',
+                'Bar Graph DI',
+                'Pie Chart DI',
+                'Line Graph DI',
+                'Caselet DI',
+                'Quadratic Equations',
+                'Approximation & Simplification'] }
+    ]
+  },
+  'Prelims — English Language (30 Marks)': {
+    marks: 30, color: '#10b981',
+    topics: [
+      { name: 'English for SBI PO', hindi: 'SBI PO के लिए अंग्रेजी',
+        micro: ['Reading Comprehension — Story/Economy based',
+                'Cloze Test',
+                'Error Detection',
+                'Sentence Improvement',
+                'Para Jumbles',
+                'Fill in the Blanks',
+                'Word Swap / Sentence Connector'] }
+    ]
+  },
+  'Mains — Data Analysis & Interpretation (60 Marks)': {
+    marks: 60, color: '#f59e0b',
+    topics: [
+      { name: 'Advanced DI & Quant', hindi: 'उन्नत DI एवं गणित',
+        micro: ['Complex Tabular DI — 5 Qs per set',
+                'Caselet DI — Paragraph based',
+                'Mixed DI',
+                'Probability',
+                'Permutation & Combination',
+                'Data Sufficiency',
+                'Advanced Arithmetic'] }
+    ]
+  },
+  'Mains — Reasoning & Computer Aptitude (60 Marks)': {
+    marks: 60, color: '#3b82f6',
+    topics: [
+      { name: 'Advanced Reasoning & Computer', hindi: 'उन्नत तर्कशक्ति एवं कंप्यूटर',
+        micro: ['Complex Multi-variable Puzzles',
+                'Advanced Seating Arrangement',
+                'Input-Output',
+                'Logical Reasoning',
+                'Computer Fundamentals',
+                'MS Office, Internet, Networking',
+                'Cybersecurity, Database basics'] }
+    ]
+  },
+  'Mains — General/Economy/Banking Awareness (40 Marks)': {
+    marks: 40, color: '#8b5cf6',
+    topics: [
+      { name: 'Banking & Economy Awareness', hindi: 'बैंकिंग एवं अर्थव्यवस्था जागरूकता',
+        micro: ['RBI — Monetary policy, Rates, Functions',
+                'SBI — History, Products, Services, Subsidiaries',
+                'Banking terms — NPA, SARFAESI, IBC, CIBIL',
+                'Financial institutions — NABARD, SIDBI, EXIM',
+                'Capital markets — SEBI, Mutual funds, IPO',
+                'Government schemes — Jan Dhan, Mudra, PMAY',
+                'Budget, GST, Fiscal policy',
+                'Current Affairs — last 6 months',
+                'International — IMF, World Bank, ADB'] }
+    ]
+  },
+  'Mains — English Language (40 Marks)': {
+    marks: 40, color: '#10b981',
+    topics: [
+      { name: 'Advanced English', hindi: 'उन्नत अंग्रेजी',
+        micro: ['Reading Comprehension — 2 passages',
+                'Essay Writing',
+                'Letter Writing',
+                'Précis Writing',
+                'Advanced Vocabulary',
+                'Advanced Grammar',
+                'Para Jumbles'] }
+    ]
+  }
+};
+
+// ── IBPS RRB PO 2026 ─────────────────────────────────────────
+const syl_ibps_rrb = {
+  'Prelims — Reasoning (40 Marks)': {
+    marks: 40, color: '#3b82f6',
+    topics: [
+      { name: 'Reasoning for RRB', hindi: 'RRB के लिए तर्कशक्ति',
+        micro: ['Puzzles — Floor, Box, Linear, Circular',
+                'Syllogism',
+                'Inequality',
+                'Blood Relations',
+                'Direction & Distance',
+                'Coding-Decoding',
+                'Alphanumeric Series',
+                'Order & Ranking'] }
+    ]
+  },
+  'Prelims — Quantitative Aptitude (40 Marks)': {
+    marks: 40, color: '#f59e0b',
+    topics: [
+      { name: 'Quant for RRB', hindi: 'RRB के लिए गणित',
+        micro: ['Number Series',
+                'Simplification & Approximation',
+                'Percentage, Profit & Loss',
+                'Simple & Compound Interest',
+                'Time & Work, Speed & Distance',
+                'Average, Ratio & Proportion',
+                'Data Interpretation — Tables, Graphs'] }
+    ]
+  },
+  'Mains — Reasoning (40 Marks)': {
+    marks: 40, color: '#3b82f6',
+    topics: [
+      { name: 'Advanced Reasoning', hindi: 'उन्नत तर्कशक्ति',
+        micro: ['Complex Puzzles',
+                'Advanced Seating Arrangement',
+                'Input-Output',
+                'Logical Reasoning',
+                'Data Sufficiency',
+                'Critical Reasoning'] }
+    ]
+  },
+  'Mains — Quantitative Aptitude (40 Marks)': {
+    marks: 40, color: '#f59e0b',
+    topics: [
+      { name: 'Advanced Quant', hindi: 'उन्नत गणित',
+        micro: ['Complex DI — Caselet, Mixed',
+                'Probability',
+                'Permutation & Combination',
+                'Advanced Arithmetic',
+                'Data Sufficiency',
+                'Quadratic Equations'] }
+    ]
+  },
+  'Mains — General Awareness (40 Marks)': {
+    marks: 40, color: '#8b5cf6',
+    topics: [
+      { name: 'Banking & Rural Economy Awareness', hindi: 'बैंकिंग एवं ग्रामीण अर्थव्यवस्था',
+        micro: ['RBI — Functions, Monetary policy',
+                'RRBs — History, Structure, Functions, NABARD',
+                'Rural banking — Kisan Credit Card, PMFBY, e-NAM',
+                'Agriculture — Crops, MSP, Food security',
+                'Government schemes — PM-KISAN, MGNREGA, PMAY',
+                'Current Affairs — last 6 months',
+                'Banking terms, Financial institutions'] }
+    ]
+  },
+  'Mains — English / Hindi Language (40 Marks)': {
+    marks: 40, color: '#10b981',
+    topics: [
+      { name: 'Language Skills', hindi: 'भाषा कौशल',
+        micro: ['Reading Comprehension',
+                'Cloze Test',
+                'Error Detection',
+                'Sentence Improvement',
+                'Para Jumbles',
+                'Fill in the Blanks',
+                'Hindi Grammar (for Hindi medium)'] }
+    ]
+  }
+};
+
+// ── IBPS Clerk 2026 ──────────────────────────────────────────
+const syl_ibps_clerk = {
+  'Prelims — Reasoning Ability (35 Marks)': {
+    marks: 35, color: '#3b82f6',
+    topics: [
+      { name: 'Reasoning for Clerk', hindi: 'Clerk के लिए तर्कशक्ति',
+        micro: ['Puzzles — Simple Floor, Box, Linear',
+                'Syllogism',
+                'Inequality',
+                'Blood Relations',
+                'Direction & Distance',
+                'Coding-Decoding',
+                'Alphanumeric Series',
+                'Order & Ranking',
+                'Alphabet Test'] }
+    ]
+  },
+  'Prelims — Quantitative Aptitude (35 Marks)': {
+    marks: 35, color: '#f59e0b',
+    topics: [
+      { name: 'Quant for Clerk', hindi: 'Clerk के लिए गणित',
+        micro: ['Number Series',
+                'Simplification & Approximation',
+                'Percentage, Profit & Loss',
+                'Simple & Compound Interest',
+                'Time & Work, Speed & Distance',
+                'Average, Ratio & Proportion',
+                'Data Interpretation — Basic'] }
+    ]
+  },
+  'Prelims — English Language (30 Marks)': {
+    marks: 30, color: '#10b981',
+    topics: [
+      { name: 'English for Clerk', hindi: 'Clerk के लिए अंग्रेजी',
+        micro: ['Reading Comprehension',
+                'Cloze Test',
+                'Error Detection',
+                'Sentence Improvement',
+                'Para Jumbles',
+                'Fill in the Blanks'] }
+    ]
+  },
+  'Mains — Reasoning Ability & Computer Aptitude (50 Marks)': {
+    marks: 50, color: '#3b82f6',
+    topics: [
+      { name: 'Reasoning & Computer', hindi: 'तर्कशक्ति एवं कंप्यूटर',
+        micro: ['Complex Puzzles',
+                'Advanced Seating Arrangement',
+                'Input-Output',
+                'Logical Reasoning',
+                'Computer Fundamentals',
+                'MS Office, Internet, Networking'] }
+    ]
+  },
+  'Mains — Quantitative Aptitude (50 Marks)': {
+    marks: 50, color: '#f59e0b',
+    topics: [
+      { name: 'Advanced Quant', hindi: 'उन्नत गणित',
+        micro: ['Complex DI',
+                'Probability',
+                'Advanced Arithmetic',
+                'Data Sufficiency',
+                'Quadratic Equations'] }
+    ]
+  },
+  'Mains — General/Financial Awareness (50 Marks)': {
+    marks: 50, color: '#8b5cf6',
+    topics: [
+      { name: 'Banking & Financial Awareness', hindi: 'बैंकिंग एवं वित्तीय जागरूकता',
+        micro: ['RBI — Functions, Monetary policy, Rates',
+                'Banking terms — NPA, SARFAESI, CIBIL',
+                'Financial institutions — NABARD, SIDBI',
+                'Government schemes — Jan Dhan, Mudra',
+                'Current Affairs — last 6 months',
+                'Static GK — Countries, Capitals, Currencies'] }
+    ]
+  },
+  'Mains — English Language (40 Marks)': {
+    marks: 40, color: '#10b981',
+    topics: [
+      { name: 'English for Clerk Mains', hindi: 'Clerk Mains के लिए अंग्रेजी',
+        micro: ['Reading Comprehension',
+                'Cloze Test',
+                'Error Detection',
+                'Sentence Improvement',
+                'Para Jumbles',
+                'Fill in the Blanks',
+                'Vocabulary'] }
+    ]
+  }
+};
+
+// ═══ chunks/c18.js ═══
+// ═══════════════════════════════════════════════════════════════
+// c18.js — NDA 2026 Syllabus
+// ═══════════════════════════════════════════════════════════════
+const syl_nda = {
+  'Mathematics Paper (300 Marks)': {
+    marks: 300, color: '#ef4444',
+    topics: [
+      { name: 'Algebra', hindi: 'बीजगणित',
+        micro: ['Sets — Union, Intersection, Complement, Venn diagrams',
+                'Complex numbers — Modulus, Argument, Cube roots of unity',
+                'Quadratic equations — Roots, Nature of roots, Relation between roots & coefficients',
+                'Permutation & Combination — nPr, nCr, Binomial theorem',
+                'Logarithms — Laws, Natural & Common logarithms',
+                'Matrices — Types, Operations, Determinants, Inverse',
+                'Linear equations — Cramer\'s rule, Consistency'] },
+      { name: 'Trigonometry', hindi: 'त्रिकोणमिति',
+        micro: ['Angles — Degree & Radian measure',
+                'Trigonometric ratios — sin, cos, tan, cot, sec, cosec',
+                'Trigonometric identities — Pythagorean, Sum-Product formulas',
+                'Inverse trigonometric functions — Domain, Range, Properties',
+                'Heights & Distances — Angle of elevation & depression',
+                'Properties of triangles — Sine rule, Cosine rule, Area'] },
+      { name: 'Analytical Geometry (2D & 3D)', hindi: 'विश्लेषणात्मक ज्यामिति',
+        micro: ['Rectangular Cartesian coordinate system',
+                'Distance formula, Section formula, Area of triangle',
+                'Straight lines — Slope, Intercepts, Angle between lines, Distance from point',
+                'Circles — Standard form, General form, Tangent, Normal',
+                'Conic sections — Parabola, Ellipse, Hyperbola (standard forms)',
+                '3D Geometry — Distance between points, Direction cosines, Equation of line & plane'] },
+      { name: 'Differential Calculus', hindi: 'अवकल गणित',
+        micro: ['Concept of real-valued function — Domain, Range, Graph',
+                'Limits — Standard limits, L\'Hopital\'s rule',
+                'Continuity — Definition, Discontinuity types',
+                'Differentiation — First principles, Standard derivatives',
+                'Chain rule, Product rule, Quotient rule',
+                'Applications — Maxima & Minima, Increasing/Decreasing functions, Tangent & Normal'] },
+      { name: 'Integral Calculus & Differential Equations', hindi: 'समाकल गणित एवं अवकल समीकरण',
+        micro: ['Integration — Standard integrals, Substitution, By parts, Partial fractions',
+                'Definite integrals — Properties, Area under curve',
+                'Differential equations — Order, Degree, Formation',
+                'Solution methods — Variable separable, Homogeneous, Linear DE'] },
+      { name: 'Vector Algebra', hindi: 'सदिश बीजगणित',
+        micro: ['Vectors — Types, Addition, Subtraction, Scalar multiplication',
+                'Dot product (Scalar product) — Properties, Angle between vectors',
+                'Cross product (Vector product) — Properties, Area of parallelogram',
+                'Scalar triple product — Volume of parallelepiped'] },
+      { name: 'Statistics & Probability', hindi: 'सांख्यिकी एवं प्रायिकता',
+        micro: ['Statistics — Mean, Median, Mode, Variance, Standard Deviation',
+                'Frequency distribution — Grouped & Ungrouped data',
+                'Probability — Classical definition, Addition theorem, Multiplication theorem',
+                'Conditional probability — Bayes\' theorem',
+                'Random variable — Binomial distribution, Poisson distribution'] }
+    ]
+  },
+  'GAT — English (200 Marks)': {
+    marks: 200, color: '#10b981',
+    topics: [
+      { name: 'Grammar & Usage', hindi: 'व्याकरण एवं प्रयोग',
+        micro: ['Parts of Speech — Noun, Pronoun, Verb, Adjective, Adverb, Preposition, Conjunction',
+                'Tenses — All 12 tenses with usage',
+                'Voice — Active & Passive transformation',
+                'Narration — Direct & Indirect speech',
+                'Articles — Definite & Indefinite',
+                'Prepositions — Usage in context',
+                'Subject-Verb Agreement'] },
+      { name: 'Vocabulary & Comprehension', hindi: 'शब्दावली एवं बोध',
+        micro: ['Synonyms & Antonyms',
+                'One Word Substitution',
+                'Idioms & Phrases',
+                'Spelling Correction',
+                'Reading Comprehension — 2–3 passages',
+                'Fill in the Blanks',
+                'Sentence Improvement & Error Detection'] }
+    ]
+  },
+  'GAT — Physics (150 Marks)': {
+    marks: 150, color: '#3b82f6',
+    topics: [
+      { name: 'Mechanics', hindi: 'यांत्रिकी',
+        micro: ['Physical properties of matter — Elasticity, Surface tension, Viscosity',
+                'Newton\'s Laws of Motion — Applications, Friction',
+                'Work, Energy & Power — Conservation laws',
+                'Rotational motion — Moment of inertia, Angular momentum',
+                'Gravitation — Kepler\'s laws, Orbital velocity, Escape velocity',
+                'Fluid mechanics — Archimedes\' principle, Bernoulli\'s theorem'] },
+      { name: 'Heat, Light & Sound', hindi: 'ऊष्मा, प्रकाश एवं ध्वनि',
+        micro: ['Heat — Modes of transfer, Specific heat, Latent heat',
+                'Thermodynamics — Laws, Carnot engine, Entropy',
+                'Light — Reflection, Refraction, Total internal reflection',
+                'Lenses & Mirrors — Ray diagrams, Magnification',
+                'Wave optics — Interference, Diffraction, Polarisation',
+                'Sound — Properties, Doppler effect, Resonance, Ultrasound'] },
+      { name: 'Electricity & Magnetism', hindi: 'विद्युत एवं चुंबकत्व',
+        micro: ['Electrostatics — Coulomb\'s law, Electric field, Potential',
+                'Current electricity — Ohm\'s law, Kirchhoff\'s laws, Wheatstone bridge',
+                'Magnetic effects of current — Biot-Savart law, Ampere\'s law',
+                'Electromagnetic induction — Faraday\'s laws, Lenz\'s law',
+                'Alternating current — RMS, Impedance, Resonance',
+                'Electromagnetic waves — Spectrum, Properties'] },
+      { name: 'Modern Physics', hindi: 'आधुनिक भौतिकी',
+        micro: ['Photoelectric effect — Einstein\'s equation',
+                'Atomic structure — Bohr\'s model, Hydrogen spectrum',
+                'Nuclear physics — Radioactivity, Fission, Fusion',
+                'Semiconductors — p-n junction, Diode, Transistor',
+                'X-rays — Properties, Applications',
+                'Lasers — Principle, Types, Applications'] }
+    ]
+  },
+  'GAT — Chemistry (60 Marks)': {
+    marks: 60, color: '#f59e0b',
+    topics: [
+      { name: 'Physical & Inorganic Chemistry', hindi: 'भौतिक एवं अकार्बनिक रसायन',
+        micro: ['Atomic structure — Bohr\'s model, Quantum numbers, Electronic configuration',
+                'Periodic table — Trends in properties, Groups & Periods',
+                'Chemical bonding — Ionic, Covalent, Metallic, Hydrogen bonding',
+                'States of matter — Gas laws, Kinetic theory',
+                'Solutions — Concentration, Colligative properties',
+                'Electrochemistry — Electrolysis, Galvanic cells, Faraday\'s laws',
+                'Metals & Non-metals — Properties, Extraction, Uses'] },
+      { name: 'Organic Chemistry', hindi: 'कार्बनिक रसायन',
+        micro: ['Hydrocarbons — Alkanes, Alkenes, Alkynes, Benzene',
+                'Functional groups — Alcohols, Aldehydes, Ketones, Acids, Esters',
+                'Polymers — Natural & Synthetic, Uses',
+                'Biomolecules — Carbohydrates, Proteins, Fats, Vitamins',
+                'Environmental chemistry — Pollution, Green chemistry'] }
+    ]
+  },
+  'GAT — General Science (40 Marks)': {
+    marks: 40, color: '#8b5cf6',
+    topics: [
+      { name: 'Biology & Health', hindi: 'जीव विज्ञान एवं स्वास्थ्य',
+        micro: ['Cell biology — Structure, Organelles, Cell division',
+                'Genetics — Mendel\'s laws, DNA, RNA, Mutations',
+                'Human physiology — Digestion, Respiration, Circulation, Excretion',
+                'Nervous system — Brain, Spinal cord, Sense organs',
+                'Endocrine system — Hormones, Glands',
+                'Diseases — Bacterial, Viral, Protozoan, Deficiency diseases',
+                'Ecology — Food chains, Ecosystems, Biodiversity'] }
+    ]
+  },
+  'GAT — History (80 Marks)': {
+    marks: 80, color: '#f97316',
+    topics: [
+      { name: 'Indian History', hindi: 'भारतीय इतिहास',
+        micro: ['Ancient India — Indus Valley, Vedic Age, Maurya, Gupta',
+                'Medieval India — Delhi Sultanate, Mughal Empire, Vijayanagara',
+                'Bhakti & Sufi movements',
+                'Modern India — British expansion, Economic impact',
+                'Freedom Movement — 1857, INC, Gandhi, Bose',
+                'Independence & Partition 1947'] },
+      { name: 'World History', hindi: 'विश्व इतिहास',
+        micro: ['French Revolution 1789 — Causes, Events, Impact',
+                'Industrial Revolution — Britain, Spread to Europe',
+                'World War I — Causes, Events, Treaty of Versailles',
+                'Russian Revolution 1917',
+                'World War II — Hitler, Holocaust, Atomic bombs',
+                'Cold War — USA vs USSR, Korean War, Vietnam War',
+                'Decolonisation — Asia & Africa',
+                'United Nations — Formation, Structure, Agencies'] }
+    ]
+  },
+  'GAT — Geography (80 Marks)': {
+    marks: 80, color: '#06b6d4',
+    topics: [
+      { name: 'Physical & Indian Geography', hindi: 'भौतिक एवं भारतीय भूगोल',
+        micro: ['Earth — Interior, Plate tectonics, Earthquakes, Volcanoes',
+                'Atmosphere — Layers, Pressure belts, Winds, Monsoon',
+                'Oceans — Currents, Tides, Marine resources',
+                'India — Physiographic divisions, Rivers, Climate, Soils',
+                'Natural vegetation & Wildlife',
+                'Agriculture — Crops, Irrigation, Green Revolution'] },
+      { name: 'World Geography & Environment', hindi: 'विश्व भूगोल एवं पर्यावरण',
+        micro: ['Continents & Oceans — Physical features',
+                'Countries — Location, Capitals, Important facts',
+                'Climate zones — Tropical, Temperate, Polar',
+                'Natural resources — Distribution, Conservation',
+                'Environmental issues — Climate change, Pollution, Deforestation',
+                'Disaster management — Types, NDMA, Sendai Framework'] }
+    ]
+  },
+  'GAT — Current Affairs (40 Marks)': {
+    marks: 40, color: '#ec4899',
+    topics: [
+      { name: 'National & International Affairs', hindi: 'राष्ट्रीय एवं अंतर्राष्ट्रीय घटनाएं',
+        micro: ['Indian defence — Army, Navy, Air Force, Recent operations',
+                'Defence acquisitions — Rafale, S-400, INS Vikrant, Tejas',
+                'DRDO — Agni, BrahMos, Pralay, Astra missiles',
+                'ISRO — Chandrayaan-3, Gaganyaan, Aditya-L1',
+                'International relations — India\'s bilateral ties',
+                'Summits & Agreements — G20, SCO, QUAD, BRICS',
+                'Awards — Param Vir Chakra, Ashoka Chakra, Gallantry awards',
+                'Sports — Olympics, Asian Games, Commonwealth Games',
+                'Important days — Defence related, National, International'] }
+    ]
+  }
+};

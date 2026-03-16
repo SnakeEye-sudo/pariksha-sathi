@@ -115,6 +115,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .exam-card::after{content:'';position:absolute;inset:0;border-radius:24px;opacity:0;transition:opacity .35s;pointer-events:none}
 .bpsc-card::after{background:radial-gradient(circle at 20% 20%,rgba(245,158,11,.15),transparent 60%)}
 .upsc-card::after{background:radial-gradient(circle at 20% 20%,rgba(16,185,129,.15),transparent 60%)}
+.bpsc72-card::after{background:radial-gradient(circle at 20% 20%,rgba(139,92,246,.15),transparent 60%)}
+.ssc-card::after{background:radial-gradient(circle at 20% 20%,rgba(59,130,246,.15),transparent 60%)}
+.ibps-card::after{background:radial-gradient(circle at 20% 20%,rgba(6,182,212,.15),transparent 60%)}
+.sbi-card::after{background:radial-gradient(circle at 20% 20%,rgba(34,197,94,.15),transparent 60%)}
+.rrb-card::after{background:radial-gradient(circle at 20% 20%,rgba(249,115,22,.15),transparent 60%)}
+.clerk-card::after{background:radial-gradient(circle at 20% 20%,rgba(168,85,247,.15),transparent 60%)}
+.nda-card::after{background:radial-gradient(circle at 20% 20%,rgba(239,68,68,.15),transparent 60%)}
+.bpsc71-card::after{background:radial-gradient(circle at 20% 20%,rgba(236,72,153,.15),transparent 60%)}
 .exam-card:hover{transform:translateY(-8px) scale(1.01)}
 .bpsc-card:hover{border-color:rgba(245,158,11,.5);box-shadow:0 24px 80px rgba(245,158,11,.2),0 0 0 1px rgba(245,158,11,.3),inset 0 1px 0 rgba(255,255,255,.1)}
 .upsc-card:hover{border-color:rgba(16,185,129,.5);box-shadow:0 24px 80px rgba(16,185,129,.2),0 0 0 1px rgba(16,185,129,.3),inset 0 1px 0 rgba(255,255,255,.1)}
@@ -476,7 +484,47 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 /* Position in plan topbar */
 .lang-toggle-topbar{margin-right:.3rem}
 
-/* ══ FREE MISSION BOX ══ */
+/* ══ EXAM CATEGORY LABELS ══ */
+.exam-category-label{font-family:'Space Grotesk',sans-serif;font-size:.82rem;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin:2rem auto .8rem;max-width:800px;width:100%;padding:0 .2rem;animation:fadeUp .8s .5s ease both}
+
+/* ══ NEW CARD ICON WRAPS ══ */
+.bpsc71-icon-wrap{background:rgba(236,72,153,.12);border:1px solid rgba(236,72,153,.25);box-shadow:0 4px 16px rgba(236,72,153,.15)}
+.bpsc72-icon-wrap{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.25);box-shadow:0 4px 16px rgba(139,92,246,.15)}
+.ssc-icon-wrap{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);box-shadow:0 4px 16px rgba(59,130,246,.15)}
+.ibps-icon-wrap{background:rgba(6,182,212,.12);border:1px solid rgba(6,182,212,.25);box-shadow:0 4px 16px rgba(6,182,212,.15)}
+.sbi-icon-wrap{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.25);box-shadow:0 4px 16px rgba(34,197,94,.15)}
+.rrb-icon-wrap{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.25);box-shadow:0 4px 16px rgba(249,115,22,.15)}
+.clerk-icon-wrap{background:rgba(168,85,247,.12);border:1px solid rgba(168,85,247,.25);box-shadow:0 4px 16px rgba(168,85,247,.15)}
+.nda-icon-wrap{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);box-shadow:0 4px 16px rgba(239,68,68,.15)}
+
+/* ══ NEW CARD HOVER STYLES ══ */
+.bpsc71-card:hover{border-color:rgba(236,72,153,.5);box-shadow:0 24px 80px rgba(236,72,153,.2),0 0 0 1px rgba(236,72,153,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.bpsc72-card:hover{border-color:rgba(139,92,246,.5);box-shadow:0 24px 80px rgba(139,92,246,.2),0 0 0 1px rgba(139,92,246,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.ssc-card:hover{border-color:rgba(59,130,246,.5);box-shadow:0 24px 80px rgba(59,130,246,.2),0 0 0 1px rgba(59,130,246,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.ibps-card:hover{border-color:rgba(6,182,212,.5);box-shadow:0 24px 80px rgba(6,182,212,.2),0 0 0 1px rgba(6,182,212,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.sbi-card:hover{border-color:rgba(34,197,94,.5);box-shadow:0 24px 80px rgba(34,197,94,.2),0 0 0 1px rgba(34,197,94,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.rrb-card:hover{border-color:rgba(249,115,22,.5);box-shadow:0 24px 80px rgba(249,115,22,.2),0 0 0 1px rgba(249,115,22,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.clerk-card:hover{border-color:rgba(168,85,247,.5);box-shadow:0 24px 80px rgba(168,85,247,.2),0 0 0 1px rgba(168,85,247,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+.nda-card:hover{border-color:rgba(239,68,68,.5);box-shadow:0 24px 80px rgba(239,68,68,.2),0 0 0 1px rgba(239,68,68,.3),inset 0 1px 0 rgba(255,255,255,.1)}
+
+/* ══ NEW CARD EC-BTN STYLES ══ */
+.bpsc71-card .ec-btn{background:rgba(236,72,153,.1);color:#f472b6;border:1px solid rgba(236,72,153,.2)}
+.bpsc72-card .ec-btn{background:rgba(139,92,246,.1);color:var(--purple-l);border:1px solid rgba(139,92,246,.2)}
+.ssc-card .ec-btn{background:rgba(59,130,246,.1);color:var(--blue-l);border:1px solid rgba(59,130,246,.2)}
+.ibps-card .ec-btn{background:rgba(6,182,212,.1);color:var(--cyan);border:1px solid rgba(6,182,212,.2)}
+.sbi-card .ec-btn{background:rgba(34,197,94,.1);color:#4ade80;border:1px solid rgba(34,197,94,.2)}
+.rrb-card .ec-btn{background:rgba(249,115,22,.1);color:#fb923c;border:1px solid rgba(249,115,22,.2)}
+.clerk-card .ec-btn{background:rgba(168,85,247,.1);color:#c084fc;border:1px solid rgba(168,85,247,.2)}
+.nda-card .ec-btn{background:rgba(239,68,68,.1);color:var(--red-l);border:1px solid rgba(239,68,68,.2)}
+
+.bpsc71-card:hover .ec-btn{background:linear-gradient(135deg,#ec4899,#f43f5e);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(236,72,153,.3)}
+.bpsc72-card:hover .ec-btn{background:var(--grad-purple);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(139,92,246,.3)}
+.ssc-card:hover .ec-btn{background:var(--grad-blue);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(59,130,246,.3)}
+.ibps-card:hover .ec-btn{background:linear-gradient(135deg,#06b6d4,#3b82f6);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(6,182,212,.3)}
+.sbi-card:hover .ec-btn{background:linear-gradient(135deg,#22c55e,#10b981);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(34,197,94,.3)}
+.rrb-card:hover .ec-btn{background:linear-gradient(135deg,#f97316,#ef4444);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(249,115,22,.3)}
+.clerk-card:hover .ec-btn{background:linear-gradient(135deg,#a855f7,#8b5cf6);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(168,85,247,.3)}
+.nda-card:hover .ec-btn{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;border-color:transparent;box-shadow:0 4px 16px rgba(239,68,68,.3)}
 .free-mission-box{display:flex;align-items:flex-start;gap:.9rem;max-width:600px;margin:2.5rem auto 0;padding:1.1rem 1.4rem;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.18);border-radius:16px;text-align:left;animation:fadeUp .8s .8s ease both;backdrop-filter:blur(8px)}
 .free-mission-icon{font-size:1.3rem;flex-shrink:0;margin-top:.05rem}
 .free-mission-text{font-size:.85rem;color:var(--t2);line-height:1.7;font-weight:500}

@@ -47,7 +47,7 @@
 
     <div class="hero-stats">
       <div class="hstat">
-        <div class="hstat-num">2</div>
+        <div class="hstat-num">11+</div>
         <div class="hstat-lbl" data-i18n="statExams">Exams</div>
       </div>
       <div class="hstat-sep"></div>
@@ -69,8 +69,9 @@
 
     <p class="choose-label" data-i18n="chooseLabel">अपना Exam चुनें 👇</p>
 
+    <!-- 🏫 Teaching -->
+    <div class="exam-category-label">🏫 Teaching</div>
     <div class="exam-cards">
-      <!-- BPSC Card -->
       <div class="exam-card bpsc-card" onclick="selectExam('bpsc')">
         <div class="ec-ribbon" data-i18n="ribbon">Most Popular</div>
         <div class="ec-top">
@@ -82,47 +83,196 @@
         </div>
         <div class="ec-divider"></div>
         <div class="ec-details">
-          <div class="ec-detail-row">
-            <span class="ec-detail-icon">📅</span>
-            <span data-i18n="bpscDate">Exam: Sep 2026 (Tentative)</span>
-          </div>
-          <div class="ec-detail-row">
-            <span class="ec-detail-icon">🎯</span>
-            <span data-i18n="bpscVac">46,595 Vacancies</span>
-          </div>
-          <div class="ec-detail-row">
-            <span class="ec-detail-icon">📝</span>
-            <span data-i18n="bpscClass">Class 1–5 (PRT) & 6–8 (TGT)</span>
-          </div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span data-i18n="bpscDate">Exam: Sep 2026 (Tentative)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span data-i18n="bpscVac">46,595 Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span data-i18n="bpscClass">Class 1–5 (PRT) & 6–8 (TGT)</span></div>
         </div>
         <div class="ec-btn"><span data-i18n="bpscBtn">Plan बनाएं</span> <span class="ec-arrow">→</span></div>
       </div>
+    </div>
 
-      <!-- UPSC Card -->
-      <div class="exam-card upsc-card" onclick="selectExam('upsc')">
+    <!-- 🏛️ Civil Services -->
+    <div class="exam-category-label">🏛️ Civil Services</div>
+    <div class="exam-cards">
+      <div class="exam-card upsc-card" onclick="selectExam('upsc_2026')">
         <div class="ec-top">
           <div class="ec-icon-wrap upsc-icon-wrap">🏛️</div>
           <div class="ec-info">
-            <div class="ec-title" data-i18n="upscTitle">UPSC CSE 2026/27</div>
-            <div class="ec-sub" data-i18n="upscSub">Civil Services Examination</div>
+            <div class="ec-title">UPSC CSE 2026</div>
+            <div class="ec-sub">Civil Services Examination</div>
           </div>
         </div>
         <div class="ec-divider"></div>
         <div class="ec-details">
-          <div class="ec-detail-row">
-            <span class="ec-detail-icon">📅</span>
-            <span data-i18n="upscDate">Prelims: May 2026 or 2027</span>
-          </div>
-          <div class="ec-detail-row">
-            <span class="ec-detail-icon">🎯</span>
-            <span data-i18n="upscService">IAS / IPS / IFS</span>
-          </div>
-          <div class="ec-detail-row">
-            <span class="ec-detail-icon">📝</span>
-            <span data-i18n="upscPattern">Pre + Mains + Interview</span>
-          </div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: May 24, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>IAS / IPS / IFS</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
         </div>
         <div class="ec-btn"><span data-i18n="upscBtn">Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card upsc-card" onclick="selectExam('upsc_2027')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap upsc-icon-wrap">🏛️</div>
+          <div class="ec-info">
+            <div class="ec-title">UPSC CSE 2027</div>
+            <div class="ec-sub">Civil Services Examination</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: May 2027</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>IAS / IPS / IFS</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span data-i18n="upscBtn">Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- ⚖️ State PSC -->
+    <div class="exam-category-label">⚖️ State PSC</div>
+    <div class="exam-cards">
+      <div class="exam-card bpsc71-card" onclick="selectExam('bpsc_71')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap bpsc71-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">BPSC 71st CCE</div>
+            <div class="ec-sub">Bihar Combined Competitive Exam</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Mains: Apr 26, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>1,298 Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card bpsc72-card" onclick="selectExam('bpsc_72')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap bpsc72-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">BPSC 72nd CCE</div>
+            <div class="ec-sub">Bihar Combined Competitive Exam</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Jul 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~1500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 📋 SSC -->
+    <div class="exam-category-label">📋 SSC</div>
+    <div class="exam-cards">
+      <div class="exam-card ssc-card" onclick="selectExam('ssc_cgl')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap ssc-icon-wrap">📋</div>
+          <div class="ec-info">
+            <div class="ec-title">SSC CGL 2026</div>
+            <div class="ec-sub">Combined Graduate Level</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Aug 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~17,000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Tier 1 + Tier 2 (MCQ)</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 🏦 Banking -->
+    <div class="exam-category-label">🏦 Banking</div>
+    <div class="exam-cards">
+      <div class="exam-card ibps-card" onclick="selectExam('ibps_po')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap ibps-icon-wrap">🏦</div>
+          <div class="ec-info">
+            <div class="ec-title">IBPS PO 2026</div>
+            <div class="ec-sub">Probationary Officer</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Aug 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~4000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card sbi-card" onclick="selectExam('sbi_po')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap sbi-icon-wrap">🏦</div>
+          <div class="ec-info">
+            <div class="ec-title">SBI PO 2026</div>
+            <div class="ec-sub">State Bank of India PO</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Sep 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~2000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card rrb-card" onclick="selectExam('ibps_rrb')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap rrb-icon-wrap">🌾</div>
+          <div class="ec-info">
+            <div class="ec-title">IBPS RRB PO 2026</div>
+            <div class="ec-sub">Regional Rural Banks Officer</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Nov 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~8000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card clerk-card" onclick="selectExam('ibps_clerk')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap clerk-icon-wrap">📑</div>
+          <div class="ec-info">
+            <div class="ec-title">IBPS Clerk 2026</div>
+            <div class="ec-sub">Clerical Cadre — Public Banks</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Dec 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~6000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- ⚔️ Defence -->
+    <div class="exam-category-label">⚔️ Defence</div>
+    <div class="exam-cards">
+      <div class="exam-card nda-card" onclick="selectExam('nda_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap nda-icon-wrap">⚔️</div>
+          <div class="ec-info">
+            <div class="ec-title">NDA 2026 (I)</div>
+            <div class="ec-sub">National Defence Academy</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Apr 19, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~400+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Maths + GAT + SSB</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
       </div>
     </div>
 
@@ -375,7 +525,7 @@
       <span class="footer-name">ParikshaSathi</span>
     </div>
     <p><span data-i18n="footerBy">Made with ❤️ by</span> <strong>Er. Sangam Krishna</strong></p>
-    <p class="footer-sub" data-i18n="footerSub">BPSC TRE 4.0: Sep 2026 (Tentative) | UPSC CSE 2026/2027: May 2026/2027</p>
+    <p class="footer-sub" data-i18n="footerSub">BPSC TRE 4.0 | UPSC CSE 2026/27 | BPSC CCE 71st/72nd | SSC CGL | IBPS PO | SBI PO | IBPS RRB | IBPS Clerk | NDA 2026</p>
   </footer>
 </div>
 

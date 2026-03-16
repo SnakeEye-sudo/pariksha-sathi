@@ -48,29 +48,46 @@ function selectExam(exam){
   selectedExam=exam;
   const bg=document.getElementById('bpscClassGroup');
   const og=document.getElementById('upscOptionalGroup');
-  if(exam==='bpsc'){
+  const yg=document.getElementById('upscYearGroup');
+
+  // Get category from registry or legacy
+  const cfg = getExamConfig(exam);
+  const category = cfg ? cfg.category : (exam === 'bpsc' ? 'teaching' : 'civil_services');
+  const icon = cfg ? cfg.icon : (exam === 'bpsc' ? '🏫' : '🏛️');
+  const title = cfg ? cfg.title : (exam === 'bpsc' ? 'BPSC TRE 4.0' : 'UPSC CSE');
+  const subtitle = cfg ? cfg.subtitle : '';
+
+  // Show/hide form sections based on category
+  if (exam === 'bpsc' || exam === 'bpsc_tre') {
     bg.classList.remove('hidden');
     og.classList.add('hidden');
-    document.getElementById('upscYearGroup').classList.add('hidden');
-    document.getElementById('formHeaderIcon').textContent='🏫';
-    document.getElementById('formTitle').textContent=t('formTitleBpsc');
-    document.getElementById('formSubtitle').textContent=t('formSubBpsc');
+    yg.classList.add('hidden');
     document.getElementById('nameNum').textContent='02';
     document.getElementById('dateNum').textContent='03';
     document.getElementById('hoursNum').textContent='04';
     document.getElementById('slotNum').textContent='05';
-  } else {
+  } else if (category === 'civil_services') {
     bg.classList.add('hidden');
     og.classList.remove('hidden');
-    document.getElementById('upscYearGroup').classList.remove('hidden');
-    document.getElementById('formHeaderIcon').textContent='🏛️';
-    document.getElementById('formTitle').textContent=t('formTitleUpsc');
-    document.getElementById('formSubtitle').textContent=t('formSubUpsc');
+    yg.classList.remove('hidden');
     document.getElementById('nameNum').textContent='03';
     document.getElementById('dateNum').textContent='04';
     document.getElementById('hoursNum').textContent='05';
     document.getElementById('slotNum').textContent='06';
+  } else {
+    // Banking, SSC, Defence, State PSC — no special sub-selections
+    bg.classList.add('hidden');
+    og.classList.add('hidden');
+    yg.classList.add('hidden');
+    document.getElementById('nameNum').textContent='01';
+    document.getElementById('dateNum').textContent='02';
+    document.getElementById('hoursNum').textContent='03';
+    document.getElementById('slotNum').textContent='04';
   }
+
+  document.getElementById('formHeaderIcon').textContent=icon;
+  document.getElementById('formTitle').textContent=title+' — '+(lang==='en'?'Fill Details':'जानकारी भरें');
+  document.getElementById('formSubtitle').textContent=subtitle || (lang==='en'?'Fill in your details to get a personalized plan':'सभी जानकारी भरें और अपना personalized plan पाएं');
   showScreen('formScreen');
 }
 

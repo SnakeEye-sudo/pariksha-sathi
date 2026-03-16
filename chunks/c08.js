@@ -6,6 +6,7 @@ const syllabusData = {
 };
 
 function getSyllabus() {
+  // Legacy exam IDs (bpsc, upsc) — keep backward compat
   if (userData.exam === 'bpsc') {
     if (userData.bpscClass === 'both') {
       const merged = {};
@@ -15,13 +16,18 @@ function getSyllabus() {
     }
     return userData.bpscClass === '1-5' ? syl_bpsc15 : syl_bpsc68;
   }
-  // UPSC: merge prelims + mains + optional (if selected)
-  const base = { ...syl_upsc_pre, ...syl_upsc_mains };
-  if (userData.optionalSubject) {
-    const optSyl = getOptionalSyllabus(userData.optionalSubject);
-    if (optSyl) Object.assign(base, optSyl);
+  if (userData.exam === 'upsc') {
+    const base = { ...syl_upsc_pre, ...syl_upsc_mains };
+    if (userData.optionalSubject) {
+      const optSyl = getOptionalSyllabus(userData.optionalSubject);
+      if (optSyl) Object.assign(base, optSyl);
+    }
+    return base;
   }
-  return base;
+  // New registry-based exams
+  const cfg = getExamConfig(userData.exam);
+  if (cfg && cfg.getSyllabus) return cfg.getSyllabus(userData);
+  return {};
 }
 
 function getSubjectsList() {
@@ -29,8 +35,9 @@ function getSubjectsList() {
   const list = Object.entries(syl).map(([name, data]) => ({
     name, marks: data.marks, color: data.color, topics: data.topics
   }));
-  // BPSC: Language is qualifying — schedule last
-  if (userData.exam === 'bpsc') {
+  // BPSC TRE: Language is qualifying — schedule last
+  const exam = userData.exam;
+  if (exam === 'bpsc' || exam === 'bpsc_tre') {
     const langIdx = list.findIndex(s => s.name.includes('Part I') && s.name.includes('Language'));
     if (langIdx > -1) { const [l] = list.splice(langIdx, 1); list.push(l); }
   }
@@ -38,8 +45,13 @@ function getSubjectsList() {
 }
 
 function getExamDate() {
+  // Legacy IDs
   if (userData.exam === 'bpsc') return new Date('2026-09-22');
-  return userData.upscYear === '2026' ? new Date('2026-05-17') : new Date('2027-05-16');
+  if (userData.exam === 'upsc') return userData.upscYear === '2026' ? new Date('2026-05-24') : new Date('2027-05-16');
+  // Registry-based
+  const cfg = getExamConfig(userData.exam);
+  if (cfg && cfg.examDate) return new Date(cfg.examDate);
+  return new Date(Date.now() + 365 * 86400000); // fallback: 1 year from now
 }
 
 function generatePlan() {
@@ -54,10 +66,15 @@ function generatePlan() {
   document.querySelectorAll('input[name="slot"]:checked').forEach(s => slots.push(s.value));
 
   let bpscClass = '', optionalSubject = '', upscYear = '2027';
-  if (selectedExam === 'bpsc') {
+
+  // Determine exam category from registry or legacy
+  const cfg = getExamConfig(selectedExam);
+  const category = cfg ? cfg.category : (selectedExam === 'bpsc' ? 'teaching' : 'civil_services');
+
+  if (selectedExam === 'bpsc' || selectedExam === 'bpsc_tre') {
     const bc = document.querySelector('input[name="bpscClass"]:checked');
     bpscClass = bc ? bc.value : '1-5';
-  } else {
+  } else if (category === 'civil_services' || selectedExam === 'upsc' || selectedExam === 'upsc_2026' || selectedExam === 'upsc_2027') {
     const optEl = document.getElementById('upscOptional');
     optionalSubject = optEl ? optEl.value : '';
     const yrEl = document.querySelector('input[name="upscYear"]:checked');
@@ -76,64 +93,39 @@ function generatePlan() {
 // BPSC TRE & UPSC are ARTS-heavy exams — GS/History/Polity/Geography dominate
 function getSubjectWeights(subjects, exam) {
   const bpscPriority = {
-    // High weight — core GS subjects, max marks
-    'GENERAL STUDIES': 5,
-    'HISTORY': 5,
-    'POLITY': 5,
-    'GEOGRAPHY': 5,
-    'ENVIRONMENT': 4,
-    'ECONOMY': 4,
-    'CHILD DEVELOPMENT': 4,
-    'PEDAGOGY': 4,
-    // Medium — supporting subjects
-    'SCIENCE': 3,
-    'REASONING': 3,
-    'COMPUTER': 2,
-    // Low — maths is small section, language is qualifying
-    'MATHEMATICS': 2,
-    'MATHS': 2,
-    'LANGUAGE': 1,
-    'HINDI': 1,
-    'ENGLISH': 1,
+    'GENERAL STUDIES': 5, 'HISTORY': 5, 'POLITY': 5, 'GEOGRAPHY': 5,
+    'ENVIRONMENT': 4, 'ECONOMY': 4, 'CHILD DEVELOPMENT': 4, 'PEDAGOGY': 4,
+    'SCIENCE': 3, 'REASONING': 3, 'COMPUTER': 2,
+    'MATHEMATICS': 2, 'MATHS': 2, 'LANGUAGE': 1, 'HINDI': 1, 'ENGLISH': 1,
   };
   const upscPriority = {
-    // Very high — core mains subjects
-    'HISTORY': 5,
-    'POLITY': 5,
-    'GEOGRAPHY': 5,
-    'ECONOMY': 5,
-    'ENVIRONMENT': 5,
-    'ETHICS': 5,
-    'OPTIONAL': 5,
-    // High — prelims + IR
-    'PRELIMS': 4,
-    'INTERNATIONAL': 4,
-    'GOVERNANCE': 4,
-    'SOCIAL': 4,
-    // Medium — science & tech, security
-    'SCIENCE': 3,
-    'TECHNOLOGY': 3,
-    'SECURITY': 3,
-    // Low — no maths in UPSC
-    'MATHEMATICS': 1,
-    'MATHS': 1,
-    'LANGUAGE': 1,
+    'HISTORY': 5, 'POLITY': 5, 'GEOGRAPHY': 5, 'ECONOMY': 5,
+    'ENVIRONMENT': 5, 'ETHICS': 5, 'OPTIONAL': 5,
+    'PRELIMS': 4, 'INTERNATIONAL': 4, 'GOVERNANCE': 4, 'SOCIAL': 4,
+    'SCIENCE': 3, 'TECHNOLOGY': 3, 'SECURITY': 3,
+    'MATHEMATICS': 1, 'MATHS': 1, 'LANGUAGE': 1,
   };
 
-  const priorityMap = exam === 'bpsc' ? bpscPriority : upscPriority;
+  // Try registry priorityMap first
+  let priorityMap = null;
+  const cfg = getExamConfig(exam);
+  if (cfg && cfg.priorityMap) {
+    priorityMap = cfg.priorityMap;
+  } else if (exam === 'bpsc') {
+    priorityMap = bpscPriority;
+  } else {
+    priorityMap = upscPriority;
+  }
 
   return subjects.map(subj => {
     const name = subj.name.toUpperCase();
     let weight = 3; // default medium
-    // Match against priority map keys
     for (const [key, w] of Object.entries(priorityMap)) {
-      if (name.includes(key)) {
-        weight = Math.max(weight, w);
-      }
+      if (name.includes(key)) { weight = Math.max(weight, w); }
     }
     // Language/qualifying always lowest regardless
     if (name.includes('LANGUAGE') || name.includes('QUALIFYING') ||
-        name.includes('PART I') && name.includes('LANG')) {
+        (name.includes('PART I') && name.includes('LANG'))) {
       weight = 1;
     }
     return weight;

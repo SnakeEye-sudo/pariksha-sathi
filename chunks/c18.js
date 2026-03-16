@@ -1,0 +1,196 @@
+// ═══════════════════════════════════════════════════════════════
+// c18.js — NDA 2026 Syllabus
+// ═══════════════════════════════════════════════════════════════
+const syl_nda = {
+  'Mathematics Paper (300 Marks)': {
+    marks: 300, color: '#ef4444',
+    topics: [
+      { name: 'Algebra', hindi: 'बीजगणित',
+        micro: ['Sets — Union, Intersection, Complement, Venn diagrams',
+                'Complex numbers — Modulus, Argument, Cube roots of unity',
+                'Quadratic equations — Roots, Nature of roots, Relation between roots & coefficients',
+                'Permutation & Combination — nPr, nCr, Binomial theorem',
+                'Logarithms — Laws, Natural & Common logarithms',
+                'Matrices — Types, Operations, Determinants, Inverse',
+                'Linear equations — Cramer\'s rule, Consistency'] },
+      { name: 'Trigonometry', hindi: 'त्रिकोणमिति',
+        micro: ['Angles — Degree & Radian measure',
+                'Trigonometric ratios — sin, cos, tan, cot, sec, cosec',
+                'Trigonometric identities — Pythagorean, Sum-Product formulas',
+                'Inverse trigonometric functions — Domain, Range, Properties',
+                'Heights & Distances — Angle of elevation & depression',
+                'Properties of triangles — Sine rule, Cosine rule, Area'] },
+      { name: 'Analytical Geometry (2D & 3D)', hindi: 'विश्लेषणात्मक ज्यामिति',
+        micro: ['Rectangular Cartesian coordinate system',
+                'Distance formula, Section formula, Area of triangle',
+                'Straight lines — Slope, Intercepts, Angle between lines, Distance from point',
+                'Circles — Standard form, General form, Tangent, Normal',
+                'Conic sections — Parabola, Ellipse, Hyperbola (standard forms)',
+                '3D Geometry — Distance between points, Direction cosines, Equation of line & plane'] },
+      { name: 'Differential Calculus', hindi: 'अवकल गणित',
+        micro: ['Concept of real-valued function — Domain, Range, Graph',
+                'Limits — Standard limits, L\'Hopital\'s rule',
+                'Continuity — Definition, Discontinuity types',
+                'Differentiation — First principles, Standard derivatives',
+                'Chain rule, Product rule, Quotient rule',
+                'Applications — Maxima & Minima, Increasing/Decreasing functions, Tangent & Normal'] },
+      { name: 'Integral Calculus & Differential Equations', hindi: 'समाकल गणित एवं अवकल समीकरण',
+        micro: ['Integration — Standard integrals, Substitution, By parts, Partial fractions',
+                'Definite integrals — Properties, Area under curve',
+                'Differential equations — Order, Degree, Formation',
+                'Solution methods — Variable separable, Homogeneous, Linear DE'] },
+      { name: 'Vector Algebra', hindi: 'सदिश बीजगणित',
+        micro: ['Vectors — Types, Addition, Subtraction, Scalar multiplication',
+                'Dot product (Scalar product) — Properties, Angle between vectors',
+                'Cross product (Vector product) — Properties, Area of parallelogram',
+                'Scalar triple product — Volume of parallelepiped'] },
+      { name: 'Statistics & Probability', hindi: 'सांख्यिकी एवं प्रायिकता',
+        micro: ['Statistics — Mean, Median, Mode, Variance, Standard Deviation',
+                'Frequency distribution — Grouped & Ungrouped data',
+                'Probability — Classical definition, Addition theorem, Multiplication theorem',
+                'Conditional probability — Bayes\' theorem',
+                'Random variable — Binomial distribution, Poisson distribution'] }
+    ]
+  },
+  'GAT — English (200 Marks)': {
+    marks: 200, color: '#10b981',
+    topics: [
+      { name: 'Grammar & Usage', hindi: 'व्याकरण एवं प्रयोग',
+        micro: ['Parts of Speech — Noun, Pronoun, Verb, Adjective, Adverb, Preposition, Conjunction',
+                'Tenses — All 12 tenses with usage',
+                'Voice — Active & Passive transformation',
+                'Narration — Direct & Indirect speech',
+                'Articles — Definite & Indefinite',
+                'Prepositions — Usage in context',
+                'Subject-Verb Agreement'] },
+      { name: 'Vocabulary & Comprehension', hindi: 'शब्दावली एवं बोध',
+        micro: ['Synonyms & Antonyms',
+                'One Word Substitution',
+                'Idioms & Phrases',
+                'Spelling Correction',
+                'Reading Comprehension — 2–3 passages',
+                'Fill in the Blanks',
+                'Sentence Improvement & Error Detection'] }
+    ]
+  },
+  'GAT — Physics (150 Marks)': {
+    marks: 150, color: '#3b82f6',
+    topics: [
+      { name: 'Mechanics', hindi: 'यांत्रिकी',
+        micro: ['Physical properties of matter — Elasticity, Surface tension, Viscosity',
+                'Newton\'s Laws of Motion — Applications, Friction',
+                'Work, Energy & Power — Conservation laws',
+                'Rotational motion — Moment of inertia, Angular momentum',
+                'Gravitation — Kepler\'s laws, Orbital velocity, Escape velocity',
+                'Fluid mechanics — Archimedes\' principle, Bernoulli\'s theorem'] },
+      { name: 'Heat, Light & Sound', hindi: 'ऊष्मा, प्रकाश एवं ध्वनि',
+        micro: ['Heat — Modes of transfer, Specific heat, Latent heat',
+                'Thermodynamics — Laws, Carnot engine, Entropy',
+                'Light — Reflection, Refraction, Total internal reflection',
+                'Lenses & Mirrors — Ray diagrams, Magnification',
+                'Wave optics — Interference, Diffraction, Polarisation',
+                'Sound — Properties, Doppler effect, Resonance, Ultrasound'] },
+      { name: 'Electricity & Magnetism', hindi: 'विद्युत एवं चुंबकत्व',
+        micro: ['Electrostatics — Coulomb\'s law, Electric field, Potential',
+                'Current electricity — Ohm\'s law, Kirchhoff\'s laws, Wheatstone bridge',
+                'Magnetic effects of current — Biot-Savart law, Ampere\'s law',
+                'Electromagnetic induction — Faraday\'s laws, Lenz\'s law',
+                'Alternating current — RMS, Impedance, Resonance',
+                'Electromagnetic waves — Spectrum, Properties'] },
+      { name: 'Modern Physics', hindi: 'आधुनिक भौतिकी',
+        micro: ['Photoelectric effect — Einstein\'s equation',
+                'Atomic structure — Bohr\'s model, Hydrogen spectrum',
+                'Nuclear physics — Radioactivity, Fission, Fusion',
+                'Semiconductors — p-n junction, Diode, Transistor',
+                'X-rays — Properties, Applications',
+                'Lasers — Principle, Types, Applications'] }
+    ]
+  },
+  'GAT — Chemistry (60 Marks)': {
+    marks: 60, color: '#f59e0b',
+    topics: [
+      { name: 'Physical & Inorganic Chemistry', hindi: 'भौतिक एवं अकार्बनिक रसायन',
+        micro: ['Atomic structure — Bohr\'s model, Quantum numbers, Electronic configuration',
+                'Periodic table — Trends in properties, Groups & Periods',
+                'Chemical bonding — Ionic, Covalent, Metallic, Hydrogen bonding',
+                'States of matter — Gas laws, Kinetic theory',
+                'Solutions — Concentration, Colligative properties',
+                'Electrochemistry — Electrolysis, Galvanic cells, Faraday\'s laws',
+                'Metals & Non-metals — Properties, Extraction, Uses'] },
+      { name: 'Organic Chemistry', hindi: 'कार्बनिक रसायन',
+        micro: ['Hydrocarbons — Alkanes, Alkenes, Alkynes, Benzene',
+                'Functional groups — Alcohols, Aldehydes, Ketones, Acids, Esters',
+                'Polymers — Natural & Synthetic, Uses',
+                'Biomolecules — Carbohydrates, Proteins, Fats, Vitamins',
+                'Environmental chemistry — Pollution, Green chemistry'] }
+    ]
+  },
+  'GAT — General Science (40 Marks)': {
+    marks: 40, color: '#8b5cf6',
+    topics: [
+      { name: 'Biology & Health', hindi: 'जीव विज्ञान एवं स्वास्थ्य',
+        micro: ['Cell biology — Structure, Organelles, Cell division',
+                'Genetics — Mendel\'s laws, DNA, RNA, Mutations',
+                'Human physiology — Digestion, Respiration, Circulation, Excretion',
+                'Nervous system — Brain, Spinal cord, Sense organs',
+                'Endocrine system — Hormones, Glands',
+                'Diseases — Bacterial, Viral, Protozoan, Deficiency diseases',
+                'Ecology — Food chains, Ecosystems, Biodiversity'] }
+    ]
+  },
+  'GAT — History (80 Marks)': {
+    marks: 80, color: '#f97316',
+    topics: [
+      { name: 'Indian History', hindi: 'भारतीय इतिहास',
+        micro: ['Ancient India — Indus Valley, Vedic Age, Maurya, Gupta',
+                'Medieval India — Delhi Sultanate, Mughal Empire, Vijayanagara',
+                'Bhakti & Sufi movements',
+                'Modern India — British expansion, Economic impact',
+                'Freedom Movement — 1857, INC, Gandhi, Bose',
+                'Independence & Partition 1947'] },
+      { name: 'World History', hindi: 'विश्व इतिहास',
+        micro: ['French Revolution 1789 — Causes, Events, Impact',
+                'Industrial Revolution — Britain, Spread to Europe',
+                'World War I — Causes, Events, Treaty of Versailles',
+                'Russian Revolution 1917',
+                'World War II — Hitler, Holocaust, Atomic bombs',
+                'Cold War — USA vs USSR, Korean War, Vietnam War',
+                'Decolonisation — Asia & Africa',
+                'United Nations — Formation, Structure, Agencies'] }
+    ]
+  },
+  'GAT — Geography (80 Marks)': {
+    marks: 80, color: '#06b6d4',
+    topics: [
+      { name: 'Physical & Indian Geography', hindi: 'भौतिक एवं भारतीय भूगोल',
+        micro: ['Earth — Interior, Plate tectonics, Earthquakes, Volcanoes',
+                'Atmosphere — Layers, Pressure belts, Winds, Monsoon',
+                'Oceans — Currents, Tides, Marine resources',
+                'India — Physiographic divisions, Rivers, Climate, Soils',
+                'Natural vegetation & Wildlife',
+                'Agriculture — Crops, Irrigation, Green Revolution'] },
+      { name: 'World Geography & Environment', hindi: 'विश्व भूगोल एवं पर्यावरण',
+        micro: ['Continents & Oceans — Physical features',
+                'Countries — Location, Capitals, Important facts',
+                'Climate zones — Tropical, Temperate, Polar',
+                'Natural resources — Distribution, Conservation',
+                'Environmental issues — Climate change, Pollution, Deforestation',
+                'Disaster management — Types, NDMA, Sendai Framework'] }
+    ]
+  },
+  'GAT — Current Affairs (40 Marks)': {
+    marks: 40, color: '#ec4899',
+    topics: [
+      { name: 'National & International Affairs', hindi: 'राष्ट्रीय एवं अंतर्राष्ट्रीय घटनाएं',
+        micro: ['Indian defence — Army, Navy, Air Force, Recent operations',
+                'Defence acquisitions — Rafale, S-400, INS Vikrant, Tejas',
+                'DRDO — Agni, BrahMos, Pralay, Astra missiles',
+                'ISRO — Chandrayaan-3, Gaganyaan, Aditya-L1',
+                'International relations — India\'s bilateral ties',
+                'Summits & Agreements — G20, SCO, QUAD, BRICS',
+                'Awards — Param Vir Chakra, Ashoka Chakra, Gallantry awards',
+                'Sports — Olympics, Asian Games, Commonwealth Games',
+                'Important days — Defence related, National, International'] }
+    ]
+  }
+};
