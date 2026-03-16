@@ -63,6 +63,7 @@
     }
     async function saveProgressToCloud(user) {
       try {
+        // 1. Save all localStorage to progress/data subcollection (existing behaviour)
         const data = {};
         for(let i = 0; i < localStorage.length; i++) {
           const k = localStorage.key(i);
@@ -70,19 +71,78 @@
         }
         const ref = doc(db, 'users', user.uid, 'progress', 'data');
         await setDoc(ref, { ...data, updatedAt: new Date().toISOString() });
+
+        // 2. Also save structured plan + checklist to users/{uid} doc
+        //    so the Telegram bot can read plan days with dateStr
+        try {
+          const rawPlan = localStorage.getItem('pariksha_sathi_plan');
+          const rawChecklist = localStorage.getItem('ps_checklist');
+          if (rawPlan) {
+            const parsed = JSON.parse(rawPlan);
+            // studyPlan is the global array built by buildPlan()
+            // We need to serialize it with dateStr per day
+            const planArr = (typeof studyPlan !== 'undefined' && studyPlan.length)
+              ? studyPlan.map(day => ({
+                  day: day.day,
+                  dateStr: day.date instanceof Date
+                    ? day.date.toISOString().slice(0,10)
+                    : String(day.date).slice(0,10),
+                  dayName: day.dayName,
+                  isMock: day.isMock || false,
+                  isRevision: day.isRevision || false,
+                  slots: (day.slots || []).map(s => ({
+                    type: s.type,
+                    subject: s.subject,
+                    topic: s.topic,
+                    slotType: s.slotType,
+                    color: s.color || ''
+                  }))
+                }))
+              : [];
+            const userRef = doc(db, 'users', user.uid);
+            const updatePayload = {
+              plan: planArr,
+              planSavedAt: new Date().toISOString(),
+              name: parsed.userData?.name || user.displayName || ''
+            };
+            if (rawChecklist) {
+              // Only write checklist if not already updated by Telegram bot
+              // Use merge:true so bot's updates aren't overwritten
+              updatePayload.checklist = JSON.parse(rawChecklist);
+            }
+            await setDoc(userRef, updatePayload, { merge: true });
+          }
+        } catch(e2) { console.warn('Structured plan save failed', e2); }
       } catch(e) { console.error('Cloud save failed', e); }
     }
     async function syncPlanFromCloud(user) {
       try {
+        // 1. Restore localStorage from progress/data subcollection
         const ref = doc(db, 'users', user.uid, 'progress', 'data');
         const snap = await getDoc(ref);
         if(snap.exists()) {
           const d = snap.data();
           Object.keys(d).forEach(k => { if(k !== 'updatedAt') localStorage.setItem(k, d[k]); });
-          if(typeof window.loadSavedPlan === 'function') window.loadSavedPlan();
-          const msg = document.getElementById('cloudSyncMsg');
-          if(msg) { msg.textContent = '☁️ Cloud se sync ho gaya!'; msg.style.display='block'; setTimeout(()=>msg.style.display='none',3000); }
         }
+
+        // 2. Merge checklist from users/{uid} doc (Telegram bot may have updated it)
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const ud = userSnap.data();
+            if (ud.checklist && typeof ud.checklist === 'object') {
+              // Merge: cloud checklist wins (Telegram ticks should persist)
+              const localCL = JSON.parse(localStorage.getItem('ps_checklist') || '{}');
+              const merged = { ...localCL, ...ud.checklist };
+              localStorage.setItem('ps_checklist', JSON.stringify(merged));
+            }
+          }
+        } catch(e2) { console.warn('Checklist merge failed', e2); }
+
+        if(typeof window.loadSavedPlan === 'function') window.loadSavedPlan();
+        const msg = document.getElementById('cloudSyncMsg');
+        if(msg) { msg.textContent = '☁️ Cloud se sync ho gaya!'; msg.style.display='block'; setTimeout(()=>msg.style.display='none',3000); }
       } catch(e) { console.error('Cloud sync failed', e); }
     }
     window.psSaveToCloud = function() {
@@ -92,7 +152,30 @@
     onAuthStateChanged(auth, (user) => {
       updateAuthUI(user);
       if(user) {
+        // Auto-save every 60s
         setInterval(() => saveProgressToCloud(user), 60000);
+        // Sync checklist from Firestore every 5 min (picks up Telegram bot ticks)
+        setInterval(async () => {
+          try {
+            const { doc: d2, getDoc: g2 } = await import('https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js');
+            const userSnap = await g2(d2(db, 'users', user.uid));
+            if (userSnap.exists()) {
+              const ud = userSnap.data();
+              if (ud.checklist && typeof ud.checklist === 'object') {
+                const localCL = JSON.parse(localStorage.getItem('ps_checklist') || '{}');
+                const merged = { ...localCL, ...ud.checklist };
+                const localStr = JSON.stringify(localCL);
+                const mergedStr = JSON.stringify(merged);
+                if (localStr !== mergedStr) {
+                  localStorage.setItem('ps_checklist', mergedStr);
+                  // Re-render checklist ticks if plan is visible
+                  if (typeof window.renderChecklist === 'function') window.renderChecklist();
+                  else if (typeof renderPlan === 'function') renderPlan();
+                }
+              }
+            }
+          } catch(e) {}
+        }, 5 * 60 * 1000);
       }
     });
 function updateAuthUI(user) {
