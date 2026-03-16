@@ -6,7 +6,7 @@
 ![Exams](https://img.shields.io/badge/Exams-11%2B-10b981?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge)
 ![Made with Love](https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F%20by-Er.%20Sangam%20Krishna-ef4444?style=for-the-badge)
-[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/SangamKrishna3)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/snakeeye)
 
 **🌐 Live Site:** https://snakeeye-sudo.github.io/pariksha-sathi/
 
