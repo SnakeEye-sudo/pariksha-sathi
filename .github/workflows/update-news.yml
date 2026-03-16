@@ -1,0 +1,164 @@
+name: Daily News Update
+
+# Runs every day at 6:00 AM IST (00:30 UTC)
+on:
+  schedule:
+    - cron: '30 0 * * *'
+  workflow_dispatch:  # Manual trigger anytime
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests feedparser
+
+      - name: Fetch and save news
+        run: |
+          python3 << 'EOF'
+          import json, requests, feedparser
+          from datetime import datetime, timezone
+
+          today = datetime.now().strftime('%d %b %Y')
+          output = { "updated": today, "categories": {} }
+
+          # ── Category 1: India (PIB RSS — official govt, no API key) ──
+          india_items = []
+          try:
+              feed = feedparser.parse('https://pib.gov.in/RssMain.aspx?ModId=6&Lang=1&Regid=3')
+              for e in feed.entries[:15]:
+                  india_items.append({
+                      "title": e.get('title','').strip(),
+                      "link": e.get('link',''),
+                      "pubDate": e.get('published','')[:16] if e.get('published') else today,
+                      "description": (e.get('summary','') or '')[:130],
+                      "source": "PIB India"
+                  })
+              print(f"PIB: {len(india_items)} items")
+          except Exception as ex:
+              print(f"PIB failed: {ex}")
+
+          # Fallback: DD News RSS
+          if len(india_items) < 5:
+              try:
+                  feed = feedparser.parse('https://ddnews.gov.in/en/feed/')
+                  for e in feed.entries[:15]:
+                      india_items.append({
+                          "title": e.get('title','').strip(),
+                          "link": e.get('link',''),
+                          "pubDate": e.get('published','')[:16] if e.get('published') else today,
+                          "description": (e.get('summary','') or '')[:130],
+                          "source": "DD News"
+                      })
+                  print(f"DD News: {len(india_items)} items total")
+              except Exception as ex:
+                  print(f"DD News failed: {ex}")
+
+          output["categories"]["india"] = india_items[:15]
+
+          # ── Category 2: UPSC (GNews API) ──
+          upsc_items = []
+          try:
+              api_key = 'def2f18d9384efb35cb6217a7659c5f0'
+              url = f'https://gnews.io/api/v4/search?q=UPSC+civil+services+India&lang=en&country=in&max=15&apikey={api_key}'
+              r = requests.get(url, timeout=10)
+              if r.status_code == 200:
+                  data = r.json()
+                  for a in data.get('articles', []):
+                      upsc_items.append({
+                          "title": a.get('title','').strip(),
+                          "link": a.get('url',''),
+                          "pubDate": a.get('publishedAt','')[:10] if a.get('publishedAt') else today,
+                          "description": (a.get('description','') or '')[:130],
+                          "source": a.get('source',{}).get('name','GNews')
+                      })
+                  print(f"GNews UPSC: {len(upsc_items)} items")
+          except Exception as ex:
+              print(f"GNews UPSC failed: {ex}")
+
+          # Fallback: Insights IAS RSS
+          if len(upsc_items) < 5:
+              try:
+                  feed = feedparser.parse('https://www.insightsonindia.com/feed/')
+                  for e in feed.entries[:15]:
+                      upsc_items.append({
+                          "title": e.get('title','').strip(),
+                          "link": e.get('link',''),
+                          "pubDate": e.get('published','')[:16] if e.get('published') else today,
+                          "description": (e.get('summary','') or '').replace('<p>','').replace('</p>','')[:130],
+                          "source": "Insights IAS"
+                      })
+                  print(f"Insights IAS: {len(upsc_items)} items total")
+              except Exception as ex:
+                  print(f"Insights IAS failed: {ex}")
+
+          output["categories"]["upsc"] = upsc_items[:15]
+
+          # ── Category 3: Economy (GNews API) ──
+          eco_items = []
+          try:
+              api_key = 'def2f18d9384efb35cb6217a7659c5f0'
+              url = f'https://gnews.io/api/v4/search?q=India+economy+budget+RBI&lang=en&country=in&max=15&apikey={api_key}'
+              r = requests.get(url, timeout=10)
+              if r.status_code == 200:
+                  data = r.json()
+                  for a in data.get('articles', []):
+                      eco_items.append({
+                          "title": a.get('title','').strip(),
+                          "link": a.get('url',''),
+                          "pubDate": a.get('publishedAt','')[:10] if a.get('publishedAt') else today,
+                          "description": (a.get('description','') or '')[:130],
+                          "source": a.get('source',{}).get('name','GNews')
+                      })
+                  print(f"GNews Economy: {len(eco_items)} items")
+          except Exception as ex:
+              print(f"GNews Economy failed: {ex}")
+
+          # Fallback: RBI RSS
+          if len(eco_items) < 5:
+              try:
+                  feed = feedparser.parse('https://www.rbi.org.in/scripts/rss.aspx')
+                  for e in feed.entries[:15]:
+                      eco_items.append({
+                          "title": e.get('title','').strip(),
+                          "link": e.get('link',''),
+                          "pubDate": e.get('published','')[:16] if e.get('published') else today,
+                          "description": (e.get('summary','') or '')[:130],
+                          "source": "RBI"
+                      })
+                  print(f"RBI RSS: {len(eco_items)} items total")
+              except Exception as ex:
+                  print(f"RBI RSS failed: {ex}")
+
+          output["categories"]["economy"] = eco_items[:15]
+
+          # ── Write news.json ──
+          with open('news.json', 'w', encoding='utf-8') as f:
+              json.dump(output, f, ensure_ascii=False, indent=2)
+
+          total = sum(len(v) for v in output["categories"].values())
+          print(f"\n✅ news.json written — {total} total articles, updated: {today}")
+          EOF
+
+      - name: Commit and push news.json
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add news.json
+          if git diff --staged --quiet; then
+            echo 'No news changes to commit'
+          else
+            git commit -m "chore: daily news update $(date +%Y-%m-%d) [skip ci]"
+            git push
+          fi

@@ -96,13 +96,29 @@ let _newsCache = {};
 
 // Multiple free API fallbacks
 async function fetchNewsItems(categoryIdx) {
+  const catKeys = ['india', 'upsc', 'economy'];
+  const catKey = catKeys[categoryIdx] || 'india';
   const cat = NEWS_CATEGORIES[categoryIdx];
   const cacheKey = `cat_${categoryIdx}`;
   if (_newsCache[cacheKey] && Date.now() - _newsCache[cacheKey].time < 20 * 60 * 1000) {
     return _newsCache[cacheKey].items;
   }
 
-  // Try GNews API first
+  // ── Try 1: news.json from repo (GitHub Action updates daily) ──
+  try {
+    const base = window.location.pathname.replace(/\/$/, '');
+    const res = await fetch(`${base}/news.json?t=${Math.floor(Date.now()/3600000)}`);
+    if (res.ok) {
+      const data = await res.json();
+      const items = (data.categories?.[catKey] || []);
+      if (items.length) {
+        _newsCache[cacheKey] = { items, time: Date.now() };
+        return items;
+      }
+    }
+  } catch { /* fall through */ }
+
+  // ── Try 2: GNews API directly ──
   try {
     const url = `https://gnews.io/api/v4/search?q=${encodeURIComponent(cat.query)}&lang=${cat.lang}&country=in&max=15&apikey=${GNEWS_API_KEY}`;
     const res = await fetch(url);
@@ -122,29 +138,7 @@ async function fetchNewsItems(categoryIdx) {
     }
   } catch { /* fall through */ }
 
-  // Fallback: NewsAPI.org via allorigins proxy (free CORS proxy)
-  try {
-    const newsApiUrl = `https://newsapi.org/v2/everything?q=${encodeURIComponent(cat.query)}&language=en&sortBy=publishedAt&pageSize=15&apiKey=pub_free`;
-    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(newsApiUrl)}`;
-    const res = await fetch(proxy);
-    if (res.ok) {
-      const outer = await res.json();
-      const data = JSON.parse(outer.contents || '{}');
-      if (data.articles && data.articles.length) {
-        const items = data.articles.map(a => ({
-          title: a.title,
-          link: a.url,
-          pubDate: a.publishedAt ? new Date(a.publishedAt).toLocaleDateString('en-IN', { day:'numeric', month:'short' }) : '',
-          description: (a.description || '').slice(0, 130),
-          source: a.source?.name || '',
-        }));
-        _newsCache[cacheKey] = { items, time: Date.now() };
-        return items;
-      }
-    }
-  } catch { /* fall through */ }
-
-  // Final fallback: static curated UPSC links
+  // ── Try 3: Static curated links (always works) ──
   return getStaticNewsLinks(categoryIdx);
 }
 
