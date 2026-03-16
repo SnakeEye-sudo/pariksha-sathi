@@ -630,7 +630,7 @@
       </div>
       <button class="ptb-btn ptb-download" onclick="downloadPDF()"><span data-i18n="pdfBtn">⬇️ PDF</span></button>
       <button class="ptb-btn" onclick="showScreen('formScreen')"><span data-i18n="editBtn">✏️ Edit</span></button>
-      <button class="ptb-btn ptb-reset" onclick="clearSavedPlan()"><span data-i18n="resetBtn">🔄 Naya Plan</span></button>
+      <button class="ptb-btn ptb-reset" onclick="confirmResetPlan()"><span data-i18n="resetBtn">🔄 Naya Plan</span></button>
     </div>
   </div>
 
@@ -673,6 +673,19 @@
   <span class="bmc-float-icon">☕</span>
   <span class="bmc-float-text">Buy me a coffee</span>
 </a>
+
+<!-- ═══ RESET CONFIRM MODAL ═══ -->
+<div id="resetConfirmModal" class="terms-modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="reset-confirm-box">
+    <div class="reset-confirm-icon">⚠️</div>
+    <h3 class="reset-confirm-title">सारा Progress Delete हो जाएगा!</h3>
+    <p class="reset-confirm-body">Naya plan banane se aapka <strong>checklist progress, streak, aur reschedule data</strong> permanently delete ho jayega. Kya aap sure hain?</p>
+    <div class="reset-confirm-actions">
+      <button class="reset-cancel-btn" onclick="document.getElementById('resetConfirmModal').classList.remove('open')">रहने दो, वापस जाओ</button>
+      <button class="reset-confirm-btn" onclick="doResetPlan()">हाँ, नया Plan बनाओ</button>
+    </div>
+  </div>
+</div>
 
 <!-- ═══ TERMS & DISCLAIMER MODAL ═══ -->
 <div id="termsModal" class="terms-modal-overlay" onclick="closeTermsModal(event)">

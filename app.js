@@ -231,7 +231,19 @@ function loadPlanFromStorage() {
 function clearSavedPlan() {
   localStorage.removeItem(LS_KEY);
   localStorage.removeItem('pariksha_tg_chatid');
+  localStorage.removeItem('ps_checklist');
+  localStorage.removeItem('ps_streak');
+  localStorage.removeItem('ps_reschedule');
   showScreen('welcomeScreen');
+}
+
+function confirmResetPlan() {
+  document.getElementById('resetConfirmModal').classList.add('open');
+}
+
+function doResetPlan() {
+  document.getElementById('resetConfirmModal').classList.remove('open');
+  clearSavedPlan();
 }
 
 // ── Screen helpers ────────────────────────────────────────────
