@@ -238,7 +238,17 @@ function clearSavedPlan() {
 }
 
 function confirmResetPlan() {
-  document.getElementById('resetConfirmModal').classList.add('open');
+  const modal = document.getElementById('resetConfirmModal');
+  if (modal) {
+    modal.classList.add('open');
+  } else {
+    // fallback if modal not found
+    if (confirm(lang === 'hi'
+      ? 'सारा progress delete हो जाएगा! क्या आप sure हैं?'
+      : 'All progress will be deleted! Are you sure?')) {
+      clearSavedPlan();
+    }
+  }
 }
 
 function doResetPlan() {
