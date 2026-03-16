@@ -23,6 +23,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Inject feedback token
+        env:
+          GH_FEEDBACK_TOKEN: ${{ secrets.GH_FEEDBACK_TOKEN }}
+        run: |
+          sed -i "s|FEEDBACK_TOKEN_PLACEHOLDER|${GH_FEEDBACK_TOKEN}|g" index.html
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

@@ -537,37 +537,81 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
    RESPONSIVE
 ══════════════════════════════════════════════════ */
 @media(max-width:768px){
-  .hero{padding:4.5rem 1rem 4rem}
-  .hero-title{font-size:clamp(2.2rem,9vw,3.5rem)}
-  .hero-stats{gap:.4rem}
-  .hstat{padding:.7rem .9rem;min-width:70px}
-  .hstat-num{font-size:1.35rem}
-  .exam-card{min-width:240px}
-  .form-card{padding:2rem 1.4rem;border-radius:20px}
-  .plan-topbar{padding:.7rem 1rem;flex-wrap:wrap;gap:.5rem}
-  .plan-topbar-actions{gap:.3rem}
-  .ptb-btn{padding:.38rem .7rem;font-size:.75rem}
-  .plan-hero{padding:2rem 1rem}
-  .plan-hero-inner h2{font-size:1.5rem}
-  .plan-body-wrap{padding:1.5rem 1rem}
-  .slots-grid{grid-template-columns:1fr}
-  .day-card{padding:1.1rem 1rem}
-  .pyq-grid,.info-grid{grid-template-columns:1fr}
-  .lang-toggle-topbar{display:none}
-}
-@media(max-width:480px){
+  /* Welcome / Hero */
+  .hero{padding:3.5rem 1rem 3rem}
+  .hero-title{font-size:clamp(1.9rem,8vw,3rem)}
+  .hero-sub{font-size:.85rem;padding:0 .5rem}
   .hero-badge{font-size:.72rem;padding:.4rem 1rem}
-  .hero-sub{font-size:.88rem}
-  .exam-cards{gap:.8rem}
-  .exam-card{min-width:100%;max-width:100%}
-  .ec-title{font-size:1rem}
-  .radio-group{flex-direction:column}
-  .radio-card{min-width:100%}
-  .plan-topbar-brand .ptb-name{display:none}
-  .week-header{padding:.8rem 1rem}
-  .day-num-circle{width:44px;height:44px;border-radius:11px}
-  .day-num-val{font-size:1rem}
+  .hero-stats{gap:.4rem;flex-wrap:wrap;justify-content:center}
+  .hstat{padding:.6rem .8rem;min-width:65px}
+  .hstat-num{font-size:1.2rem}
+  .hstat-label{font-size:.62rem}
+
+  /* Exam cards */
+  .exam-cards{gap:.8rem;padding:0 .5rem}
+  .exam-card{min-width:calc(50% - .4rem);max-width:calc(50% - .4rem)}
+  .ec-title{font-size:.9rem}
+  .ec-sub{font-size:.72rem}
+
+  /* Form card */
+  .form-card{padding:1.6rem 1.2rem;border-radius:18px;margin:0 .5rem}
+  .form-card h2{font-size:1.2rem}
+  .radio-group{flex-direction:column;gap:.5rem}
+  .radio-card{min-width:100%;padding:.8rem 1rem}
+  .form-submit-btn{padding:.85rem 1.5rem;font-size:.95rem}
+
+  /* Plan topbar */
+  .plan-topbar{padding:.6rem .8rem;flex-wrap:wrap;gap:.4rem}
+  .plan-topbar-brand .ptb-name{font-size:.85rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .plan-topbar-actions{gap:.25rem;flex-wrap:wrap}
+  .ptb-btn{padding:.35rem .6rem;font-size:.72rem}
+  .ptb-btn span:not(.ptb-icon){display:none}
+
+  /* Plan hero */
+  .plan-hero{padding:1.5rem .8rem}
+  .plan-hero-inner h2{font-size:1.3rem}
+  .plan-hero-inner p{font-size:.82rem}
+
+  /* Plan body */
+  .plan-body-wrap{padding:1rem .8rem}
+  .slots-grid{grid-template-columns:1fr}
+  .day-card{padding:1rem .9rem}
+  .slot-card{padding:.9rem .9rem .9rem .9rem}
+
+  /* Tabs */
+  .plan-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 .5rem}
+  .plan-tabs::-webkit-scrollbar{display:none}
+  .plan-tab{white-space:nowrap;padding:.5rem .9rem;font-size:.8rem}
+
+  /* Grids */
+  .pyq-grid,.info-grid{grid-template-columns:1fr}
+
+  /* Feedback modal */
+  .fb-modal{width:calc(100vw - 2rem);max-height:90vh;overflow-y:auto;padding:1.4rem 1.2rem;border-radius:18px}
+  .fb-type-grid{grid-template-columns:1fr 1fr}
+  .fb-float-btn{bottom:1.2rem;right:1.2rem;width:48px;height:48px;font-size:1.3rem}
+
+  /* Misc */
+  .lang-toggle-topbar{display:none}
+  .plan-extras-row{gap:.5rem}
+  .streak-badge,.notif-btn{font-size:.75rem;padding:.35rem .8rem}
 }
+
+@media(max-width:480px){
+  .hero-title{font-size:clamp(1.7rem,7vw,2.5rem)}
+  .exam-card{min-width:100%;max-width:100%}
+  .plan-topbar-brand .ptb-name{display:none}
+  .week-header{padding:.7rem .8rem}
+  .day-num-circle{width:40px;height:40px;border-radius:10px}
+  .day-num-val{font-size:.95rem}
+  .day-num-day{font-size:.6rem}
+  .slot-card-title{font-size:.88rem}
+  .slot-card-sub{font-size:.75rem}
+  .fb-type-grid{grid-template-columns:1fr 1fr}
+  .fb-type-btn{padding:.6rem .4rem}
+  .fb-type-label{font-size:.7rem}
+}
+
 @media(min-width:1200px){
   .exam-cards{max-width:1000px}
   .slots-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}

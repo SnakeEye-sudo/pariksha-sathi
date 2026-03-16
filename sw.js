@@ -1,7 +1,7 @@
 // ParikshaSathi — Service Worker
 // Offline-first caching for PWA support
 
-const CACHE_NAME = 'pariksha-sathi-v6';
+const CACHE_NAME = 'pariksha-sathi-v7';
 const ASSETS = [
   '/pariksha-sathi/',
   '/pariksha-sathi/index.html',

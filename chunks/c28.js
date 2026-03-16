@@ -1,13 +1,13 @@
 // c28.js — Feedback Widget + News App URL config
 
 // ── News App URL — replace with actual URL when ready ────────
-// Format: NEWS_APP_URL + '?date=YYYY-MM-DD' will be opened on CA card click
 const NEWS_APP_URL = 'https://YOUR_NEWS_APP_URL_HERE';
 
-// ── Feedback Widget ───────────────────────────────────────────
-// Sends feedback directly to developer's Telegram via bot
-const FB_BOT_TOKEN = '8623862519:AAEuV4PC4hJYJP3uaYbC0JEMcFG8IIvUde0';
-const FB_CHAT_ID   = '1618744678';
+// ── Feedback config ───────────────────────────────────────────
+// Uses GitHub Actions webhook → Python → Telegram (no CORS issues)
+// Set FEEDBACK_REPO to your GitHub repo (owner/repo format)
+const FEEDBACK_REPO = 'snakeeyesudo/pariksha-sathi';
+const FEEDBACK_GH_TOKEN = ''; // Leave empty — handled via public workflow_dispatch
 
 const FB_TYPES = [
   { id: 'bug',     icon: '🐛', label: 'Bug / Galti mili',    color: '#ef4444' },
@@ -15,6 +15,8 @@ const FB_TYPES = [
   { id: 'content', icon: '📚', label: 'Content Galat hai',   color: '#8b5cf6' },
   { id: 'other',   icon: '💬', label: 'Kuch aur batana hai', color: '#10b981' },
 ];
+
+let selectedFbType = 'other';
 
 function injectFeedbackButton() {
   if (document.getElementById('fbFloatBtn')) return;
@@ -27,7 +29,6 @@ function injectFeedbackButton() {
   btn.onclick = showFeedbackModal;
   document.body.appendChild(btn);
 
-  // Tooltip that pulses once to draw attention
   const tip = document.createElement('div');
   tip.id = 'fbFloatTip';
   tip.className = 'fb-float-tip';
@@ -37,7 +38,6 @@ function injectFeedbackButton() {
 }
 
 function showFeedbackModal() {
-  // Hide tooltip
   const tip = document.getElementById('fbFloatTip');
   if (tip) tip.classList.add('fb-tip-hide');
 
@@ -53,7 +53,6 @@ function showFeedbackModal() {
       <div class="fb-modal-icon">💬</div>
       <div class="fb-modal-title">Feedback / Suggestion</div>
       <div class="fb-modal-sub">Aapki baat seedhi developer tak pahunchegi</div>
-
       <div class="fb-type-grid" id="fbTypeGrid">
         ${FB_TYPES.map(t => `
           <button class="fb-type-btn" data-type="${t.id}" onclick="selectFbType('${t.id}')"
@@ -63,17 +62,14 @@ function showFeedbackModal() {
           </button>
         `).join('')}
       </div>
-
       <textarea id="fbTextarea" class="fb-textarea"
-        placeholder="Yahan likho — kya galat hai, kya add karna chahte ho, ya koi bhi baat..."
+        placeholder="Yahan likho — kya galat hai, kya add karna chahte ho..."
         rows="4" maxlength="1000"></textarea>
       <div class="fb-char-count"><span id="fbCharCount">0</span>/1000</div>
-
       <div class="fb-name-row">
         <input type="text" id="fbNameInput" class="fb-name-input"
           placeholder="Aapka naam (optional)" maxlength="50">
       </div>
-
       <button class="fb-submit-btn" id="fbSubmitBtn" onclick="submitFeedback()">
         📤 Bhejo Developer ko
       </button>
@@ -82,14 +78,11 @@ function showFeedbackModal() {
   `;
   document.body.appendChild(modal);
   modal.addEventListener('click', e => { if (e.target === modal) closeFeedbackModal(); });
-
-  // Char counter
   document.getElementById('fbTextarea').addEventListener('input', function() {
     document.getElementById('fbCharCount').textContent = this.value.length;
   });
 }
 
-let selectedFbType = 'other';
 function selectFbType(type) {
   selectedFbType = type;
   document.querySelectorAll('.fb-type-btn').forEach(b => {
@@ -99,15 +92,12 @@ function selectFbType(type) {
 
 function resetFeedbackModal() {
   selectedFbType = 'other';
-  const ta = document.getElementById('fbTextarea');
-  const st = document.getElementById('fbStatus');
-  const cc = document.getElementById('fbCharCount');
-  const ni = document.getElementById('fbNameInput');
-  if (ta) ta.value = '';
-  if (st) { st.textContent = ''; st.className = 'fb-status'; }
-  if (cc) cc.textContent = '0';
-  if (ni) ni.value = '';
+  ['fbTextarea','fbNameInput'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+  const st = document.getElementById('fbStatus'); if(st){st.textContent='';st.className='fb-status';}
+  const cc = document.getElementById('fbCharCount'); if(cc) cc.textContent='0';
   document.querySelectorAll('.fb-type-btn').forEach(b => b.classList.remove('fb-type-selected'));
+  const btn = document.getElementById('fbSubmitBtn');
+  if(btn){btn.disabled=false;btn.textContent='📤 Bhejo Developer ko';}
 }
 
 function closeFeedbackModal() {
@@ -127,47 +117,73 @@ async function submitFeedback() {
   }
 
   const typeObj = FB_TYPES.find(t => t.id === selectedFbType) || FB_TYPES[3];
-  const examInfo = typeof userData !== 'undefined' && userData.exam
-    ? `Exam: ${userData.exam.toUpperCase()}` : 'Exam: N/A';
+  const examInfo = typeof userData !== 'undefined' && userData?.exam ? `Exam: ${userData.exam.toUpperCase()}` : 'Exam: N/A';
   const userInfo = name ? `User: ${name}` : 'User: Anonymous';
   const loginUser = window.psAuth?.currentUser?.email || '';
 
-  const msg = [
-    `${typeObj.icon} <b>ParikshaSathi Feedback</b>`,
+  const msgText = [
+    `${typeObj.icon} ParikshaSathi Feedback`,
+    `Type: ${typeObj.label}`,
+    `${userInfo}${loginUser ? ` (${loginUser})` : ''}`,
+    `${examInfo}`,
     ``,
-    `<b>Type:</b> ${typeObj.label}`,
-    `<b>${userInfo}</b>${loginUser ? ` (${loginUser})` : ''}`,
-    `<b>${examInfo}</b>`,
-    ``,
-    `<b>Message:</b>`,
+    `Message:`,
     text,
     ``,
-    `<i>Sent from pariksha-sathi.in</i>`,
+    `Sent from pariksha-sathi.in`,
   ].join('\n');
 
   if (btn) { btn.disabled = true; btn.textContent = 'Bhej raha hoon...'; }
   if (status) { status.textContent = ''; status.className = 'fb-status'; }
 
+  // Send via GitHub Actions workflow_dispatch (no CORS issues)
   try {
-    // Use no-cors mode to avoid CORS block — Telegram receives it, we just can't read response
-    await fetch(`https://api.telegram.org/bot${FB_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: FB_CHAT_ID, text: msg, parse_mode: 'HTML' }),
-      mode: 'no-cors',
-    });
-    // no-cors means response is opaque — assume success
-    if (status) { status.textContent = '✅ Feedback pahunch gaya! Shukriya 🙏'; status.className = 'fb-status fb-success'; }
-    if (btn) { btn.textContent = '✅ Bhej diya!'; }
-    setTimeout(closeFeedbackModal, 2500);
-  } catch(e) {
-    if (status) { status.textContent = 'Nahi bheja ja saka. Internet check karein.'; status.className = 'fb-status fb-error'; }
-    if (btn) { btn.disabled = false; btn.textContent = '📤 Bhejo Developer ko'; }
+    const res = await fetch(
+      `https://api.github.com/repos/${FEEDBACK_REPO}/actions/workflows/send-feedback.yml/dispatches`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${await getFeedbackToken()}`,
+        },
+        body: JSON.stringify({
+          ref: 'main',
+          inputs: {
+            message: msgText.substring(0, 1000),
+            type: typeObj.id,
+          }
+        }),
+      }
+    );
+
+    if (res.status === 204 || res.ok) {
+      if (status) { status.textContent = '✅ Feedback pahunch gaya! Shukriya 🙏'; status.className = 'fb-status fb-success'; }
+      if (btn) btn.textContent = '✅ Bhej diya!';
+      setTimeout(closeFeedbackModal, 2500);
+      return;
+    }
+  } catch(e) {}
+
+  // Fallback: open Telegram directly
+  if (status) {
+    status.innerHTML = `Seedha Telegram pe bhejein:<br>
+      <a href="https://t.me/snakeeyesudo" target="_blank" rel="noopener"
+        style="color:var(--amber);font-weight:700;text-decoration:none">
+        👉 t.me/snakeeyesudo
+      </a>`;
+    status.className = 'fb-status fb-error';
   }
+  try { await navigator.clipboard.writeText(msgText); } catch(e) {}
+  if (btn) { btn.disabled = false; btn.textContent = '📤 Bhejo Developer ko'; }
 }
 
-// ── Auto-inject on load ───────────────────────────────────────
+// Gets a public read-only token from meta tag (injected at build time or via env)
+async function getFeedbackToken() {
+  const meta = document.querySelector('meta[name="gh-feedback-token"]');
+  return meta ? meta.content : '';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  // Inject feedback button after a short delay so page loads first
   setTimeout(injectFeedbackButton, 1500);
 });
