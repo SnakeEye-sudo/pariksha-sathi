@@ -649,16 +649,6 @@
     <div id="planBody"></div>
   </div>
 
-  <!-- ═══ DISCLAIMER BANNER ═══ -->
-  <div class="disclaimer-banner">
-    <span class="disclaimer-icon">⚠️</span>
-    <p class="disclaimer-text">
-      यह tool केवल एक <strong>study planning aid</strong> है। Syllabus, dates और topics publicly available sources पर आधारित हैं — 100% accuracy की कोई guarantee नहीं है।
-      कृपया official sources (UPSC/BPSC website) से verify करें। इस tool पर पूरी तरह निर्भर न रहें।
-      <button class="disclaimer-link-btn" onclick="openTermsModal()">पूरी Terms पढ़ें →</button>
-    </p>
-  </div>
-
   <footer class="site-footer">
     <div class="footer-brand">
       <img src="logo.svg" alt="PS" class="footer-logo-img"/>
@@ -666,8 +656,9 @@
     </div>
     <p><span data-i18n="footerBy">Made with ❤️ by</span> <strong>Er. Sangam Krishna</strong></p>
     <p class="footer-sub" data-i18n="footerSub">BPSC TRE 4.0 | UPSC CSE 2026/27 | BPSC CCE 71st/72nd | SSC CGL | IBPS PO | SBI PO | IBPS RRB | IBPS Clerk | NDA 2026</p>
-    <div class="footer-links">
-      <button class="footer-terms-btn" onclick="openTermsModal()">📋 Terms &amp; Disclaimer</button>
+    <div class="footer-disclaimer-row">
+      <span class="footer-disclaimer-text">⚠️ Publicly available sources पर based — official sources से verify करें</span>
+      <button class="footer-terms-btn" onclick="openTermsModal()">Terms &amp; Disclaimer</button>
     </div>
     <div class="footer-bmc">
       <a href="https://buymeacoffee.com/snakeeye" target="_blank" rel="noopener" class="footer-bmc-btn">
@@ -675,70 +666,6 @@
       </a>
     </div>
   </footer>
-
-  <!-- ═══ TERMS & DISCLAIMER MODAL ═══ -->
-  <div id="termsModal" class="terms-modal-overlay" onclick="closeTermsModal(event)">
-    <div class="terms-modal-box">
-      <button class="terms-modal-close" onclick="closeTermsModal()">&times;</button>
-      <div class="terms-modal-header">
-        <span class="terms-modal-icon">📋</span>
-        <h2 class="terms-modal-title">Terms of Use &amp; Disclaimer</h2>
-        <p class="terms-modal-subtitle">ParikshaSathi — Free Study Planner</p>
-      </div>
-      <div class="terms-modal-body">
-
-        <div class="terms-section">
-          <h3>1. यह Tool क्या है?</h3>
-          <p>ParikshaSathi एक <strong>free, open-source study planning tool</strong> है जो publicly available exam syllabuses के आधार पर एक personalized day-by-day study schedule बनाता है। यह किसी भी coaching institute, government body या official exam authority से affiliated नहीं है।</p>
-        </div>
-
-        <div class="terms-section">
-          <h3>2. Accuracy की कोई Guarantee नहीं</h3>
-          <p>इस tool में दिए गए syllabus, exam dates, topics और अन्य जानकारी <strong>internet पर publicly available sources</strong> से ली गई है। हम किसी भी जानकारी की 100% accuracy, completeness या up-to-date होने की guarantee नहीं देते।</p>
-          <ul>
-            <li>Exam dates बदल सकती हैं — official notification देखें।</li>
-            <li>Syllabus में बदलाव हो सकता है — UPSC/BPSC की official website check करें।</li>
-            <li>यह plan एक <em>suggested framework</em> है, final authority नहीं।</li>
-          </ul>
-        </div>
-
-        <div class="terms-section">
-          <h3>3. आपकी जिम्मेदारी</h3>
-          <p>इस tool का उपयोग करके आप स्वीकार करते हैं कि:</p>
-          <ul>
-            <li>आप सभी जानकारी को <strong>official sources से verify</strong> करेंगे।</li>
-            <li>आप इस tool पर <strong>पूरी तरह निर्भर नहीं रहेंगे</strong>।</li>
-            <li>Study plan को अपनी जरूरत के हिसाब से adjust करना आपकी जिम्मेदारी है।</li>
-          </ul>
-        </div>
-
-        <div class="terms-section">
-          <h3>4. No Liability</h3>
-          <p>Developer (Er. Sangam Krishna) किसी भी प्रकार के नुकसान, परीक्षा में असफलता, या किसी भी अन्य परिणाम के लिए <strong>जिम्मेदार नहीं होंगे</strong> जो इस tool के उपयोग से हो। यह tool "as-is" basis पर बिल्कुल free में provide किया जा रहा है।</p>
-        </div>
-
-        <div class="terms-section">
-          <h3>5. Data Privacy</h3>
-          <p>आपका सारा data (नाम, plan, progress) केवल <strong>आपके browser के localStorage</strong> में save होता है। कोई भी personal data किसी server पर नहीं भेजा जाता। App बंद करने या browser data clear करने पर data delete हो जाता है।</p>
-        </div>
-
-        <div class="terms-section">
-          <h3>6. Free Forever</h3>
-          <p>यह tool हमेशा <strong>100% free</strong> रहेगा। Er. Sangam Krishna का मानना है कि quality study resources सबके लिए accessible होने चाहिए — चाहे आर्थिक स्थिति कुछ भी हो।</p>
-        </div>
-
-        <div class="terms-official-links">
-          <p>Official Sources:</p>
-          <a href="https://upsc.gov.in" target="_blank" rel="noopener">🔗 upsc.gov.in</a>
-          <a href="https://bpsc.bih.nic.in" target="_blank" rel="noopener">🔗 bpsc.bih.nic.in</a>
-        </div>
-
-      </div>
-      <div class="terms-modal-footer">
-        <button class="terms-accept-btn" onclick="closeTermsModal()">समझ गया, ठीक है ✓</button>
-      </div>
-    </div>
-  </div>
 </div>
 
 <!-- ═══ BUY ME A COFFEE — Floating Button ═══ -->
@@ -746,6 +673,67 @@
   <span class="bmc-float-icon">☕</span>
   <span class="bmc-float-text">Buy me a coffee</span>
 </a>
+
+<!-- ═══ TERMS & DISCLAIMER MODAL ═══ -->
+<div id="termsModal" class="terms-modal-overlay" onclick="closeTermsModal(event)">
+  <div class="terms-modal-box">
+    <button class="terms-modal-close" onclick="closeTermsModal()">&times;</button>
+    <div class="terms-modal-header">
+      <span class="terms-modal-icon">⚖️</span>
+      <h2 class="terms-modal-title">Terms of Use &amp; Disclaimer</h2>
+      <p class="terms-modal-subtitle">ParikshaSathi — Free Study Planner by Er. Sangam Krishna</p>
+    </div>
+    <div class="terms-modal-body">
+      <div class="terms-section">
+        <div class="terms-section-num">01</div>
+        <h3>यह Tool क्या है?</h3>
+        <p>ParikshaSathi एक <strong>free, open-source study planning tool</strong> है जो publicly available exam syllabuses के आधार पर personalized schedule बनाता है। यह किसी भी coaching institute, government body या official exam authority से affiliated नहीं है।</p>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">02</div>
+        <h3>Accuracy की कोई Guarantee नहीं</h3>
+        <p>Syllabus, exam dates और topics <strong>publicly available internet sources</strong> पर based हैं। 100% accuracy की कोई guarantee नहीं है।</p>
+        <ul>
+          <li>Exam dates बदल सकती हैं — official notification देखें</li>
+          <li>Syllabus में बदलाव हो सकता है — UPSC/BPSC website check करें</li>
+          <li>यह plan एक <em>suggested framework</em> है, final authority नहीं</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">03</div>
+        <h3>आपकी जिम्मेदारी</h3>
+        <ul>
+          <li>सभी जानकारी को <strong>official sources से verify</strong> करें</li>
+          <li>इस tool पर <strong>पूरी तरह निर्भर न रहें</strong></li>
+          <li>Plan को अपनी जरूरत के हिसाब से adjust करें</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">04</div>
+        <h3>No Liability</h3>
+        <p>Developer (Er. Sangam Krishna) किसी भी नुकसान, परीक्षा में असफलता, या किसी भी परिणाम के लिए <strong>जिम्मेदार नहीं होंगे</strong>। यह tool "as-is" basis पर बिल्कुल free में दिया जा रहा है।</p>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">05</div>
+        <h3>Data Privacy</h3>
+        <p>आपका सारा data केवल <strong>आपके browser के localStorage</strong> में रहता है। कोई भी personal data किसी server पर नहीं जाता।</p>
+      </div>
+      <div class="terms-section terms-section-last">
+        <div class="terms-section-num">06</div>
+        <h3>Free Forever 💛</h3>
+        <p>यह tool हमेशा <strong>100% free</strong> रहेगा — क्योंकि हर aspirant को equal opportunity मिलनी चाहिए।</p>
+      </div>
+      <div class="terms-official-links">
+        <span class="terms-official-label">Official Sources:</span>
+        <a href="https://upsc.gov.in" target="_blank" rel="noopener">upsc.gov.in</a>
+        <a href="https://bpsc.bih.nic.in" target="_blank" rel="noopener">bpsc.bih.nic.in</a>
+      </div>
+    </div>
+    <div class="terms-modal-footer">
+      <button class="terms-accept-btn" onclick="closeTermsModal()">समझ गया, ठीक है ✓</button>
+    </div>
+  </div>
+</div>
 
 <script src="app.js"></script>
 <script>
@@ -758,7 +746,7 @@ function closeTermsModal(e) {
   document.getElementById('termsModal').classList.remove('open');
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTermsModal(); });
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeTermsModal(); });
 </script>
 </body>
 </html>
