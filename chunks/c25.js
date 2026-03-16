@@ -331,11 +331,14 @@ function selectExamWithYearPicker(exam) {
       if (d1 && d2) return d1 < d2 ? d1 : d2;
       return d1 || d2 || new Date(Date.now() + 365 * 86400000);
     }
-    // Year picker mode: use user-selected year/month/day
-    if (userData._selectedExamYear && userData._selectedExamMonth && userData._selectedExamDay) {
+    // Year picker mode: ONLY use selected year if current exam supports year picker
+    if (
+      YEAR_PICKER_EXAMS.includes(userData.exam) &&
+      userData._selectedExamYear && userData._selectedExamMonth && userData._selectedExamDay
+    ) {
       return new Date(userData._selectedExamYear, userData._selectedExamMonth - 1, userData._selectedExamDay);
     }
-    // Fallback to original
+    // Fallback to original (uses fixed examDate from config)
     return origGED ? origGED() : new Date(Date.now() + 365 * 86400000);
   };
 
