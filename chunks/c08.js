@@ -142,45 +142,80 @@ function buildPlan() {
   const subjects = getSubjectsList();
   const weights = getSubjectWeights(subjects, userData.exam);
 
-  // Per-subject topic pointer
+  // Per-subject topic pointer — cycles back when exhausted
   const topicPointers = subjects.map(() => 0);
+  // Track how many full cycles each subject has done (for display/info)
+  const topicCycles = subjects.map(() => 0);
 
-  // Pick 3 DIFFERENT subjects for a day:
+  // Advance pointer for subject si, cycling if needed
+  function advanceTopic(si) {
+    topicPointers[si]++;
+    if (topicPointers[si] >= subjects[si].topics.length) {
+      topicPointers[si] = 0; // cycle back to start
+      topicCycles[si]++;
+    }
+  }
+
+  // Pick MIN 2, TARGET 3 DIFFERENT subjects for a day:
   // Rule 1: Each slot must be a DIFFERENT subject (no same subject twice in one day)
   // Rule 2: If a subject appeared on BOTH yesterday AND day-before, it is blocked today
   // Rule 3: Prefer subjects not seen yesterday (freshness)
-  // Rule 4: High-weight subjects get priority in selection order
+  // Rule 4: High-weight subjects get priority — weighted random selection
   function pickDaySubjects(recentDays) {
-    const usedYesterday  = new Set(recentDays[0] || []);
-    const usedDayBefore  = new Set(recentDays[1] || []);
+    const usedYesterday = new Set(recentDays[0] || []);
+    const usedDayBefore = new Set(recentDays[1] || []);
 
-    // Blocked = appeared 2 days in a row already
+    // Blocked = appeared 2 consecutive days already
     const blocked = new Set(
       [...usedYesterday].filter(si => usedDayBefore.has(si))
     );
 
-    // Build candidate list sorted by priority: fresh > stale > (blocked only if no choice)
-    const available = subjects
-      .map((_, si) => si)
-      .filter(si => topicPointers[si] < subjects[si].topics.length);
+    // All subjects are always available (topics cycle), just split by priority tier
+    const allIdx = subjects.map((_, si) => si);
 
-    const fresh  = available.filter(si => !usedYesterday.has(si) && !blocked.has(si));
-    const stale  = available.filter(si =>  usedYesterday.has(si) && !blocked.has(si));
-    const blkd   = available.filter(si =>  blocked.has(si)); // last resort
+    const fresh = allIdx.filter(si => !usedYesterday.has(si) && !blocked.has(si));
+    const stale = allIdx.filter(si =>  usedYesterday.has(si) && !blocked.has(si));
+    const blkd  = allIdx.filter(si =>  blocked.has(si));
 
-    // Sort each group by weight descending
-    const byWeight = arr => arr.sort((a, b) => weights[b] - weights[a]);
-    const ordered = [...byWeight(fresh), ...byWeight(stale), ...byWeight(blkd)];
-
-    // Pick 3 UNIQUE subjects
-    const chosen = [];
-    const chosenSet = new Set();
-    for (const si of ordered) {
-      if (chosen.length >= 3) break;
-      if (!chosenSet.has(si)) { chosen.push(si); chosenSet.add(si); }
+    // Weighted random pick from a group
+    function weightedPick(pool, exclude) {
+      const candidates = pool.filter(si => !exclude.has(si));
+      if (!candidates.length) return -1;
+      const totalW = candidates.reduce((s, si) => s + weights[si], 0);
+      let r = Math.random() * totalW;
+      for (const si of candidates) {
+        r -= weights[si];
+        if (r <= 0) return si;
+      }
+      return candidates[candidates.length - 1];
     }
 
-    // Shuffle so same subject isn't always in morning slot
+    const chosen = [];
+    const chosenSet = new Set();
+
+    // Fill up to 3 slots: fresh first, then stale, then blocked as last resort
+    const tiers = [fresh, stale, blkd];
+    for (const tier of tiers) {
+      if (chosen.length >= 3) break;
+      // Keep picking from this tier until it's exhausted or we have 3
+      let attempts = tier.length;
+      while (chosen.length < 3 && attempts-- > 0) {
+        const si = weightedPick(tier, chosenSet);
+        if (si === -1) break;
+        chosen.push(si);
+        chosenSet.add(si);
+      }
+    }
+
+    // Safety: if still < 2, force-fill from any subject not yet chosen
+    if (chosen.length < 2) {
+      for (const si of allIdx) {
+        if (chosen.length >= 3) break;
+        if (!chosenSet.has(si)) { chosen.push(si); chosenSet.add(si); }
+      }
+    }
+
+    // Shuffle final selection so slot order varies each day
     for (let i = chosen.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [chosen[i], chosen[j]] = [chosen[j], chosen[i]];
@@ -223,20 +258,18 @@ function buildPlan() {
       todaySubjIndices.forEach((si, s) => {
         const subj = subjects[si];
         const tp = topicPointers[si];
-        if (tp < subj.topics.length) {
-          const topic = subj.topics[tp];
-          topicPointers[si]++;
-          todayUsed.push(si);
-          daySlots.push({
-            type: 'subject',
-            subject: subj.name,
-            color: subj.color || '#f59e0b',
-            topic: topic.name,
-            hindiTopic: topic.hindi || '',
-            microTopics: topic.micro || [],
-            slotType: slotTypes[s]
-          });
-        }
+        const topic = subj.topics[tp];
+        advanceTopic(si);
+        todayUsed.push(si);
+        daySlots.push({
+          type: 'subject',
+          subject: subj.name,
+          color: subj.color || '#f59e0b',
+          topic: topic.name,
+          hindiTopic: topic.hindi || '',
+          microTopics: topic.micro || [],
+          slotType: slotTypes[s]
+        });
       });
 
       // Update recent days tracker
