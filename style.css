@@ -528,3 +528,17 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .free-mission-box{display:flex;align-items:flex-start;gap:.9rem;max-width:600px;margin:2.5rem auto 0;padding:1.1rem 1.4rem;background:rgba(245,158,11,.05);border:1px solid rgba(245,158,11,.18);border-radius:16px;text-align:left;animation:fadeUp .8s .8s ease both;backdrop-filter:blur(8px)}
 .free-mission-icon{font-size:1.3rem;flex-shrink:0;margin-top:.05rem}
 .free-mission-text{font-size:.85rem;color:var(--t2);line-height:1.7;font-weight:500}
+
+/* ══ BUY ME A COFFEE ══ */
+.bmc-float{position:fixed;bottom:1.6rem;right:1.6rem;z-index:999;display:flex;align-items:center;gap:.55rem;background:#FFDD00;color:#000;text-decoration:none;padding:.7rem 1.3rem;border-radius:50px;font-weight:800;font-size:.88rem;font-family:'Inter',sans-serif;box-shadow:0 4px 24px rgba(255,221,0,.4),0 2px 8px rgba(0,0,0,.3);transition:all .3s cubic-bezier(.4,0,.2,1);letter-spacing:.01em;border:2px solid rgba(0,0,0,.08)}
+.bmc-float:hover{transform:translateY(-4px) scale(1.04);box-shadow:0 12px 40px rgba(255,221,0,.5),0 4px 16px rgba(0,0,0,.3)}
+.bmc-float-icon{font-size:1.1rem;line-height:1}
+.bmc-float-text{white-space:nowrap}
+@media(max-width:480px){.bmc-float-text{display:none}.bmc-float{padding:.75rem;border-radius:50%;width:48px;height:48px;justify-content:center}.bmc-float-icon{font-size:1.3rem}}
+
+.footer-bmc{margin-top:1.2rem}
+.footer-bmc-btn{display:inline-flex;align-items:center;gap:.5rem;background:#FFDD00;color:#000;text-decoration:none;padding:.6rem 1.4rem;border-radius:50px;font-weight:800;font-size:.88rem;font-family:'Inter',sans-serif;transition:all .3s;box-shadow:0 2px 12px rgba(255,221,0,.3);letter-spacing:.01em}
+.footer-bmc-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,221,0,.45)}
+
+.hero-bmc-link{display:inline-flex;align-items:center;gap:.4rem;color:#FFDD00;text-decoration:none;font-weight:700;font-size:.82rem;margin-top:.5rem;transition:opacity .2s}
+.hero-bmc-link:hover{opacity:.8;text-decoration:underline}

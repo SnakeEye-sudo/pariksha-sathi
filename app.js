@@ -2693,7 +2693,7 @@ const EXAM_REGISTRY = {
   ssc_cgl: {
     id: 'ssc_cgl', title: 'SSC CGL 2026', subtitle: 'Combined Graduate Level',
     icon: '📋', color: '#3b82f6', cardClass: 'ssc-card',
-    examDate: new Date('2026-08-15'), category: 'ssc',
+    examDate: new Date('2026-05-15'), category: 'ssc',
     vacancies: '~17,000+', pattern: 'Tier 1 + Tier 2 (MCQ)',
     getSyllabus: () => syl_ssc_cgl,
     priorityMap: {
@@ -2720,7 +2720,7 @@ const EXAM_REGISTRY = {
   sbi_po: {
     id: 'sbi_po', title: 'SBI PO 2026', subtitle: 'Probationary Officer — State Bank of India',
     icon: '🏦', color: '#22c55e', cardClass: 'sbi-card',
-    examDate: new Date('2026-09-15'), category: 'banking',
+    examDate: new Date('2026-09-01'), category: 'banking',
     vacancies: '~2000+', pattern: 'Prelims + Mains + Interview',
     getSyllabus: () => syl_sbi_po,
     priorityMap: {
@@ -2760,7 +2760,7 @@ const EXAM_REGISTRY = {
   nda_2026: {
     id: 'nda_2026', title: 'NDA 2026 (I)', subtitle: 'National Defence Academy',
     icon: '⚔️', color: '#ef4444', cardClass: 'nda-card',
-    examDate: new Date('2026-04-19'), category: 'defence',
+    examDate: new Date('2026-04-12'), category: 'defence',
     vacancies: '~400+', pattern: 'Maths + GAT (Written) + SSB',
     getSyllabus: () => syl_nda,
     priorityMap: {
@@ -2774,7 +2774,7 @@ const EXAM_REGISTRY = {
   bpsc_71: {
     id: 'bpsc_71', title: 'BPSC 71st CCE', subtitle: 'Bihar Combined Competitive Exam',
     icon: '⚖️', color: '#ec4899', cardClass: 'bpsc71-card',
-    examDate: new Date('2026-04-26'), category: 'state_psc',
+    examDate: new Date('2026-04-25'), category: 'state_psc',
     vacancies: '1,298', pattern: 'Mains + Interview',
     getSyllabus: () => syl_bpsc_cce,
     priorityMap: {

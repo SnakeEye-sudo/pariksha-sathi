@@ -6,6 +6,7 @@
 ![Exams](https://img.shields.io/badge/Exams-11%2B-10b981?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge)
 ![Made with Love](https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F%20by-Er.%20Sangam%20Krishna-ef4444?style=for-the-badge)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/SangamKrishna3)
 
 **🌐 Live Site:** https://snakeeye-sudo.github.io/pariksha-sathi/
 
@@ -20,16 +21,16 @@
 | Category | Exam | Date |
 |---|---|---|
 | 🏫 Teaching | BPSC TRE 4.0 (Class 1–5 & 6–8) | Sep 2026 (Tentative) |
-| 🏛️ Civil Services | UPSC CSE 2026 | May 24, 2026 |
-| 🏛️ Civil Services | UPSC CSE 2027 | May 2027 |
-| ⚖️ State PSC | BPSC 71st CCE | Apr 26, 2026 |
-| ⚖️ State PSC | BPSC 72nd CCE | Jul 2026 |
-| 📋 SSC | SSC CGL 2026 | Aug 2026 |
-| 🏦 Banking | IBPS PO 2026 | Aug 2026 |
-| 🏦 Banking | SBI PO 2026 | Sep 2026 |
-| 🌾 Banking | IBPS RRB PO 2026 | Nov 2026 |
-| 📑 Banking | IBPS Clerk 2026 | Dec 2026 |
-| ⚔️ Defence | NDA 2026 (I) | Apr 19, 2026 |
+| 🏛️ Civil Services | UPSC CSE 2026 | Prelims: May 24, 2026 |
+| 🏛️ Civil Services | UPSC CSE 2027 | Prelims: May 2027 |
+| ⚖️ State PSC | BPSC 71st CCE | Mains: Apr 25–30, 2026 |
+| ⚖️ State PSC | BPSC 72nd CCE | Prelims: Jul 26, 2026 |
+| 📋 SSC | SSC CGL 2026 | Tier 1: May–Jun 2026 (Tentative) |
+| 🏦 Banking | IBPS PO 2026 | Prelims: Aug 22–23, 2026 |
+| 🏦 Banking | SBI PO 2026 | Sep 2026 (Tentative) |
+| 🌾 Banking | IBPS RRB PO 2026 | Prelims: Nov 21–22, 2026 |
+| 📑 Banking | IBPS Clerk 2026 | Prelims: Dec 6, 2026 |
+| ⚔️ Defence | NDA 2026 (I) | Apr 12, 2026 |
 
 ---
 
