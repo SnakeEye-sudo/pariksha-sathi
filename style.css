@@ -1116,3 +1116,48 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .tg-link-status{font-size:.8rem;text-align:center;margin-top:.6rem;min-height:1.2rem;}
 .ptb-tg{background:rgba(37,99,235,.15);border-color:rgba(37,99,235,.3);color:#93c5fd;}
 .ptb-tg.tg-linked{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:#6ee7b7;}
+
+/* ══════════════════════════════════════════════════
+   FEEDBACK WIDGET
+══════════════════════════════════════════════════ */
+.fb-float-btn{position:fixed;bottom:1.5rem;right:1.5rem;z-index:9000;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--orange));border:none;font-size:1.4rem;cursor:pointer;box-shadow:0 4px 20px rgba(245,158,11,.45);transition:transform .2s,box-shadow .2s;display:flex;align-items:center;justify-content:center;animation:glowPulse 3s infinite}
+.fb-float-btn:hover{transform:scale(1.12) translateY(-2px);box-shadow:0 8px 32px rgba(245,158,11,.6)}
+.fb-float-tip{position:fixed;bottom:4.8rem;right:1.2rem;z-index:9001;background:rgba(10,8,35,.95);border:1px solid var(--border2);color:var(--t1);font-size:.78rem;font-weight:600;padding:.45rem .9rem;border-radius:20px;white-space:nowrap;pointer-events:none;font-family:'Inter',sans-serif;box-shadow:var(--shadow);transition:opacity .5s,transform .5s;animation:fadeUp .4s ease both}
+.fb-tip-hide{opacity:0;transform:translateY(6px)}
+
+.fb-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99998;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(10px);animation:fadeIn .2s ease}
+.fb-modal{background:var(--bg3);border:1px solid var(--border2);border-radius:24px;padding:2rem 1.75rem;max-width:440px;width:100%;position:relative;font-family:'Inter',sans-serif;box-shadow:var(--shadow-lg);animation:scaleIn .3s ease;max-height:90vh;overflow-y:auto}
+.fb-modal-close{position:absolute;top:.9rem;right:.9rem;background:var(--surface);border:1px solid var(--border);color:var(--t3);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:.85rem;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+.fb-modal-close:hover{color:var(--t1);background:var(--surface2)}
+.fb-modal-icon{font-size:2.5rem;text-align:center;margin-bottom:.5rem}
+.fb-modal-title{font-size:1.2rem;font-weight:800;color:var(--t1);text-align:center;margin-bottom:.3rem;font-family:'Syne',sans-serif}
+.fb-modal-sub{font-size:.82rem;color:var(--t2);text-align:center;margin-bottom:1.4rem}
+
+.fb-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.2rem}
+.fb-type-btn{background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:.65rem .75rem;cursor:pointer;display:flex;align-items:center;gap:.5rem;transition:all var(--transition);text-align:left}
+.fb-type-btn:hover{border-color:var(--fb-color,var(--amber));background:rgba(245,158,11,.06)}
+.fb-type-btn.fb-type-selected{border-color:var(--fb-color,var(--amber));background:color-mix(in srgb,var(--fb-color,var(--amber)) 12%,transparent)}
+.fb-type-icon{font-size:1.2rem;flex-shrink:0}
+.fb-type-label{font-size:.78rem;font-weight:600;color:var(--t2);line-height:1.3}
+.fb-type-btn.fb-type-selected .fb-type-label{color:var(--t1)}
+
+.fb-textarea{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:12px;padding:.8rem 1rem;color:var(--t1);font-size:.88rem;font-family:'Inter',sans-serif;resize:vertical;outline:none;transition:border-color var(--transition);line-height:1.6}
+.fb-textarea:focus{border-color:var(--amber)}
+.fb-textarea::placeholder{color:var(--t3)}
+.fb-char-count{text-align:right;font-size:.72rem;color:var(--t3);margin:.3rem 0 .8rem}
+.fb-name-row{margin-bottom:1rem}
+.fb-name-input{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:.65rem .9rem;color:var(--t1);font-size:.85rem;font-family:'Inter',sans-serif;outline:none;transition:border-color var(--transition)}
+.fb-name-input:focus{border-color:var(--amber)}
+.fb-name-input::placeholder{color:var(--t3)}
+.fb-submit-btn{width:100%;background:var(--grad-amber);border:none;border-radius:12px;color:#000;font-size:.92rem;font-weight:800;padding:.85rem;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .2s,transform .15s}
+.fb-submit-btn:hover{opacity:.9;transform:translateY(-1px)}
+.fb-submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.fb-status{font-size:.82rem;text-align:center;margin-top:.75rem;min-height:1.2rem;font-weight:600}
+.fb-success{color:var(--green-l)}
+.fb-error{color:var(--red-l)}
+
+/* Current Affairs card — clickable link */
+.ca-read-link{margin-top:.6rem;font-size:.78rem;font-weight:700;color:var(--amber);letter-spacing:.02em;display:inline-flex;align-items:center;gap:.3rem}
+.ca-slot-card:hover .ca-read-link{text-decoration:underline}
+.ca-slot-card{transition:transform .15s,box-shadow .15s}
+.ca-slot-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.15)}

@@ -113,13 +113,17 @@ function generateDayPlanHTML() {
         }
 
         if (slot.type === 'current_affairs') {
-          return `<div class="slot-card ca-slot-card">
+          // Build date string for the news app link — format YYYY-MM-DD
+          const caDateStr = day.date.toISOString().slice(0, 10);
+          const caUrl = `${NEWS_APP_URL}?date=${caDateStr}`;
+          return `<div class="slot-card ca-slot-card" style="cursor:pointer" onclick="window.open('${caUrl}','_blank')" title="News Analysis padhne ke liye click karein">
             <div class="slot-card-header">
               <span class="slot-type-badge" style="background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.2)">📰 Current Affairs</span>
               <span class="slot-duration">30 min</span>
             </div>
             <div class="slot-card-title">${t('caTitle')}</div>
             <div class="slot-card-sub">${t('caSub')}</div>
+            <div class="ca-read-link">📖 News Analysis padhein →</div>
           </div>`;
         }
 
