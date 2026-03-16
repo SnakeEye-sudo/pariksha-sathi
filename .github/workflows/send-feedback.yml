@@ -21,23 +21,20 @@ jobs:
         env:
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          FB_MESSAGE: ${{ inputs.message }}
         run: |
-          python3 - <<'EOF'
-          import os, urllib.request, urllib.parse, json
+          python3 - <<'PYEOF'
+          import os, urllib.request, json, sys
 
           token = os.environ['BOT_TOKEN']
           chat_id = os.environ['CHAT_ID']
-          message = """${{ inputs.message }}"""
+          message = os.environ['FB_MESSAGE']
 
           url = f"https://api.telegram.org/bot{token}/sendMessage"
-          data = json.dumps({
-              "chat_id": chat_id,
-              "text": message,
-              "parse_mode": "HTML"
-          }).encode()
-
+          data = json.dumps({"chat_id": chat_id, "text": message}).encode()
           req = urllib.request.Request(url, data=data,
               headers={"Content-Type": "application/json"})
           with urllib.request.urlopen(req) as r:
-              print(r.read().decode())
-          EOF
+              resp = json.loads(r.read().decode())
+              print("OK" if resp.get("ok") else f"Error: {resp}")
+          PYEOF
