@@ -258,7 +258,7 @@ function closeCalendarModal() {
 }
 
 // ── FCM Push Notifications ────────────────────────────────────
-const FCM_VAPID_KEY = '0Pkbm-kb7s32ifYoFcC9flRikYHpWPjmcLW6obBVHC0';
+const FCM_VAPID_KEY = 'BNAPKz2pnA78NTdyke51n48arAtcx7mE7AGxwCNW7Ttb5HIBMteMH8j3QMcTcMAa72M41K7EN3Y-bRnXKKAN9HQ';
 
 async function requestNotificationPermission() {
   if (!('Notification' in window)) {
