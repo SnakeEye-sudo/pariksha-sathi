@@ -1,0 +1,74 @@
+name: Exam Date Auto-Checker
+
+on:
+  schedule:
+    # Runs every day at 02:00 UTC (7:30 AM IST)
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Force run even if no changes'
+        required: false
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  check-dates:
+    runs-on: ubuntu-latest
+    name: Check & Update Exam Dates
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run exam date checker
+        id: checker
+        run: |
+          python .github/scripts/check_exam_dates.py
+          echo "exit_code=$?" >> $GITHUB_OUTPUT
+
+      - name: Check for file changes
+        id: changes
+        run: |
+          git diff --quiet chunks/c14.js chunks/c19.js && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Rebuild app.js if dates changed
+        if: steps.changes.outputs.changed == 'true'
+        run: python build.py
+
+      - name: Commit and push updates
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config user.name "ParikshaSathi Bot"
+          git config user.email "bot@pariksha-sathi.github.io"
+          git add chunks/c14.js chunks/c19.js app.js exam_date_report.md
+          git commit -m "chore(dates): auto-update exam dates [$(date -u '+%Y-%m-%d')]"
+          git push
+
+      - name: Upload report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exam-date-report-${{ github.run_number }}
+          path: exam_date_report.md
+          retention-days: 30
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Exam Date Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f exam_date_report.md ]; then
+            cat exam_date_report.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No report generated." >> $GITHUB_STEP_SUMMARY
+          fi
