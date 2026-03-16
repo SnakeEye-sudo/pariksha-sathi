@@ -305,6 +305,13 @@ function scheduleLocalNotifications() {
   // Store notification preference
   localStorage.setItem('ps_notif_enabled', '1');
 
+  // Get today's slots from studyPlan
+  const todayStr = new Date().toDateString();
+  const todayDay = (typeof studyPlan !== 'undefined' && studyPlan.length)
+    ? studyPlan.find(d => d.date.toDateString() === todayStr)
+    : null;
+  const todaySlots = todayDay ? todayDay.slots.filter(s => s.type === 'subject') : [];
+
   // Use SW to schedule — send message to SW
   if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
     const examDate = typeof getExamDate === 'function' ? getExamDate() : null;
@@ -313,8 +320,35 @@ function scheduleLocalNotifications() {
       examDate: examDate ? examDate.toISOString() : null,
       userName: userData.name || '',
       exam: userData.exam || '',
+      slots: todaySlots,
     });
   }
+
+  // Streak break check — if 2 days no tick, send alert
+  checkStreakBreakAlert();
+}
+
+function checkStreakBreakAlert() {
+  if (!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
+  try {
+    const cl = JSON.parse(localStorage.getItem('ps_checklist') || '{}');
+    const now = new Date();
+    let missedDays = 0;
+    for (let i = 1; i <= 2; i++) {
+      const d = new Date(now);
+      d.setDate(d.getDate() - i);
+      const dStr = d.toISOString().slice(0, 10);
+      const hasAnyTick = Object.keys(cl).some(k => k.startsWith(dStr));
+      if (!hasAnyTick) missedDays++;
+    }
+    if (missedDays >= 2) {
+      navigator.serviceWorker.controller.postMessage({
+        type: 'CHECK_STREAK',
+        streak: 0,
+        userName: userData.name || '',
+      });
+    }
+  } catch(e) {}
 }
 
 function disableNotifications() {

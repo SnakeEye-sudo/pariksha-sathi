@@ -1,126 +1,390 @@
 name: Daily Telegram Study Reminder
 
-# Runs every day at 6:00 AM IST (00:30 UTC)
+# 6 AM IST  = 00:30 UTC  → morning reminders
+# 8 PM IST  = 14:30 UTC  → evening check-in
+# 9 PM IST  = 15:30 UTC  → process replies (haan/skip/progress)
+# 9 AM IST  = 03:30 UTC  → process replies (morning window)
+# Sunday 8 AM IST = Sun 02:30 UTC → weekly report
 on:
   schedule:
-    - cron: '30 0 * * *'
+    - cron: '30 0 * * *'    # 6 AM IST  — morning plan
+    - cron: '30 14 * * *'   # 8 PM IST  — evening check-in
+    - cron: '30 3 * * *'    # 9 AM IST  — process replies
+    - cron: '30 15 * * *'   # 9 PM IST  — process replies
+    - cron: '30 2 * * 0'    # Sunday 8 AM IST — weekly report
   workflow_dispatch:
 
 jobs:
-  send-reminders:
+  telegram-tasks:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - run: pip install requests google-cloud-firestore google-auth
 
-      - name: Install dependencies
-        run: pip install requests google-cloud-firestore google-auth
-
-      - name: Send daily reminders
+      - name: Run Telegram bot tasks
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          CRON_SCHEDULE: ${{ github.event.schedule }}
         run: |
-          python3 << 'EOF'
-          import os, json, requests
+          python3 << 'PYEOF'
+          import os, json, requests, random
           from datetime import datetime, timezone, timedelta
 
           BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
           SA_JSON   = os.environ.get('FIREBASE_SERVICE_ACCOUNT', '')
+          SCHEDULE  = os.environ.get('CRON_SCHEDULE', '')
+          EVENT     = os.environ.get('GITHUB_EVENT_NAME', '')
 
           if not BOT_TOKEN:
-              print("ERROR: TELEGRAM_BOT_TOKEN not set")
-              exit(1)
+              print("ERROR: TELEGRAM_BOT_TOKEN not set"); exit(1)
+
+          IST = timezone(timedelta(hours=5, minutes=30))
+          now_ist   = datetime.now(IST)
+          today_str = now_ist.strftime('%Y-%m-%d')
+          day_name  = now_ist.strftime('%A, %d %B')
+          weekday   = now_ist.weekday()  # 0=Mon, 6=Sun
+
+          IS_MORNING  = SCHEDULE == '30 0 * * *'  or EVENT == 'workflow_dispatch'
+          IS_EVENING  = SCHEDULE == '30 14 * * *'
+          IS_REPLIES  = SCHEDULE in ('30 3 * * *', '30 15 * * *') or EVENT == 'workflow_dispatch'
+          IS_WEEKLY   = SCHEDULE == '30 2 * * 0'
+
+          MOTIVATIONAL_QUOTES = [
+              "🌟 \"Sapne wo nahi jo neend mein aate hain, sapne wo hain jo neend nahi aane dete.\" — APJ Abdul Kalam",
+              "💪 \"Uthho, jaago aur tab tak mat ruko jab tak lakshya prapt na ho jaye.\" — Swami Vivekananda",
+              "🔥 \"Safalta tab milti hai jab aapke sapne aapke daro se bade ho jaate hain.\"",
+              "📚 \"Padhai ka koi shortcut nahi hota, lekin consistency zaroor kaam aati hai.\"",
+              "🎯 \"Har din ek kadam — exam tak pahunch jaoge.\"",
+              "⚡ \"Mushkilein aati hain toh aao, hum unhe mauka samajhte hain.\"",
+              "🌅 \"Subah ki mehnat raat ko results deti hai.\"",
+              "🏆 \"UPSC/BPSC crack karna mushkil hai, lekin impossible nahi — lakho ne kiya hai.\"",
+              "📖 \"Ek topic roz — exam tak sab cover ho jaayega.\"",
+              "🌙 \"Aaj ki mehnat kal ki safalta hai.\"",
+          ]
 
           # ── Init Firestore ──
-          users_with_tg = []
+          db = None
           if SA_JSON:
               try:
-                  import google.auth
                   from google.oauth2 import service_account
                   from google.cloud import firestore
-
                   sa_info = json.loads(SA_JSON)
                   creds = service_account.Credentials.from_service_account_info(
-                      sa_info,
-                      scopes=['https://www.googleapis.com/auth/cloud-platform']
-                  )
+                      sa_info, scopes=['https://www.googleapis.com/auth/cloud-platform'])
                   db = firestore.Client(credentials=creds, project=sa_info['project_id'])
-
-                  # Fetch all users with telegramChatId
-                  users_ref = db.collection('users')
-                  docs = users_ref.stream()
-                  for doc in docs:
-                      data = doc.to_dict()
-                      if data.get('telegramChatId') and data.get('plan'):
-                          users_with_tg.append({
-                              'uid': doc.id,
-                              'chatId': data['telegramChatId'],
-                              'name': data.get('name', 'Student'),
-                              'plan': data.get('plan', []),
-                              'exam': data.get('exam', ''),
-                          })
-                  print(f"Found {len(users_with_tg)} users with Telegram linked")
+                  print("Firestore connected")
               except Exception as e:
-                  print(f"Firestore error: {e}")
-          else:
-              print("WARNING: FIREBASE_SERVICE_ACCOUNT not set — skipping Firestore fetch")
+                  print(f"Firestore error: {e}"); exit(1)
 
-          # ── Send message to each user ──
-          IST = timezone(timedelta(hours=5, minutes=30))
-          today = datetime.now(IST)
-          today_str = today.strftime('%Y-%m-%d')
-          day_name = today.strftime('%A, %d %B')
-
-          def send_tg(chat_id, text, reply_markup=None):
-              payload = {'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'}
+          def send_tg(chat_id, text, reply_markup=None, parse_mode='HTML'):
+              payload = {'chat_id': chat_id, 'text': text, 'parse_mode': parse_mode}
               if reply_markup:
                   payload['reply_markup'] = json.dumps(reply_markup)
-              r = requests.post(
-                  f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage',
-                  json=payload, timeout=10
-              )
-              return r.status_code == 200
+              try:
+                  r = requests.post(f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage',
+                                    json=payload, timeout=10)
+                  return r.status_code == 200
+              except: return False
 
-          sent = 0
-          for user in users_with_tg:
-              # Find today's plan
-              today_slots = []
-              for day in user['plan']:
-                  if day.get('dateStr') == today_str or day.get('date', '').startswith(today_str):
-                      today_slots = [s for s in day.get('slots', []) if s.get('type') == 'subject']
+          def get_updates(offset=None):
+              params = {'limit': 100, 'timeout': 5}
+              if offset: params['offset'] = offset
+              try:
+                  r = requests.get(f'https://api.telegram.org/bot{BOT_TOKEN}/getUpdates',
+                                   params=params, timeout=15)
+                  if r.status_code == 200:
+                      return r.json().get('result', [])
+              except: pass
+              return []
+
+          def get_user_stats(data, today_str):
+              """Calculate progress stats for a user."""
+              checklist = data.get('checklist', {})
+              plan = data.get('plan', [])
+              total_topics = 0
+              done_topics  = 0
+              streak = 0
+              today_total = 0
+              today_done  = 0
+
+              # Count all subject slots
+              for day in plan:
+                  d_str = day.get('dateStr') or day.get('date', '')[:10]
+                  day_slots = [s for s in day.get('slots', []) if s.get('type') == 'subject']
+                  total_topics += len(day_slots)
+                  for idx, slot in enumerate(day_slots):
+                      key = f"{d_str}_{idx}"
+                      if checklist.get(key):
+                          done_topics += 1
+                  if d_str == today_str:
+                      today_total = len(day_slots)
+                      today_done  = sum(1 for idx, s in enumerate(day_slots) if checklist.get(f"{d_str}_{idx}"))
+
+              # Streak: consecutive days with at least 1 tick
+              from datetime import date as dt_date
+              check_date = datetime.now(IST).date()
+              for _ in range(365):
+                  d_str = check_date.strftime('%Y-%m-%d')
+                  has_tick = any(k.startswith(d_str) and checklist.get(k) for k in checklist)
+                  if has_tick:
+                      streak += 1
+                      check_date -= timedelta(days=1)
+                  else:
                       break
 
-              if not today_slots:
-                  msg = f"📚 <b>Namaste {user['name']}!</b>\n\n🗓 <b>{day_name}</b>\n\nAaj ke liye koi plan nahi mila. App check karein!"
-              else:
-                  topics = '\n'.join([f"  • {s.get('topic','')}" for s in today_slots[:6]])
-                  msg = (
-                      f"📚 <b>Namaste {user['name']}!</b>\n\n"
-                      f"🗓 <b>{day_name}</b> ka study plan:\n\n"
-                      f"{topics}\n\n"
-                      f"💪 Aaj ka target complete karo!\n"
-                      f"<i>Padh lene ke baad reply karein: <b>haan</b></i>"
-                  )
-
-              markup = {
-                  'keyboard': [[{'text': '✅ Haan, padh liya!'}], [{'text': '⏰ Baad mein'}]],
-                  'resize_keyboard': True,
-                  'one_time_keyboard': True
+              pct = round(done_topics / total_topics * 100, 1) if total_topics else 0
+              return {
+                  'total': total_topics, 'done': done_topics, 'pct': pct,
+                  'streak': streak, 'today_total': today_total, 'today_done': today_done
               }
 
-              ok = send_tg(user['chatId'], msg, markup)
-              if ok:
-                  sent += 1
-                  print(f"Sent to {user['name']} ({user['chatId']})")
-              else:
-                  print(f"Failed for {user['name']} ({user['chatId']})")
+          # ── PROCESS REPLIES (haan / skip / /progress / /start) ──
+          if IS_REPLIES and db:
+              print("\n--- Processing replies ---")
+              meta_ref = db.collection('_bot_meta').document('state')
+              meta = meta_ref.get()
+              last_offset = meta.to_dict().get('last_update_id', 0) if meta.exists else 0
 
-          print(f"\nDone: {sent}/{len(users_with_tg)} reminders sent")
-          EOF
+              updates = get_updates(offset=last_offset + 1 if last_offset else None)
+              new_last = last_offset
+
+              for upd in updates:
+                  uid = upd.get('update_id', 0)
+                  if uid > new_last: new_last = uid
+
+                  msg = upd.get('message', {})
+                  text = (msg.get('text') or '').strip().lower()
+                  chat_id = str(msg.get('chat', {}).get('id', ''))
+                  if not chat_id or not text: continue
+
+                  users = db.collection('users').where('telegramChatId', '==', chat_id).limit(1).stream()
+                  user_doc = next(users, None)
+                  if not user_doc:
+                      if text == '/start':
+                          send_tg(chat_id, "Namaste! 🙏\n\nPehle <b>ParikshaSathi</b> app mein login karke Telegram link karein.\n\n👉 pariksha-sathi.in")
+                      continue
+
+                  user_data = user_doc.to_dict()
+                  user_ref  = db.collection('users').document(user_doc.id)
+                  name = user_data.get('name', 'Student')
+
+                  # /start
+                  if text == '/start':
+                      send_tg(chat_id,
+                          f"Namaste <b>{name}</b>! 🙏\n\n"
+                          f"ParikshaSathi bot se connected ho gaye!\n"
+                          f"Har roz subah 6 baje aapka study plan milega.\n\n"
+                          f"<b>Commands:</b>\n"
+                          f"✅ <b>haan</b> — aaj ke topics done mark karo\n"
+                          f"⏭ <b>/skip</b> — aaj ka din skip karo\n"
+                          f"📊 <b>/progress</b> — apna progress dekho\n\n"
+                          f"<i>Padh lene ke baad 'haan' reply karein!</i>")
+                      continue
+
+                  # /progress
+                  if text == '/progress':
+                      stats = get_user_stats(user_data, today_str)
+                      fire_emoji = '�' * min(stats['streak'], 5) if stats['streak'] else '💤'
+                      send_tg(chat_id,
+                          f"📊 <b>{name} ka Progress</b>\n\n"
+                          f"✅ Topics done: <b>{stats['done']}/{stats['total']}</b> ({stats['pct']}%)\n"
+                          f"🔥 Current streak: <b>{stats['streak']} din</b> {fire_emoji}\n"
+                          f"📅 Aaj: <b>{stats['today_done']}/{stats['today_total']}</b> topics\n\n"
+                          f"{'Bahut badhiya! Keep it up! 💪' if stats['pct'] > 50 else 'Aur mehnat karo — exam paas aa raha hai! 📚'}")
+                      continue
+
+                  # /skip
+                  if text in ('/skip', 'skip', 'aaj nahi', 'kal karunga'):
+                      checklist = user_data.get('checklist', {})
+                      plan = user_data.get('plan', [])
+                      # Mark today as skipped (special key)
+                      checklist[f"{today_str}_skipped"] = True
+                      user_ref.update({'checklist': checklist})
+                      send_tg(chat_id,
+                          f"⏭ <b>Aaj skip kar diya.</b>\n\n"
+                          f"Koi baat nahi {name}! Kal zaroor padhna. 💪\n"
+                          f"<i>Consistency hi success hai — ek din miss hota hai, lekin kal se wapas shuru karo!</i>")
+                      continue
+
+                  # haan / yes / done
+                  POSITIVE = ['haan', 'han', 'yes', 'ha', 'padh liya', 'done', 'ho gaya', 'kar liya', '✅', 'haa']
+                  if any(p in text for p in POSITIVE):
+                      checklist = user_data.get('checklist', {})
+                      plan = user_data.get('plan', [])
+                      marked = 0
+                      for day in plan:
+                          d_str = day.get('dateStr') or day.get('date', '')[:10]
+                          if d_str == today_str:
+                              for idx, slot in enumerate(day.get('slots', [])):
+                                  if slot.get('type') == 'subject':
+                                      key = f"{today_str}_{idx}"
+                                      if not checklist.get(key):
+                                          checklist[key] = True
+                                          marked += 1
+                              break
+                      if marked > 0:
+                          user_ref.update({'checklist': checklist})
+                          stats = get_user_stats({**user_data, 'checklist': checklist}, today_str)
+                          send_tg(chat_id,
+                              f"✅ <b>Bahut badhiya {name}!</b> {marked} topics done!\n\n"
+                              f"🔥 Streak: <b>{stats['streak']} din</b>\n"
+                              f"📈 Overall: <b>{stats['pct']}%</b> complete\n\n"
+                              f"App mein bhi reflect ho jaayega. Keep it up! 💪")
+                          print(f"Marked {marked} slots for {user_doc.id}")
+                      else:
+                          send_tg(chat_id, "✅ Aaj ke topics already done hain! Great work! 🎉")
+
+                  elif any(p in text for p in ['nahi', 'nhi', 'no', 'nope', 'nahin']):
+                      send_tg(chat_id,
+                          f"Koi baat nahi {name}! 😊\n\n"
+                          f"Kal zaroor padhna. Consistency hi success hai!\n"
+                          f"Agar thoda bhi padh sako to app mein manually tick kar sakte ho.")
+
+              if new_last > last_offset:
+                  meta_ref.set({'last_update_id': new_last, 'updated': now_ist.isoformat()})
+                  print(f"Processed {len(updates)} updates, last_id={new_last}")
+
+          # ── MORNING REMINDERS (6 AM IST) ──
+          if IS_MORNING and db:
+              print("\n--- Sending morning reminders ---")
+              docs = list(db.collection('users').stream())
+              sent = 0
+              for doc in docs:
+                  data = doc.to_dict()
+                  chat_id = data.get('telegramChatId')
+                  if not chat_id: continue
+                  name = data.get('name', 'Student')
+                  plan = data.get('plan', [])
+                  today_slots = []
+                  for day in plan:
+                      d_str = day.get('dateStr') or day.get('date', '')[:10]
+                      if d_str == today_str:
+                          today_slots = [s for s in day.get('slots', []) if s.get('type') == 'subject']
+                          break
+                  if not today_slots: continue
+
+                  topics = '\n'.join([f"  • {s.get('topic','')}" for s in today_slots[:5]])
+                  extra = f"\n  <i>...aur {len(today_slots)-5} topics</i>" if len(today_slots) > 5 else ''
+                  quote = random.choice(MOTIVATIONAL_QUOTES)
+                  stats = get_user_stats(data, today_str)
+                  streak_line = f"🔥 Streak: <b>{stats['streak']} din</b>\n\n" if stats['streak'] > 0 else ''
+
+                  msg = (
+                      f"📚 <b>Subah ki Namaste, {name}!</b> 🌅\n\n"
+                      f"🗓 <b>{day_name}</b> ka plan:\n\n"
+                      f"{topics}{extra}\n\n"
+                      f"{streak_line}"
+                      f"{quote}\n\n"
+                      f"<i>Padh lene ke baad reply karein:</i>"
+                  )
+                  markup = {
+                      'keyboard': [
+                          [{'text': '✅ Haan, padh liya!'}],
+                          [{'text': '📊 /progress'}, {'text': '⏭ /skip'}]
+                      ],
+                      'resize_keyboard': True, 'one_time_keyboard': False
+                  }
+                  if send_tg(chat_id, msg, markup): sent += 1
+              print(f"Morning reminders: {sent} sent")
+
+          # ── EVENING CHECK-IN (8 PM IST) ──
+          if IS_EVENING and db:
+              print("\n--- Sending evening check-ins ---")
+              docs = list(db.collection('users').stream())
+              sent = 0
+              for doc in docs:
+                  data = doc.to_dict()
+                  chat_id = data.get('telegramChatId')
+                  if not chat_id: continue
+                  name = data.get('name', 'Student')
+                  stats = get_user_stats(data, today_str)
+
+                  # Get tomorrow's plan preview
+                  tomorrow_str = (datetime.now(IST) + timedelta(days=1)).strftime('%Y-%m-%d')
+                  plan = data.get('plan', [])
+                  tmrw_slots = []
+                  for day in plan:
+                      d_str = day.get('dateStr') or day.get('date', '')[:10]
+                      if d_str == tomorrow_str:
+                          tmrw_slots = [s for s in day.get('slots', []) if s.get('type') == 'subject']
+                          break
+
+                  if stats['today_done'] >= stats['today_total'] and stats['today_total'] > 0:
+                      # All done!
+                      msg = (
+                          f"🌙 <b>Wah {name}!</b> Aaj ka poora plan complete! 🎉\n\n"
+                          f"✅ <b>{stats['today_done']}/{stats['today_total']}</b> topics done\n"
+                          f"🔥 Streak: <b>{stats['streak']} din</b>\n\n"
+                      )
+                  else:
+                      remaining = stats['today_total'] - stats['today_done']
+                      msg = (
+                          f"🌙 <b>Shaam ki Namaste, {name}!</b>\n\n"
+                          f"Aaj abhi <b>{remaining} topics</b> baaki hain.\n"
+                          f"Raat ko thoda time nikalo — kal fresh start hoga! 💪\n\n"
+                      )
+
+                  if tmrw_slots:
+                      tmrw_preview = ', '.join([s.get('subject','') for s in tmrw_slots[:3]])
+                      msg += f"📅 <b>Kal ka plan:</b> {tmrw_preview}{'...' if len(tmrw_slots) > 3 else ''}\n\n"
+
+                  msg += "<i>Aaj padh liya? Reply karein!</i>"
+                  markup = {
+                      'keyboard': [
+                          [{'text': '✅ Haan, padh liya!'}],
+                          [{'text': '📊 /progress'}, {'text': '⏭ /skip'}]
+                      ],
+                      'resize_keyboard': True, 'one_time_keyboard': False
+                  }
+                  if send_tg(chat_id, msg, markup): sent += 1
+              print(f"Evening check-ins: {sent} sent")
+
+          # ── WEEKLY REPORT (Sunday) ──
+          if IS_WEEKLY and db:
+              print("\n--- Sending weekly reports ---")
+              docs = list(db.collection('users').stream())
+              sent = 0
+              for doc in docs:
+                  data = doc.to_dict()
+                  chat_id = data.get('telegramChatId')
+                  if not chat_id: continue
+                  name = data.get('name', 'Student')
+                  stats = get_user_stats(data, today_str)
+
+                  # Count this week's done topics
+                  checklist = data.get('checklist', {})
+                  week_done = 0
+                  week_total = 0
+                  plan = data.get('plan', [])
+                  for i in range(7):
+                      d = (datetime.now(IST) - timedelta(days=i)).strftime('%Y-%m-%d')
+                      for day in plan:
+                          d_str = day.get('dateStr') or day.get('date', '')[:10]
+                          if d_str == d:
+                              day_slots = [s for s in day.get('slots', []) if s.get('type') == 'subject']
+                              week_total += len(day_slots)
+                              week_done += sum(1 for idx, s in enumerate(day_slots) if checklist.get(f"{d_str}_{idx}"))
+
+                  week_pct = round(week_done / week_total * 100) if week_total else 0
+                  grade = '🏆 Excellent!' if week_pct >= 80 else '👍 Good!' if week_pct >= 50 else '📈 Aur mehnat karo!'
+                  fire = '🔥' * min(stats['streak'] // 3 + 1, 5)
+
+                  msg = (
+                      f"📊 <b>Weekly Report — {name}</b>\n\n"
+                      f"📅 Is hafte:\n"
+                      f"  ✅ Topics done: <b>{week_done}/{week_total}</b> ({week_pct}%)\n"
+                      f"  {grade}\n\n"
+                      f"📈 Overall progress: <b>{stats['pct']}%</b>\n"
+                      f"🔥 Current streak: <b>{stats['streak']} din</b> {fire}\n\n"
+                      f"{'Ek aur hafte ki mehnat — exam crack hoga! 💪' if week_pct < 80 else 'Zabardast consistency! Aise hi chalte raho! 🌟'}\n\n"
+                      f"<i>Naya hafte mein bhi aise hi padho!</i>"
+                  )
+                  if send_tg(chat_id, msg): sent += 1
+              print(f"Weekly reports: {sent} sent")
+
+          print("\nDone!")
+          PYEOF

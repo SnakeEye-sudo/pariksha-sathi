@@ -80,31 +80,80 @@ self.addEventListener('notificationclick', event => {
 
 // ── Schedule local daily reminders ───────────────────────────
 self.addEventListener('message', event => {
-  if (event.data?.type !== 'SCHEDULE_NOTIFS') return;
-  const { examDate, userName, exam } = event.data;
+  if (event.data?.type === 'SCHEDULE_NOTIFS') {
+    const { examDate, userName, exam, slots } = event.data;
 
-  // Show immediate confirmation notification
-  self.registration.showNotification('🔔 ParikshaSathi Notifications ON!', {
-    body: `${userName ? userName + ', ' : ''}daily study reminders set ho gaye!`,
-    icon: '/pariksha-sathi/logo.png',
-    badge: '/pariksha-sathi/favicon.svg',
-    tag: 'ps-notif-confirm',
-  });
+    // Show immediate confirmation notification
+    self.registration.showNotification('🔔 ParikshaSathi Notifications ON!', {
+      body: `${userName ? userName + ', ' : ''}daily study reminders set ho gaye!`,
+      icon: '/pariksha-sathi/logo.png',
+      badge: '/pariksha-sathi/favicon.svg',
+      tag: 'ps-notif-confirm',
+    });
 
-  // Exam countdown reminder (if exam date available)
-  if (examDate) {
-    const exam_dt = new Date(examDate);
-    const now = new Date();
-    const daysLeft = Math.ceil((exam_dt - now) / 86400000);
-    if (daysLeft > 0 && daysLeft <= 30) {
-      setTimeout(() => {
-        self.registration.showNotification(`⏰ ${daysLeft} din baaki!`, {
-          body: `${exam.toUpperCase()} exam mein sirf ${daysLeft} din bache hain. Aaj ka plan complete karo!`,
-          icon: '/pariksha-sathi/logo.png',
-          tag: 'ps-countdown',
-          data: { url: '/pariksha-sathi/' }
-        });
-      }, 3000);
+    // Exam countdown reminder (if exam date available)
+    if (examDate) {
+      const exam_dt = new Date(examDate);
+      const now = new Date();
+      const daysLeft = Math.ceil((exam_dt - now) / 86400000);
+      if (daysLeft > 0 && daysLeft <= 30) {
+        setTimeout(() => {
+          self.registration.showNotification(`⏰ ${daysLeft} din baaki!`, {
+            body: `${exam.toUpperCase()} exam mein sirf ${daysLeft} din bache hain. Aaj ka plan complete karo!`,
+            icon: '/pariksha-sathi/logo.png',
+            tag: 'ps-countdown',
+            data: { url: '/pariksha-sathi/' }
+          });
+        }, 3000);
+      }
+    }
+
+    // Schedule slot-wise 15-min-before notifications for today's slots
+    if (slots && slots.length) {
+      const now = new Date();
+      const SLOT_HOURS = {
+        early_morning: 4, morning: 6, forenoon: 9,
+        afternoon: 12, evening: 15, night: 20,
+        revision: 19, current: 7,
+      };
+      slots.forEach((slot, idx) => {
+        const hour = SLOT_HOURS[slot.slotType] || 8;
+        const notifTime = new Date();
+        notifTime.setHours(hour, 0, 0, 0);
+        notifTime.setMinutes(notifTime.getMinutes() - 15); // 15 min before
+        const delay = notifTime - now;
+        if (delay > 0 && delay < 86400000) {
+          setTimeout(() => {
+            self.registration.showNotification(`📚 ${slot.subject || 'Study'} — 15 min mein!`, {
+              body: slot.topic || 'Aaj ka study session shuru hone wala hai!',
+              icon: '/pariksha-sathi/logo.png',
+              badge: '/pariksha-sathi/favicon.svg',
+              tag: `ps-slot-${idx}`,
+              data: { url: '/pariksha-sathi/' },
+              actions: [
+                { action: 'open', title: '📚 Plan Dekho' },
+                { action: 'dismiss', title: 'Baad mein' }
+              ]
+            });
+          }, delay);
+        }
+      });
+    }
+    return;
+  }
+
+  // Streak break alert check
+  if (event.data?.type === 'CHECK_STREAK') {
+    const { streak, userName } = event.data;
+    if (streak === 0) {
+      self.registration.showNotification('🔥 Streak khatam hone wali hai!', {
+        body: `${userName || 'Yaar'}, 2 din se kuch tick nahi hua. Aaj thoda padh lo — streak wapas shuru karo!`,
+        icon: '/pariksha-sathi/logo.png',
+        badge: '/pariksha-sathi/favicon.svg',
+        tag: 'ps-streak-alert',
+        data: { url: '/pariksha-sathi/' },
+        actions: [{ action: 'open', title: '📚 Abhi Padho' }]
+      });
     }
   }
 });
