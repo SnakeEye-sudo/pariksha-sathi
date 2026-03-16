@@ -1094,3 +1094,25 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .subtopic-hindi{font-size:.75rem;color:var(--t3,rgba(255,255,255,.45));margin-top:.15rem;}
 .micro-list{margin:.35rem 0 0 1rem;padding:0;}
 .micro-list li{font-size:.75rem;color:var(--t3,rgba(255,255,255,.45));margin-bottom:.2rem;line-height:1.5;}
+
+/* ── Telegram Link Modal ─────────────────────────────────────── */
+.tg-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:99999;display:flex;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(8px);}
+.tg-modal{background:var(--bg3,#0f172a);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:1.75rem 1.5rem;max-width:400px;width:100%;position:relative;font-family:'Inter',sans-serif;}
+.tg-modal-close{position:absolute;top:.75rem;right:.75rem;background:none;border:none;color:rgba(255,255,255,.4);font-size:1.1rem;cursor:pointer;padding:.25rem .5rem;border-radius:6px;}
+.tg-modal-close:hover{color:#f1f5f9;}
+.tg-modal-icon{font-size:2.5rem;text-align:center;margin-bottom:.5rem;}
+.tg-modal-title{font-size:1.15rem;font-weight:700;color:#f1f5f9;text-align:center;margin-bottom:.3rem;}
+.tg-modal-sub{font-size:.82rem;color:rgba(255,255,255,.45);text-align:center;margin-bottom:1.25rem;}
+.tg-steps{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.25rem;}
+.tg-step{display:flex;align-items:flex-start;gap:.75rem;}
+.tg-step-num{width:22px;height:22px;border-radius:50%;background:rgba(37,99,235,.3);color:#93c5fd;font-size:.75rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.1rem;}
+.tg-step-text{font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.5;}
+.tg-bot-link{color:#60a5fa;text-decoration:none;}
+.tg-bot-link:hover{text-decoration:underline;}
+.tg-chat-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:.65rem .9rem;color:#f1f5f9;font-size:.9rem;font-family:'Inter',sans-serif;margin-bottom:.75rem;outline:none;}
+.tg-chat-input:focus{border-color:rgba(37,99,235,.5);}
+.tg-confirm-btn{width:100%;background:linear-gradient(135deg,#1d4ed8,#2563eb);border:none;border-radius:10px;color:#fff;font-size:.9rem;font-weight:700;padding:.75rem;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .2s;}
+.tg-confirm-btn:hover{opacity:.9;}
+.tg-link-status{font-size:.8rem;text-align:center;margin-top:.6rem;min-height:1.2rem;}
+.ptb-tg{background:rgba(37,99,235,.15);border-color:rgba(37,99,235,.3);color:#93c5fd;}
+.ptb-tg.tg-linked{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.3);color:#6ee7b7;}

@@ -53,6 +53,7 @@ function renderPlan() {
     if (typeof patchDayCards === 'function') patchDayCards();
     if (typeof initFeatures === 'function') initFeatures();
     if (typeof initC24Features === 'function') initC24Features();
+    if (typeof initTelegramIntegration === 'function') initTelegramIntegration();
   }, 0);
 }
 

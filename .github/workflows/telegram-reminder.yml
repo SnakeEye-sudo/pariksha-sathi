@@ -1,0 +1,126 @@
+name: Daily Telegram Study Reminder
+
+# Runs every day at 6:00 AM IST (00:30 UTC)
+on:
+  schedule:
+    - cron: '30 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-reminders:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests google-cloud-firestore google-auth
+
+      - name: Send daily reminders
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          python3 << 'EOF'
+          import os, json, requests
+          from datetime import datetime, timezone, timedelta
+
+          BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+          SA_JSON   = os.environ.get('FIREBASE_SERVICE_ACCOUNT', '')
+
+          if not BOT_TOKEN:
+              print("ERROR: TELEGRAM_BOT_TOKEN not set")
+              exit(1)
+
+          # ── Init Firestore ──
+          users_with_tg = []
+          if SA_JSON:
+              try:
+                  import google.auth
+                  from google.oauth2 import service_account
+                  from google.cloud import firestore
+
+                  sa_info = json.loads(SA_JSON)
+                  creds = service_account.Credentials.from_service_account_info(
+                      sa_info,
+                      scopes=['https://www.googleapis.com/auth/cloud-platform']
+                  )
+                  db = firestore.Client(credentials=creds, project=sa_info['project_id'])
+
+                  # Fetch all users with telegramChatId
+                  users_ref = db.collection('users')
+                  docs = users_ref.stream()
+                  for doc in docs:
+                      data = doc.to_dict()
+                      if data.get('telegramChatId') and data.get('plan'):
+                          users_with_tg.append({
+                              'uid': doc.id,
+                              'chatId': data['telegramChatId'],
+                              'name': data.get('name', 'Student'),
+                              'plan': data.get('plan', []),
+                              'exam': data.get('exam', ''),
+                          })
+                  print(f"Found {len(users_with_tg)} users with Telegram linked")
+              except Exception as e:
+                  print(f"Firestore error: {e}")
+          else:
+              print("WARNING: FIREBASE_SERVICE_ACCOUNT not set — skipping Firestore fetch")
+
+          # ── Send message to each user ──
+          IST = timezone(timedelta(hours=5, minutes=30))
+          today = datetime.now(IST)
+          today_str = today.strftime('%Y-%m-%d')
+          day_name = today.strftime('%A, %d %B')
+
+          def send_tg(chat_id, text, reply_markup=None):
+              payload = {'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'}
+              if reply_markup:
+                  payload['reply_markup'] = json.dumps(reply_markup)
+              r = requests.post(
+                  f'https://api.telegram.org/bot{BOT_TOKEN}/sendMessage',
+                  json=payload, timeout=10
+              )
+              return r.status_code == 200
+
+          sent = 0
+          for user in users_with_tg:
+              # Find today's plan
+              today_slots = []
+              for day in user['plan']:
+                  if day.get('dateStr') == today_str or day.get('date', '').startswith(today_str):
+                      today_slots = [s for s in day.get('slots', []) if s.get('type') == 'subject']
+                      break
+
+              if not today_slots:
+                  msg = f"📚 <b>Namaste {user['name']}!</b>\n\n🗓 <b>{day_name}</b>\n\nAaj ke liye koi plan nahi mila. App check karein!"
+              else:
+                  topics = '\n'.join([f"  • {s.get('topic','')}" for s in today_slots[:6]])
+                  msg = (
+                      f"📚 <b>Namaste {user['name']}!</b>\n\n"
+                      f"🗓 <b>{day_name}</b> ka study plan:\n\n"
+                      f"{topics}\n\n"
+                      f"💪 Aaj ka target complete karo!\n"
+                      f"<i>Padh lene ke baad reply karein: <b>haan</b></i>"
+                  )
+
+              markup = {
+                  'keyboard': [[{'text': '✅ Haan, padh liya!'}], [{'text': '⏰ Baad mein'}]],
+                  'resize_keyboard': True,
+                  'one_time_keyboard': True
+              }
+
+              ok = send_tg(user['chatId'], msg, markup)
+              if ok:
+                  sent += 1
+                  print(f"Sent to {user['name']} ({user['chatId']})")
+              else:
+                  print(f"Failed for {user['name']} ({user['chatId']})")
+
+          print(f"\nDone: {sent}/{len(users_with_tg)} reminders sent")
+          EOF

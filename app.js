@@ -328,6 +328,98 @@ function toggleAccordion(el){
 
 // ── Telegram Bot Integration ──────────────────────────────────
 
+const TG_BOT_USERNAME = 'parikshaasathi_bot';
+
+async function saveTelegramChatId(chatId) {
+  if (!window.psDb || !window.psAuth?.currentUser) return false;
+  try {
+    const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js');
+    await setDoc(
+      doc(window.psDb, 'users', window.psAuth.currentUser.uid),
+      { telegramChatId: String(chatId), telegramLinkedAt: new Date().toISOString() },
+      { merge: true }
+    );
+    localStorage.setItem('pariksha_tg_chatid', String(chatId));
+    return true;
+  } catch(e) { console.error('TG save failed:', e); return false; }
+}
+
+function showTelegramLinkModal() {
+  let modal = document.getElementById('tgLinkModal');
+  if (modal) { modal.style.display = 'flex'; return; }
+  modal = document.createElement('div');
+  modal.id = 'tgLinkModal';
+  modal.className = 'tg-modal-overlay';
+  modal.innerHTML = `
+    <div class="tg-modal">
+      <button class="tg-modal-close" onclick="document.getElementById('tgLinkModal').style.display='none'">x</button>
+      <div class="tg-modal-icon">📱</div>
+      <div class="tg-modal-title">Telegram से जोड़ें</div>
+      <div class="tg-modal-sub">Daily study reminder Telegram पर पाएं</div>
+      <div class="tg-steps">
+        <div class="tg-step"><span class="tg-step-num">1</span><div class="tg-step-text">Telegram पर <a href="https://t.me/${TG_BOT_USERNAME}" target="_blank" class="tg-bot-link">@${TG_BOT_USERNAME}</a> खोलें और <b>/start</b> भेजें</div></div>
+        <div class="tg-step"><span class="tg-step-num">2</span><div class="tg-step-text"><a href="https://t.me/userinfobot" target="_blank" class="tg-bot-link">@userinfobot</a> पर भी /start भेजें — वो आपका Chat ID बताएगा</div></div>
+        <div class="tg-step"><span class="tg-step-num">3</span><div class="tg-step-text">नीचे Chat ID डालें और Save करें</div></div>
+      </div>
+      <input type="number" id="tgChatIdInput" class="tg-chat-input" placeholder="Chat ID डालें (जैसे: 123456789)">
+      <button class="tg-confirm-btn" onclick="confirmTelegramLink()">✅ Save करें</button>
+      <div id="tgLinkStatus" class="tg-link-status"></div>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+}
+
+async function confirmTelegramLink() {
+  const input = document.getElementById('tgChatIdInput');
+  const status = document.getElementById('tgLinkStatus');
+  const chatId = input?.value?.trim();
+  if (!chatId || isNaN(chatId)) {
+    if (status) { status.textContent = 'Valid Chat ID डालें'; status.style.color = '#f87171'; }
+    return;
+  }
+  if (status) { status.textContent = 'Saving...'; status.style.color = 'rgba(255,255,255,.5)'; }
+  const ok = await saveTelegramChatId(chatId);
+  if (ok) {
+    if (status) { status.textContent = 'Telegram link हो गया! कल से reminder आएगा।'; status.style.color = '#10b981'; }
+    setTimeout(() => { const m = document.getElementById('tgLinkModal'); if(m) m.style.display='none'; }, 2500);
+    injectTelegramBadge(true);
+  } else {
+    if (status) { status.textContent = 'Save नहीं हुआ। Login check करें।'; status.style.color = '#f87171'; }
+  }
+}
+
+function injectTelegramBadge(linked) {
+  const existing = document.getElementById('tgTopbarBtn');
+  if (existing) { existing.textContent = linked ? '📱 Telegram ✓' : '📱 Telegram'; existing.classList.toggle('tg-linked', linked); return; }
+  const actions = document.querySelector('.plan-topbar-actions');
+  if (!actions) return;
+  const btn = document.createElement('button');
+  btn.id = 'tgTopbarBtn';
+  btn.className = 'ptb-btn ptb-tg' + (linked ? ' tg-linked' : '');
+  btn.textContent = linked ? '📱 Telegram ✓' : '📱 Telegram';
+  btn.onclick = showTelegramLinkModal;
+  btn.title = 'Telegram daily reminder';
+  const pdfBtn = actions.querySelector('.ptb-download');
+  if (pdfBtn) actions.insertBefore(btn, pdfBtn); else actions.appendChild(btn);
+}
+
+async function initTelegramIntegration() {
+  const localId = localStorage.getItem('pariksha_tg_chatid');
+  if (localId) { injectTelegramBadge(true); return; }
+  if (!window.psDb || !window.psAuth?.currentUser) { setTimeout(initTelegramIntegration, 1500); return; }
+  try {
+    const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js');
+    const snap = await getDoc(doc(window.psDb, 'users', window.psAuth.currentUser.uid));
+    if (snap.exists() && snap.data().telegramChatId) {
+      localStorage.setItem('pariksha_tg_chatid', snap.data().telegramChatId);
+      injectTelegramBadge(true);
+    } else {
+      injectTelegramBadge(false);
+    }
+  } catch { injectTelegramBadge(false); }
+}
+
 // ═══ chunks/c02.js ═══
 // SYLLABUS DATA — BPSC Class 1-5 (PRT)
 // Pattern: Part I Language(30) + Part II GS(120) = 150 marks. No negative marking.
@@ -2177,6 +2269,7 @@ function renderPlan() {
     if (typeof patchDayCards === 'function') patchDayCards();
     if (typeof initFeatures === 'function') initFeatures();
     if (typeof initC24Features === 'function') initC24Features();
+    if (typeof initTelegramIntegration === 'function') initTelegramIntegration();
   }, 0);
 }
 
