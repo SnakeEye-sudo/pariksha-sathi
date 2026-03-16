@@ -4929,7 +4929,6 @@ function saveRescheduleData(d) {
 }
 
 function rescheduleDay(dateStr) {
-  // Find the day in studyPlan
   const dayObj = studyPlan.find(d => toDateKey(d.date) === dateStr);
   if (!dayObj) return;
 
@@ -4939,39 +4938,72 @@ function rescheduleDay(dateStr) {
     return;
   }
 
-  // Find next available day (not a mock/revision day, after dateStr)
+  // Find next 2 available days (not mock/revision)
   const dayDate = new Date(dateStr);
-  let targetDay = null;
+  const nextDays = [];
   for (const d of studyPlan) {
     if (d.date > dayDate && !d.isMock && !d.isRevision) {
-      targetDay = d;
-      break;
+      nextDays.push(d);
+      if (nextDays.length === 2) break;
     }
   }
-  if (!targetDay) {
+  if (!nextDays.length) {
     alert(lang === 'hi' ? 'Reschedule के लिए कोई अगला दिन नहीं मिला।' : 'No next day found for rescheduling.');
     return;
   }
 
-  const targetDateStr = toDateKey(targetDay.date);
+  // Split slots: first half → day1, second half → day2 (if exists)
+  const half = Math.ceil(subjectSlots.length / 2);
+  const batch1 = subjectSlots.slice(0, half);
+  const batch2 = subjectSlots.slice(half);
+
   const rd = getRescheduleData();
-  if (!rd[targetDateStr]) rd[targetDateStr] = [];
-  // Append the skipped slots to next day
-  subjectSlots.forEach(slot => rd[targetDateStr].push({ ...slot, rescheduledFrom: dateStr }));
+  const cl = getChecklist();
+
+  // Move batch1 to nextDays[0]
+  const d1Str = toDateKey(nextDays[0].date);
+  if (!rd[d1Str]) rd[d1Str] = [];
+  batch1.forEach((slot, idx) => {
+    rd[d1Str].push({ ...slot, rescheduledFrom: dateStr, _origIdx: idx });
+    // Move checklist key: original idx → new day
+    const origKey = checklistKey(dateStr, dayObj.slots.indexOf(slot));
+    const newKey  = checklistKey(d1Str, rd[d1Str].length - 1 + 1000); // offset to avoid collision
+    if (cl[origKey]) { cl[newKey] = true; delete cl[origKey]; }
+  });
+
+  // Move batch2 to nextDays[1] if exists, else also to nextDays[0]
+  if (batch2.length) {
+    const d2 = nextDays[1] || nextDays[0];
+    const d2Str = toDateKey(d2.date);
+    if (!rd[d2Str]) rd[d2Str] = [];
+    batch2.forEach((slot, idx) => {
+      rd[d2Str].push({ ...slot, rescheduledFrom: dateStr, _origIdx: half + idx });
+      const origKey = checklistKey(dateStr, dayObj.slots.indexOf(slot));
+      const newKey  = checklistKey(d2Str, rd[d2Str].length - 1 + 1000);
+      if (cl[origKey]) { cl[newKey] = true; delete cl[origKey]; }
+    });
+  }
+
   saveRescheduleData(rd);
 
-  // Mark original day as rescheduled in checklist (so progress shows skipped)
-  const cl = getChecklist();
+  // Mark original day as rescheduled
   cl[`${dateStr}_rescheduled`] = true;
   saveChecklist(cl);
 
-  // Re-render plan to reflect changes
   renderPlan();
 
-  const targetDateDisplay = targetDay.date.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'long' });
-  const msg = lang === 'hi'
-    ? `✅ ${subjectSlots.length} topics को ${targetDateDisplay} में merge कर दिया गया!`
-    : `✅ ${subjectSlots.length} topics merged into ${targetDateDisplay}!`;
+  const d1Display = nextDays[0].date.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day:'numeric', month:'long' });
+  const d2Display = nextDays[1]
+    ? nextDays[1].date.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day:'numeric', month:'long' })
+    : null;
+
+  const msg = d2Display && batch2.length
+    ? (lang === 'hi'
+        ? `✅ ${batch1.length} topics → ${d1Display}, ${batch2.length} topics → ${d2Display}`
+        : `✅ ${batch1.length} topics → ${d1Display}, ${batch2.length} topics → ${d2Display}`)
+    : (lang === 'hi'
+        ? `✅ ${subjectSlots.length} topics → ${d1Display} में move हो गए`
+        : `✅ ${subjectSlots.length} topics moved to ${d1Display}`);
   showToast(msg, 'green');
 }
 
