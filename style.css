@@ -575,3 +575,60 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
   .exam-cards{max-width:1000px}
   .slots-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
 }
+
+
+/* ══════════════════════════════════════════════════
+   c23 — Checklist, Streak, Notification, Reschedule
+══════════════════════════════════════════════════ */
+
+/* Plan extras row (streak + notif button) */
+.plan-extras-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin:.6rem 0 .4rem;padding:0 .1rem}
+
+/* Streak badge */
+.streak-badge{display:inline-flex;align-items:center;gap:.45rem;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);color:var(--amber-l);padding:.4rem 1rem;border-radius:50px;font-size:.82rem;font-weight:700;cursor:default;white-space:nowrap}
+.streak-num{font-size:1.05rem;font-weight:800;color:var(--amber)}
+.streak-best{margin-left:.4rem;font-size:.72rem;color:var(--t2);font-weight:500}
+
+/* Notification button */
+.notif-btn{display:inline-flex;align-items:center;gap:.4rem;background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.2);color:var(--blue-l);padding:.4rem 1rem;border-radius:50px;font-size:.82rem;font-weight:600;cursor:pointer;transition:all var(--transition);white-space:nowrap}
+.notif-btn:hover{background:rgba(59,130,246,.14);border-color:rgba(59,130,246,.4)}
+.notif-btn.notif-on{background:rgba(16,185,129,.08);border-color:rgba(16,185,129,.3);color:var(--green-l)}
+
+/* Day checklist progress bar */
+.day-checklist-progress{display:flex;align-items:center;gap:.6rem;padding:.5rem 1rem .2rem;margin-top:.1rem}
+.day-progress-bar-wrap{flex:1;height:5px;background:var(--surface3);border-radius:3px;overflow:hidden}
+.day-progress-bar{height:100%;background:var(--grad-amber);border-radius:3px;transition:width .4s ease,background .3s}
+.day-progress-bar.done{background:var(--green)}
+.day-progress-label{font-size:.75rem;color:var(--t2);font-weight:600;white-space:nowrap;min-width:70px;text-align:right}
+
+/* Day card completed state */
+.day-card.day-completed .day-num-circle{background:rgba(16,185,129,.15);border-color:rgba(16,185,129,.4)}
+.day-card.day-completed .day-num-val{color:var(--green)}
+
+/* Slot checkbox */
+.slot-checkbox{position:absolute;top:.6rem;right:.6rem;width:22px;height:22px;border-radius:6px;border:1.5px solid var(--border3);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition);z-index:2;user-select:none}
+.slot-checkbox:hover{border-color:var(--amber);background:rgba(245,158,11,.1)}
+.slot-checkbox.checked{background:var(--green);border-color:var(--green);box-shadow:0 0 10px rgba(16,185,129,.4)}
+.checkbox-icon{font-size:.75rem;color:#fff;font-weight:700;line-height:1}
+
+/* Slot done state */
+.slot-card.slot-done{opacity:.65}
+.slot-card.slot-done .slot-card-title{text-decoration:line-through;color:var(--t3)}
+
+/* Reschedule button */
+.reschedule-btn{display:block;width:100%;margin-top:.75rem;padding:.55rem 1rem;background:rgba(239,68,68,.06);border:1px dashed rgba(239,68,68,.3);color:var(--red-l);border-radius:10px;font-size:.8rem;font-weight:600;cursor:pointer;transition:all var(--transition);text-align:center}
+.reschedule-btn:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.5)}
+.reschedule-done-badge{display:block;width:100%;margin-top:.75rem;padding:.45rem 1rem;background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);color:var(--green-l);border-radius:10px;font-size:.78rem;font-weight:600;text-align:center}
+
+/* Rescheduled slots section */
+.rescheduled-slots-section{margin-top:.75rem;padding:.6rem .8rem;background:rgba(245,158,11,.04);border:1px solid rgba(245,158,11,.15);border-radius:10px}
+.rescheduled-label{font-size:.75rem;color:var(--amber);font-weight:700;margin-bottom:.4rem}
+.rescheduled-slot-tag{display:inline-block;padding:.25rem .65rem;border:1px solid;border-radius:6px;font-size:.75rem;font-weight:500;margin:.2rem .2rem 0 0}
+.from-date{font-size:.68rem;opacity:.6}
+
+/* Toast */
+.ps-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg4);border:1px solid var(--border2);color:var(--t1);padding:.7rem 1.4rem;border-radius:50px;font-size:.85rem;font-weight:600;z-index:9999;opacity:0;transition:all .3s ease;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center;box-shadow:var(--shadow)}
+.ps-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.ps-toast.ps-toast-green{border-color:rgba(16,185,129,.4);color:var(--green-l)}
+.ps-toast.ps-toast-red{border-color:rgba(239,68,68,.4);color:var(--red-l)}
+.ps-toast.ps-toast-amber{border-color:rgba(245,158,11,.4);color:var(--amber-l)}

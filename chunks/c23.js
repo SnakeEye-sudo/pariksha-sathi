@@ -1,0 +1,426 @@
+// ═══════════════════════════════════════════════════════════════
+// c23.js — Checklist, Notifications, Reschedule, Streak
+// By Er. Sangam Krishna | ParikshaSathi
+// ═══════════════════════════════════════════════════════════════
+
+// ── Storage Keys ──────────────────────────────────────────────
+const LS_CHECKLIST  = 'ps_checklist';   // { "YYYY-MM-DD_slotIdx": true }
+const LS_STREAK     = 'ps_streak';      // { lastDate, count, longest }
+const LS_RESCHEDULE = 'ps_reschedule';  // { "YYYY-MM-DD": [slot, slot, ...] }
+const LS_NOTIF      = 'ps_notif';       // { enabled: bool, scheduledFor: dateStr }
+
+// ── Checklist helpers ─────────────────────────────────────────
+function getChecklist() {
+  try { return JSON.parse(localStorage.getItem(LS_CHECKLIST) || '{}'); } catch(e) { return {}; }
+}
+function saveChecklist(cl) {
+  try { localStorage.setItem(LS_CHECKLIST, JSON.stringify(cl)); } catch(e) {}
+}
+function checklistKey(dateStr, slotIdx) { return `${dateStr}_${slotIdx}`; }
+
+function toggleSlotCheck(dateStr, slotIdx, el) {
+  const cl = getChecklist();
+  const key = checklistKey(dateStr, slotIdx);
+  if (cl[key]) { delete cl[key]; } else { cl[key] = true; }
+  saveChecklist(cl);
+  updateStreakOnCheck(dateStr);
+  // Re-render just the day card's progress
+  refreshDayProgress(dateStr);
+  // Animate the checkbox
+  if (el) el.classList.toggle('checked', !!cl[key]);
+}
+
+function getDayProgress(dateStr, totalSlots) {
+  if (!totalSlots) return 0;
+  const cl = getChecklist();
+  let done = 0;
+  for (let i = 0; i < totalSlots; i++) {
+    if (cl[checklistKey(dateStr, i)]) done++;
+  }
+  return Math.round((done / totalSlots) * 100);
+}
+
+function refreshDayProgress(dateStr) {
+  const bar = document.querySelector(`[data-day-progress="${dateStr}"]`);
+  const label = document.querySelector(`[data-day-progress-label="${dateStr}"]`);
+  if (!bar || !label) return;
+  const total = parseInt(bar.getAttribute('data-total') || '0');
+  const pct = getDayProgress(dateStr, total);
+  bar.style.width = pct + '%';
+  const isDone = pct === 100;
+  bar.style.background = isDone ? 'var(--green)' : '';
+  label.textContent = isDone
+    ? (lang === 'hi' ? '✅ पूरा हो गया!' : '✅ Done!')
+    : `${pct}% ${lang === 'hi' ? 'पढ़ा' : 'done'}`;
+  // Mark day card as complete
+  const card = document.querySelector(`[data-day-card="${dateStr}"]`);
+  if (card) card.classList.toggle('day-completed', isDone);
+}
+
+// ── Streak helpers ────────────────────────────────────────────
+function getStreak() {
+  try { return JSON.parse(localStorage.getItem(LS_STREAK) || '{"lastDate":null,"count":0,"longest":0}'); }
+  catch(e) { return { lastDate: null, count: 0, longest: 0 }; }
+}
+function saveStreak(s) {
+  try { localStorage.setItem(LS_STREAK, JSON.stringify(s)); } catch(e) {}
+}
+
+function updateStreakOnCheck(dateStr) {
+  // Only count today's activity for streak
+  const todayStr = toDateKey(new Date());
+  if (dateStr !== todayStr) return;
+
+  const s = getStreak();
+  if (s.lastDate === todayStr) return; // already counted today
+
+  const yesterday = toDateKey(new Date(Date.now() - 86400000));
+  if (s.lastDate === yesterday) {
+    s.count++;
+  } else {
+    s.count = 1; // streak broken or first day
+  }
+  s.lastDate = todayStr;
+  s.longest = Math.max(s.longest, s.count);
+  saveStreak(s);
+  renderStreakBadge();
+}
+
+function toDateKey(d) {
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function renderStreakBadge() {
+  const el = document.getElementById('streakBadge');
+  if (!el) return;
+  const s = getStreak();
+  const fire = s.count >= 7 ? '🔥' : s.count >= 3 ? '⚡' : '📅';
+  el.innerHTML = `${fire} <span class="streak-num">${s.count}</span> ${lang === 'hi' ? 'दिन की Streak' : 'Day Streak'}
+    <span class="streak-best">${lang === 'hi' ? 'Best:' : 'Best:'} ${s.longest}</span>`;
+  el.title = lang === 'hi' ? `सबसे लंबी streak: ${s.longest} दिन` : `Longest streak: ${s.longest} days`;
+}
+
+// ── Reschedule helpers ────────────────────────────────────────
+function getRescheduleData() {
+  try { return JSON.parse(localStorage.getItem(LS_RESCHEDULE) || '{}'); } catch(e) { return {}; }
+}
+function saveRescheduleData(d) {
+  try { localStorage.setItem(LS_RESCHEDULE, JSON.stringify(d)); } catch(e) {}
+}
+
+function rescheduleDay(dateStr) {
+  // Find the day in studyPlan
+  const dayObj = studyPlan.find(d => toDateKey(d.date) === dateStr);
+  if (!dayObj) return;
+
+  const subjectSlots = dayObj.slots.filter(s => s.type === 'subject');
+  if (!subjectSlots.length) {
+    alert(lang === 'hi' ? 'इस दिन कोई subject slot नहीं है।' : 'No subject slots on this day.');
+    return;
+  }
+
+  // Find next available day (not a mock/revision day, after dateStr)
+  const dayDate = new Date(dateStr);
+  let targetDay = null;
+  for (const d of studyPlan) {
+    if (d.date > dayDate && !d.isMock && !d.isRevision) {
+      targetDay = d;
+      break;
+    }
+  }
+  if (!targetDay) {
+    alert(lang === 'hi' ? 'Reschedule के लिए कोई अगला दिन नहीं मिला।' : 'No next day found for rescheduling.');
+    return;
+  }
+
+  const targetDateStr = toDateKey(targetDay.date);
+  const rd = getRescheduleData();
+  if (!rd[targetDateStr]) rd[targetDateStr] = [];
+  // Append the skipped slots to next day
+  subjectSlots.forEach(slot => rd[targetDateStr].push({ ...slot, rescheduledFrom: dateStr }));
+  saveRescheduleData(rd);
+
+  // Mark original day as rescheduled in checklist (so progress shows skipped)
+  const cl = getChecklist();
+  cl[`${dateStr}_rescheduled`] = true;
+  saveChecklist(cl);
+
+  // Re-render plan to reflect changes
+  renderPlan();
+
+  const targetDateDisplay = targetDay.date.toLocaleDateString(lang === 'hi' ? 'hi-IN' : 'en-IN', { day: 'numeric', month: 'long' });
+  const msg = lang === 'hi'
+    ? `✅ ${subjectSlots.length} topics को ${targetDateDisplay} में merge कर दिया गया!`
+    : `✅ ${subjectSlots.length} topics merged into ${targetDateDisplay}!`;
+  showToast(msg, 'green');
+}
+
+function getRescheduledSlotsForDay(dateStr) {
+  const rd = getRescheduleData();
+  return rd[dateStr] || [];
+}
+
+// ── Toast helper ──────────────────────────────────────────────
+function showToast(msg, color = 'amber') {
+  let toast = document.getElementById('psToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'psToast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.className = `ps-toast ps-toast-${color} show`;
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => toast.classList.remove('show'), 3500);
+}
+
+// ── Browser Notification (4 AM daily) ────────────────────────
+function getNotifSettings() {
+  try { return JSON.parse(localStorage.getItem(LS_NOTIF) || '{"enabled":false}'); } catch(e) { return { enabled: false }; }
+}
+function saveNotifSettings(s) {
+  try { localStorage.setItem(LS_NOTIF, JSON.stringify(s)); } catch(e) {}
+}
+
+async function requestNotificationPermission() {
+  if (!('Notification' in window)) {
+    showToast(lang === 'hi' ? 'यह browser notifications support नहीं करता।' : 'Browser does not support notifications.', 'red');
+    return false;
+  }
+  if (Notification.permission === 'granted') return true;
+  if (Notification.permission === 'denied') {
+    showToast(lang === 'hi' ? 'Notifications blocked हैं। Browser settings से allow करें।' : 'Notifications blocked. Allow in browser settings.', 'red');
+    return false;
+  }
+  const perm = await Notification.requestPermission();
+  return perm === 'granted';
+}
+
+async function toggleDailyNotification() {
+  const btn = document.getElementById('notifToggleBtn');
+  const ns = getNotifSettings();
+
+  if (ns.enabled) {
+    ns.enabled = false;
+    saveNotifSettings(ns);
+    if (btn) { btn.textContent = lang === 'hi' ? '🔔 Notification चालू करें' : '🔔 Enable Notification'; btn.classList.remove('notif-on'); }
+    showToast(lang === 'hi' ? 'Notifications बंद कर दी गईं।' : 'Notifications disabled.', 'amber');
+    return;
+  }
+
+  const granted = await requestNotificationPermission();
+  if (!granted) return;
+
+  ns.enabled = true;
+  saveNotifSettings(ns);
+  if (btn) { btn.textContent = lang === 'hi' ? '🔕 Notification बंद करें' : '🔕 Disable Notification'; btn.classList.add('notif-on'); }
+  showToast(lang === 'hi' ? '✅ Notifications चालू! रोज़ सुबह 4 बजे reminder आएगा।' : '✅ Notifications on! Daily 4 AM reminder set.', 'green');
+  scheduleNextNotification();
+}
+
+function scheduleNextNotification() {
+  const ns = getNotifSettings();
+  if (!ns.enabled || Notification.permission !== 'granted') return;
+
+  const now = new Date();
+  const next4am = new Date(now);
+  next4am.setHours(4, 0, 0, 0);
+  if (next4am <= now) next4am.setDate(next4am.getDate() + 1);
+
+  const msUntil = next4am - now;
+
+  setTimeout(() => {
+    fireNotification();
+    // Schedule next day
+    setInterval(fireNotification, 24 * 60 * 60 * 1000);
+  }, msUntil);
+}
+
+function fireNotification() {
+  const ns = getNotifSettings();
+  if (!ns.enabled || Notification.permission !== 'granted') return;
+
+  const todayStr = toDateKey(new Date());
+  const todayPlan = studyPlan.find(d => toDateKey(d.date) === todayStr);
+  let body = '';
+  if (todayPlan) {
+    const subjects = todayPlan.slots.filter(s => s.type === 'subject').map(s => s.topic).slice(0, 3);
+    body = subjects.length
+      ? (lang === 'hi' ? `आज पढ़ें: ${subjects.join(', ')}` : `Today: ${subjects.join(', ')}`)
+      : (lang === 'hi' ? 'आज का plan देखें!' : 'Check today\'s plan!');
+  } else {
+    body = lang === 'hi' ? 'ParikshaSathi — आज का plan देखें!' : 'ParikshaSathi — Check today\'s plan!';
+  }
+
+  new Notification(lang === 'hi' ? '📚 ParikshaSathi — सुबह 4 बजे' : '📚 ParikshaSathi — 4 AM Reminder', {
+    body,
+    icon: '/favicon.svg',
+    badge: '/favicon.svg',
+    tag: 'pariksha-daily',
+    renotify: true
+  });
+}
+
+// ── Init on plan load ─────────────────────────────────────────
+function initFeatures() {
+  renderStreakBadge();
+  // Restore notification button state
+  const ns = getNotifSettings();
+  const btn = document.getElementById('notifToggleBtn');
+  if (btn) {
+    if (ns.enabled) {
+      btn.textContent = lang === 'hi' ? '🔕 Notification बंद करें' : '🔕 Disable Notification';
+      btn.classList.add('notif-on');
+      scheduleNextNotification();
+    } else {
+      btn.textContent = lang === 'hi' ? '🔔 Notification चालू करें' : '🔔 Enable Notification';
+      btn.classList.remove('notif-on');
+    }
+  }
+  // Refresh all day progress bars
+  studyPlan.forEach(day => {
+    const dateStr = toDateKey(day.date);
+    refreshDayProgress(dateStr);
+  });
+}
+
+// ── Patch generateDayPlanHTML to inject checklist + reschedule ─
+// We override the slot card rendering by patching renderPlan
+const _origRenderPlan = typeof renderPlan === 'function' ? renderPlan : null;
+
+function renderPlanWithFeatures() {
+  if (_origRenderPlan) _origRenderPlan();
+
+  // Inject streak badge + notification button into plan header
+  injectPlanHeaderExtras();
+
+  // Patch each day card with checklist checkboxes + reschedule button
+  patchDayCards();
+
+  // Init feature state
+  initFeatures();
+}
+
+function injectPlanHeaderExtras() {
+  // Add streak badge near plan progress area if not already there
+  if (!document.getElementById('streakBadge')) {
+    const progressLabel = document.getElementById('planProgressLabel');
+    if (progressLabel) {
+      const wrap = document.createElement('div');
+      wrap.className = 'plan-extras-row';
+      wrap.innerHTML = `
+        <div id="streakBadge" class="streak-badge"></div>
+        <button id="notifToggleBtn" class="notif-btn" onclick="toggleDailyNotification()">
+          🔔 ${lang === 'hi' ? 'Notification चालू करें' : 'Enable Notification'}
+        </button>
+      `;
+      progressLabel.parentNode.insertBefore(wrap, progressLabel.nextSibling);
+    }
+  }
+}
+
+function patchDayCards() {
+  if (!studyPlan.length) return;
+  const cl = getChecklist();
+
+  studyPlan.forEach(day => {
+    const dateStr = toDateKey(day.date);
+    const isRescheduled = !!cl[`${dateStr}_rescheduled`];
+
+    // Find the day card by looking for day-num-val matching day.day
+    // We'll use a data attribute approach — find cards and add data attrs
+    const allCards = document.querySelectorAll('.day-card, .today-card, .mock-day, .revision-day');
+    allCards.forEach(card => {
+      const numEl = card.querySelector('.day-num-val');
+      if (!numEl || numEl.textContent.trim() !== String(day.day)) return;
+      if (card.getAttribute('data-day-card')) return; // already patched
+
+      card.setAttribute('data-day-card', dateStr);
+
+      // Get subject slots for this day (including rescheduled ones)
+      const rescheduledSlots = getRescheduledSlotsForDay(dateStr);
+      const allSlots = [...day.slots, ...rescheduledSlots];
+      const subjectSlots = allSlots.filter(s => s.type === 'subject');
+      const totalSlots = subjectSlots.length;
+
+      if (totalSlots === 0) return;
+
+      // Inject progress bar
+      const header = card.querySelector('.day-header');
+      if (header && !card.querySelector('.day-checklist-progress')) {
+        const pct = getDayProgress(dateStr, totalSlots);
+        const isDone = pct === 100;
+        const progressHTML = `
+          <div class="day-checklist-progress">
+            <div class="day-progress-bar-wrap">
+              <div class="day-progress-bar ${isDone ? 'done' : ''}"
+                   data-day-progress="${dateStr}"
+                   data-total="${totalSlots}"
+                   style="width:${pct}%;${isDone ? 'background:var(--green)' : ''}">
+              </div>
+            </div>
+            <span class="day-progress-label" data-day-progress-label="${dateStr}">
+              ${isDone ? (lang === 'hi' ? '✅ पूरा हो गया!' : '✅ Done!') : `${pct}% ${lang === 'hi' ? 'पढ़ा' : 'done'}`}
+            </span>
+          </div>`;
+        header.insertAdjacentHTML('afterend', progressHTML);
+      }
+
+      // Inject checkboxes into each slot card
+      const slotCards = card.querySelectorAll('.subject-slot-card');
+      slotCards.forEach((slotCard, idx) => {
+        if (slotCard.querySelector('.slot-checkbox')) return;
+        const key = checklistKey(dateStr, idx);
+        const isChecked = !!cl[key];
+        const checkHTML = `<label class="slot-checkbox ${isChecked ? 'checked' : ''}" onclick="toggleSlotCheck('${dateStr}', ${idx}, this)" title="${lang === 'hi' ? 'पढ़ लिया' : 'Mark as done'}">
+          <span class="checkbox-icon">${isChecked ? '✓' : ''}</span>
+        </label>`;
+        slotCard.style.position = 'relative';
+        slotCard.insertAdjacentHTML('beforeend', checkHTML);
+        if (isChecked) slotCard.classList.add('slot-done');
+      });
+
+      // Inject reschedule button (only for past/today days that aren't mock/revision)
+      const isToday = dateStr === toDateKey(new Date());
+      const isPast = day.date < new Date() && !isToday;
+      if ((isToday || isPast) && !day.isMock && !day.isRevision) {
+        const slotsGrid = card.querySelector('.slots-grid');
+        if (slotsGrid && !card.querySelector('.reschedule-btn')) {
+          const reschedHTML = isRescheduled
+            ? `<div class="reschedule-done-badge">↩️ ${lang === 'hi' ? 'Reschedule हो गया' : 'Rescheduled'}</div>`
+            : `<button class="reschedule-btn" onclick="rescheduleDay('${dateStr}')">
+                ↩️ ${lang === 'hi' ? 'आज नहीं पढ़ पाया — Reschedule करें' : 'Couldn\'t study today — Reschedule'}
+               </button>`;
+          slotsGrid.insertAdjacentHTML('afterend', reschedHTML);
+        }
+      }
+
+      // Show rescheduled slots if any
+      if (rescheduledSlots.length > 0) {
+        const slotsGrid = card.querySelector('.slots-grid');
+        if (slotsGrid && !card.querySelector('.rescheduled-slots-section')) {
+          const rHTML = `<div class="rescheduled-slots-section">
+            <div class="rescheduled-label">↩️ ${lang === 'hi' ? 'Reschedule किए गए topics:' : 'Rescheduled topics:'}</div>
+            ${rescheduledSlots.map(s => `<div class="rescheduled-slot-tag" style="border-color:${s.color||'var(--amber)'}40;color:${s.color||'var(--amber)'}">
+              ${s.topic}${s.rescheduledFrom ? ` <span class="from-date">(${s.rescheduledFrom})</span>` : ''}
+            </div>`).join('')}
+          </div>`;
+          slotsGrid.insertAdjacentHTML('afterend', rHTML);
+        }
+      }
+    });
+  });
+}
+
+// Override renderPlan globally after all chunks load
+window.addEventListener('DOMContentLoaded', () => {
+  const origRP = window.renderPlan;
+  if (origRP) {
+    window.renderPlan = function() {
+      origRP();
+      injectPlanHeaderExtras();
+      patchDayCards();
+      initFeatures();
+    };
+  }
+});
