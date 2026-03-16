@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (sd) { sd.value = today; sd.min = today; }
 
   // Welcome-back toast: show saved user's name if a plan exists
-  const savedRaw = localStorage.getItem('ps_plan');
+  const savedRaw = localStorage.getItem('pariksha_sathi_plan');
   if (savedRaw) {
     try {
       const saved = JSON.parse(savedRaw);
