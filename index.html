@@ -17,6 +17,99 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-PLACEHOLDER" crossorigin="anonymous"></script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6Cpg83N8fBuvY7YOSwTWsfM9DUsaVc3E",
+      authDomain: "pariksha-sathi.firebaseapp.com",
+      projectId: "pariksha-sathi",
+      storageBucket: "pariksha-sathi.firebasestorage.app",
+      messagingSenderId: "921721697043",
+      appId: "1:921721697043:web:dada90a420c40e11ae60e6",
+      measurementId: "G-NC7955J7KV"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+    window.psAuth = auth;
+    window.psDb = db;
+    window.psProvider = provider;
+    window.psSignIn = async function() {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        await saveUserToFirestore(user);
+        updateAuthUI(user);
+        await syncPlanFromCloud(user);
+      } catch(e) { console.error(e); }
+    };
+    window.psSignOut = async function() {
+      await signOut(auth);
+      updateAuthUI(null);
+    };
+    async function saveUserToFirestore(user) {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, { name: user.displayName, email: user.email, photo: user.photoURL, lastLogin: new Date().toISOString() }, { merge: true });
+    }
+    async function saveProgressToCloud(user) {
+      try {
+        const data = {};
+        for(let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          data[k] = localStorage.getItem(k);
+        }
+        const ref = doc(db, 'users', user.uid, 'progress', 'data');
+        await setDoc(ref, { ...data, updatedAt: new Date().toISOString() });
+      } catch(e) { console.error('Cloud save failed', e); }
+    }
+    async function syncPlanFromCloud(user) {
+      try {
+        const ref = doc(db, 'users', user.uid, 'progress', 'data');
+        const snap = await getDoc(ref);
+        if(snap.exists()) {
+          const d = snap.data();
+          Object.keys(d).forEach(k => { if(k !== 'updatedAt') localStorage.setItem(k, d[k]); });
+          if(typeof window.loadSavedPlan === 'function') window.loadSavedPlan();
+          const msg = document.getElementById('cloudSyncMsg');
+          if(msg) { msg.textContent = '☁️ Cloud se sync ho gaya!'; msg.style.display='block'; setTimeout(()=>msg.style.display='none',3000); }
+        }
+      } catch(e) { console.error('Cloud sync failed', e); }
+    }
+    window.psSaveToCloud = function() {
+      const user = auth.currentUser;
+      if(user) saveProgressToCloud(user);
+    };
+    onAuthStateChanged(auth, (user) => {
+      updateAuthUI(user);
+      if(user) {
+        setInterval(() => saveProgressToCloud(user), 60000);
+      }
+    });
+    function updateAuthUI(user) {
+      const loginBtn = document.getElementById('googleLoginBtn');
+      const logoutBtn = document.getElementById('googleLogoutBtn');
+      const userInfo = document.getElementById('userInfoBar');
+      const userName = document.getElementById('authUserName');
+      const userPhoto = document.getElementById('authUserPhoto');
+      if(user) {
+        if(loginBtn) loginBtn.style.display='none';
+        if(logoutBtn) logoutBtn.style.display='inline-flex';
+        if(userInfo) userInfo.style.display='flex';
+        if(userName) userName.textContent = user.displayName || user.email;
+        if(userPhoto) { userPhoto.src = user.photoURL || ''; userPhoto.style.display = user.photoURL ? 'block' : 'none'; }
+      } else {
+        if(loginBtn) loginBtn.style.display='inline-flex';
+        if(logoutBtn) logoutBtn.style.display='none';
+        if(userInfo) userInfo.style.display='none';
+      }
+    }
+  </script>
 </head>
 <body>
 
@@ -772,6 +865,23 @@ function closeTermsModal(e) {
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeTermsModal(); });
+    <!-- Google Auth Bar - Fixed top bar -->
+  <div id="authBar" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:linear-gradient(135deg,#1a1a2e,#16213e);padding:8px 16px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 10px rgba(0,0,0,0.3);font-family:Inter,sans-serif;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="color:#f59e0b;font-weight:700;font-size:14px;">PS</span>
+      <span id="cloudSyncMsg" style="color:#4ade80;font-size:12px;display:none;"></span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div id="userInfoBar" style="display:none;align-items:center;gap:8px;">
+        <img id="authUserPhoto" style="width:28px;height:28px;border-radius:50%;border:2px solid #f59e0b;display:none;" />
+        <span id="authUserName" style="color:#e2e8f0;font-size:13px;font-weight:500;"></span>
+        <button onclick="psSaveToCloud()" style="background:#1d4ed8;color:white;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:4px;">&#9729;&#65039; Save</button>
+      </div>
+      <button id="googleLoginBtn" onclick="psSignIn()" style="background:#fff;color:#333;border:none;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,0.2);"><svg width='16' height='16' viewBox='0 0 24 24'><path fill='#4285F4' d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'/><path fill='#34A853' d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'/><path fill='#FBBC05' d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z'/><path fill='#EA4335' d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'/></svg>Google se Login</button>
+      <button id="googleLogoutBtn" onclick="psSignOut()" style="background:#ef4444;color:white;border:none;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer;display:none;font-weight:600;">Logout</button>
+    </div>
+  </div>
+  <div style="height:46px;"></div><!-- Spacer for auth bar -->
 </script>
 </body>
 </html>
