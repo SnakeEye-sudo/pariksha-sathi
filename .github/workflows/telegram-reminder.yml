@@ -172,8 +172,40 @@ jobs:
                   user_ref  = db.collection('users').document(user_doc.id)
                   name = user_data.get('name', 'Student')
 
-                  # /start
-                  if text == '/start':
+                  # /start — handle both plain /start and /start uid_XXXXX (deep link)
+                  if text.startswith('/start'):
+                      parts = text.split()
+                      start_param = parts[1] if len(parts) > 1 else ''
+
+                      # Deep link: /start uid_FIREBASEUID — auto-link account
+                      if start_param.startswith('uid_'):
+                          firebase_uid = start_param[4:]  # strip 'uid_'
+                          try:
+                              user_ref2 = db.collection('users').document(firebase_uid)
+                              user_snap2 = user_ref2.get()
+                              if user_snap2.exists:
+                                  uname = user_snap2.to_dict().get('name', 'Student')
+                                  user_ref2.update({
+                                      'telegramChatId': chat_id,
+                                      'telegramLinkedAt': now_ist.isoformat()
+                                  })
+                                  send_tg(chat_id,
+                                      f"✅ <b>Connected! Namaste {uname}!</b> 🎉\n\n"
+                                      f"ParikshaSathi se Telegram link ho gaya!\n"
+                                      f"Har roz subah 6 baje aapka study plan milega.\n\n"
+                                      f"<b>Commands:</b>\n"
+                                      f"✅ <b>haan</b> — topics done mark karo\n"
+                                      f"⏭ <b>/skip</b> — din skip karo\n"
+                                      f"📊 <b>/progress</b> — stats dekho\n\n"
+                                      f"<i>App mein wapas jaiye — connected dikhega!</i>")
+                                  print(f"Auto-linked uid={firebase_uid} to chat_id={chat_id}")
+                              else:
+                                  send_tg(chat_id, "Namaste! 🙏\n\nParikshaSathi app mein login karke Telegram connect karein.\n👉 pariksha-sathi.in")
+                          except Exception as e:
+                              print(f"Deep link error: {e}")
+                              send_tg(chat_id, "Namaste! 🙏\n\nKuch error hua. App se dobara try karein.")
+                          continue
+                      # Plain /start (no uid param)
                       send_tg(chat_id,
                           f"Namaste <b>{name}</b>! 🙏\n\n"
                           f"ParikshaSathi bot se connected ho gaye!\n"

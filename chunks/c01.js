@@ -148,6 +148,12 @@ async function saveTelegramChatId(chatId) {
 }
 
 function showTelegramLinkModal() {
+  // Generate deep link with Firebase UID as start parameter
+  // When user clicks → Telegram opens → bot receives /start uid_XXXXX → saves chatId automatically
+  const uid = window.psAuth?.currentUser?.uid || '';
+  const startParam = uid ? `uid_${uid}` : 'connect';
+  const deepLink = `https://t.me/${TG_BOT_USERNAME}?start=${startParam}`;
+
   let modal = document.getElementById('tgLinkModal');
   if (modal) { modal.style.display = 'flex'; return; }
   modal = document.createElement('div');
@@ -155,22 +161,67 @@ function showTelegramLinkModal() {
   modal.className = 'tg-modal-overlay';
   modal.innerHTML = `
     <div class="tg-modal">
-      <button class="tg-modal-close" onclick="document.getElementById('tgLinkModal').style.display='none'">x</button>
+      <button class="tg-modal-close" onclick="document.getElementById('tgLinkModal').style.display='none'">✕</button>
       <div class="tg-modal-icon">📱</div>
       <div class="tg-modal-title">Telegram से जोड़ें</div>
-      <div class="tg-modal-sub">Daily study reminder Telegram पर पाएं</div>
-      <div class="tg-steps">
-        <div class="tg-step"><span class="tg-step-num">1</span><div class="tg-step-text">Telegram पर <a href="https://t.me/${TG_BOT_USERNAME}" target="_blank" class="tg-bot-link">@${TG_BOT_USERNAME}</a> खोलें और <b>/start</b> भेजें</div></div>
-        <div class="tg-step"><span class="tg-step-num">2</span><div class="tg-step-text"><a href="https://t.me/userinfobot" target="_blank" class="tg-bot-link">@userinfobot</a> पर भी /start भेजें — वो आपका Chat ID बताएगा</div></div>
-        <div class="tg-step"><span class="tg-step-num">3</span><div class="tg-step-text">नीचे Chat ID डालें और Save करें</div></div>
+      <div class="tg-modal-sub">Daily study reminder Telegram पर पाएं — सिर्फ एक click!</div>
+      <a href="${deepLink}" target="_blank" class="tg-deeplink-btn" onclick="onTelegramDeepLinkClick()">
+        <span>✈️ Telegram Bot खोलें</span>
+        <span class="tg-deeplink-sub">Click करें → Bot खुलेगा → Send दबाएं</span>
+      </a>
+      <div class="tg-waiting" id="tgWaiting" style="display:none">
+        <div class="tg-waiting-dot"></div>
+        <span>Bot से connection का इंतज़ार है...</span>
       </div>
-      <input type="number" id="tgChatIdInput" class="tg-chat-input" placeholder="Chat ID डालें (जैसे: 123456789)">
-      <button class="tg-confirm-btn" onclick="confirmTelegramLink()">✅ Save करें</button>
       <div id="tgLinkStatus" class="tg-link-status"></div>
+      <div class="tg-manual-toggle" onclick="toggleTgManual()">Manual Chat ID डालना है? ▾</div>
+      <div id="tgManualSection" style="display:none;margin-top:.75rem">
+        <input type="number" id="tgChatIdInput" class="tg-chat-input" placeholder="Chat ID डालें (जैसे: 123456789)">
+        <button class="tg-confirm-btn" onclick="confirmTelegramLink()">✅ Save करें</button>
+      </div>
     </div>
   `;
   document.body.appendChild(modal);
   modal.addEventListener('click', e => { if (e.target === modal) modal.style.display = 'none'; });
+}
+
+function toggleTgManual() {
+  const sec = document.getElementById('tgManualSection');
+  if (sec) sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+}
+
+function onTelegramDeepLinkClick() {
+  // Show waiting indicator and start polling Firestore for chatId
+  const waiting = document.getElementById('tgWaiting');
+  const status  = document.getElementById('tgLinkStatus');
+  if (waiting) waiting.style.display = 'flex';
+  if (status)  { status.textContent = ''; }
+
+  // Poll every 3 seconds for up to 2 minutes
+  let attempts = 0;
+  const maxAttempts = 40;
+  const poll = setInterval(async () => {
+    attempts++;
+    if (attempts > maxAttempts) {
+      clearInterval(poll);
+      if (waiting) waiting.style.display = 'none';
+      if (status) { status.textContent = 'Timeout. Manual Chat ID try karein.'; status.style.color = '#f87171'; }
+      return;
+    }
+    try {
+      if (!window.psDb || !window.psAuth?.currentUser) return;
+      const { doc, getDoc } = await import('https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js');
+      const snap = await getDoc(doc(window.psDb, 'users', window.psAuth.currentUser.uid));
+      if (snap.exists() && snap.data().telegramChatId) {
+        clearInterval(poll);
+        localStorage.setItem('pariksha_tg_chatid', snap.data().telegramChatId);
+        if (waiting) waiting.style.display = 'none';
+        if (status) { status.textContent = '✅ Telegram link ho gaya! Kal se reminder aayega.'; status.style.color = '#10b981'; }
+        injectTelegramBadge(true);
+        setTimeout(() => { const m = document.getElementById('tgLinkModal'); if(m) m.style.display='none'; }, 2000);
+      }
+    } catch(e) {}
+  }, 3000);
 }
 
 async function confirmTelegramLink() {

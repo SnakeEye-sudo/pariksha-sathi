@@ -1161,3 +1161,12 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .ca-slot-card:hover .ca-read-link{text-decoration:underline}
 .ca-slot-card{transition:transform .15s,box-shadow .15s}
 .ca-slot-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(239,68,68,.15)}
+
+/* ── Telegram Deep Link Button ───────────────────────────────── */
+.tg-deeplink-btn{display:flex;flex-direction:column;align-items:center;gap:.3rem;background:linear-gradient(135deg,#229ED9,#1a7fc1);color:#fff;padding:1rem 1.5rem;border-radius:14px;text-decoration:none;font-family:'Inter',sans-serif;font-weight:800;font-size:1rem;text-align:center;margin:1rem 0;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 20px rgba(34,158,217,.4)}
+.tg-deeplink-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(34,158,217,.55);color:#fff}
+.tg-deeplink-sub{font-size:.75rem;font-weight:500;opacity:.85}
+.tg-waiting{display:flex;align-items:center;gap:.6rem;justify-content:center;color:rgba(255,255,255,.55);font-size:.82rem;font-family:'Inter',sans-serif;margin:.5rem 0}
+.tg-waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:dotPulse 1.2s infinite}
+.tg-manual-toggle{font-size:.78rem;color:rgba(255,255,255,.35);text-align:center;cursor:pointer;margin-top:.5rem;padding:.3rem;transition:color .2s}
+.tg-manual-toggle:hover{color:rgba(255,255,255,.6)}
