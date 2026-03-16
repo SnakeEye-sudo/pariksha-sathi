@@ -6407,16 +6407,38 @@ async function fetchWeather() {
     if (!navigator.geolocation) { resolve(null); return; }
     navigator.geolocation.getCurrentPosition(async pos => {
       try {
-        const { latitude: lat, longitude: lon } = pos.coords;
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m&timezone=Asia%2FKolkata`;
-        const res = await fetch(url);
-        const data = await res.json();
-        const c = data.current;
-        _weatherCache = { temp: Math.round(c.temperature_2m), code: c.weathercode, wind: Math.round(c.windspeed_10m) };
+        const { latitude: lat, longitude: lon, accuracy } = pos.coords;
+
+        // Fetch weather + reverse geocode city name in parallel
+        const [weatherRes, geoRes] = await Promise.all([
+          fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode,windspeed_10m,apparent_temperature&timezone=Asia%2FKolkata`),
+          fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&zoom=10`, {
+            headers: { 'Accept-Language': 'en' }
+          })
+        ]);
+
+        const weatherData = await weatherRes.json();
+        const geoData = await geoRes.json();
+
+        const c = weatherData.current;
+        // Extract city: try city > town > village > county > state_district
+        const addr = geoData.address || {};
+        const city = addr.city || addr.town || addr.village || addr.county || addr.state_district || addr.state || '';
+
+        _weatherCache = {
+          temp: Math.round(c.temperature_2m),
+          feelsLike: Math.round(c.apparent_temperature),
+          code: c.weathercode,
+          wind: Math.round(c.windspeed_10m),
+          city,
+          accuracy: Math.round(accuracy || 0),
+        };
         _weatherCacheTime = now;
         resolve(_weatherCache);
       } catch { resolve(null); }
-    }, () => resolve(null), { timeout: 5000 });
+    },
+    () => resolve(null),
+    { enableHighAccuracy: true, timeout: 8000, maximumAge: 5 * 60 * 1000 });
   });
 }
 
@@ -6439,19 +6461,30 @@ async function injectWeatherWidget() {
   const widget = document.createElement('div');
   widget.id = 'weatherWidget';
   widget.className = 'weather-widget loading';
-  widget.innerHTML = `<span class="weather-loading">🌡️ Loading weather…</span>`;
+  widget.innerHTML = `<span class="weather-loading">🌡️ Fetching your location weather…</span>`;
   progressLabel.parentNode.insertBefore(widget, progressLabel.nextSibling);
 
   const w = await fetchWeather();
-  if (!w) { widget.remove(); return; }
+  if (!w) {
+    widget.className = 'weather-widget weather-denied';
+    widget.innerHTML = `<span class="weather-loading">📍 Location access denied — weather unavailable</span>`;
+    setTimeout(() => widget.remove(), 4000);
+    return;
+  }
 
   const label = WMO_CODES[w.code] || '🌡️ Weather';
   const tip = getWeatherTip(w.code, w.temp);
   widget.className = 'weather-widget';
   widget.innerHTML = `
     <div class="weather-main">
-      <span class="weather-label">${label}</span>
-      <span class="weather-temp">${w.temp}°C</span>
+      <div class="weather-left">
+        <span class="weather-condition">${label}</span>
+        ${w.city ? `<span class="weather-city">📍 ${w.city}</span>` : ''}
+      </div>
+      <div class="weather-right">
+        <span class="weather-temp">${w.temp}°C</span>
+        ${w.feelsLike !== w.temp ? `<span class="weather-feels">Feels ${w.feelsLike}°C</span>` : ''}
+      </div>
     </div>
     <div class="weather-tip">${tip}</div>
   `;
