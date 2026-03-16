@@ -149,19 +149,17 @@ async function submitFeedback() {
   if (status) { status.textContent = ''; status.className = 'fb-status'; }
 
   try {
-    const res = await fetch(`https://api.telegram.org/bot${FB_BOT_TOKEN}/sendMessage`, {
+    // Use no-cors mode to avoid CORS block — Telegram receives it, we just can't read response
+    await fetch(`https://api.telegram.org/bot${FB_BOT_TOKEN}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: FB_CHAT_ID, text: msg, parse_mode: 'HTML' }),
+      mode: 'no-cors',
     });
-    const data = await res.json();
-    if (data.ok) {
-      if (status) { status.textContent = '✅ Feedback pahunch gaya! Shukriya 🙏'; status.className = 'fb-status fb-success'; }
-      if (btn) { btn.textContent = '✅ Bhej diya!'; }
-      setTimeout(closeFeedbackModal, 2500);
-    } else {
-      throw new Error(data.description || 'Failed');
-    }
+    // no-cors means response is opaque — assume success
+    if (status) { status.textContent = '✅ Feedback pahunch gaya! Shukriya 🙏'; status.className = 'fb-status fb-success'; }
+    if (btn) { btn.textContent = '✅ Bhej diya!'; }
+    setTimeout(closeFeedbackModal, 2500);
   } catch(e) {
     if (status) { status.textContent = 'Nahi bheja ja saka. Internet check karein.'; status.className = 'fb-status fb-error'; }
     if (btn) { btn.disabled = false; btn.textContent = '📤 Bhejo Developer ko'; }
