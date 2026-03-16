@@ -3,20 +3,20 @@
 <div align="center">
 
 ![ParikshaSathi](https://img.shields.io/badge/ParikshaSathi-Free%20Study%20Planner-f59e0b?style=for-the-badge&logo=bookstack&logoColor=black)
-![Exams](https://img.shields.io/badge/Exams-11%2B-10b981?style=for-the-badge)
+![Exams](https://img.shields.io/badge/Exams-18%2B-10b981?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-MIT-3b82f6?style=for-the-badge)
 ![Made with Love](https://img.shields.io/badge/Made%20with%20%E2%9D%A4%EF%B8%8F%20by-Er.%20Sangam%20Krishna-ef4444?style=for-the-badge)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/snakeeye)
 
 **🌐 Live Site:** https://snakeeye-sudo.github.io/pariksha-sathi/
 
-*Free personalized study planner for 11+ major Indian competitive exams. Day-by-day plan, smart subject rotation, PDF download — 100% free, no login.*
+*Free personalized study planner for 18+ major Indian competitive exams — BPSC, UPSC, SSC, Banking, NDA, NEET, JEE, State PSCs. Day-by-day plan, smart subject rotation, PDF download — 100% free, no login.*
 
 </div>
 
 ---
 
-## 📋 Supported Exams
+## 📋 Supported Exams (18+)
 
 | Category | Exam | Date |
 |---|---|---|
@@ -25,17 +25,27 @@
 | 🏛️ Civil Services | UPSC CSE 2027 | Prelims: May 2027 |
 | ⚖️ State PSC | BPSC 71st CCE | Mains: Apr 25–30, 2026 |
 | ⚖️ State PSC | BPSC 72nd CCE | Prelims: Jul 26, 2026 |
+| ⚖️ State PSC | UPPSC PCS 2026 | Prelims: Dec 6, 2026 |
+| ⚖️ State PSC | MPPSC SSE 2026 | Prelims: Apr 26, 2026 |
+| ⚖️ State PSC | RPSC RAS 2026 | Prelims: Jun–Jul 2026 (Tentative) |
+| ⚖️ State PSC | MPSC Rajyaseva 2026 | Mains: Mar–Apr 2026 |
 | 📋 SSC | SSC CGL 2026 | Tier 1: May–Jun 2026 (Tentative) |
 | 🏦 Banking | IBPS PO 2026 | Prelims: Aug 22–23, 2026 |
 | 🏦 Banking | SBI PO 2026 | Sep 2026 (Tentative) |
 | 🌾 Banking | IBPS RRB PO 2026 | Prelims: Nov 21–22, 2026 |
-| 📑 Banking | IBPS Clerk 2026 | Prelims: Dec 6, 2026 |
+| 📑 Banking | IBPS Clerk 2026 | Prelims: Oct 10–11, 2026 |
 | ⚔️ Defence | NDA 2026 (I) | Apr 12, 2026 |
+| 🩺 Medical | NEET UG 2026 | May 3, 2026 |
+| ⚙️ Engineering | JEE Main 2026 | Session 2: Apr 2–9, 2026 |
+| ⚙️ Engineering | JEE Advanced 2026 | May 17, 2026 |
+
+> Exam dates are auto-verified daily via GitHub Actions. See [`.github/workflows/exam_date_checker.yml`](.github/workflows/exam_date_checker.yml)
 
 ---
 
 ## ✨ Features
 
+- **18+ Exams** — Teaching, Civil Services, State PSC, SSC, Banking, Defence, Medical, Engineering
 - **Smart Subject Rotation** — max 2 consecutive days same subject, min 2 unique subjects/day
 - **Arts-heavy priority** — History/Polity/Geography get higher frequency
 - **Language/qualifying papers** scheduled last (BPSC TRE)
@@ -44,12 +54,14 @@
 - **Optional subject support** for UPSC (History, Geography, Anthropology, PSIR, etc.)
 - **PDF download** with Er. Sangam Krishna watermark
 - **Hindi/English** language toggle
+- **Welcome back toast** — remembers your name via localStorage
 - **LocalStorage** — plan survives page refresh
+- **Auto date checker** — GitHub Action runs daily to keep exam dates accurate
 - **100% free** — no login, no ads, no paywall
 
 ---
 
-## 🛠️ Tech Stack
+## �️ Tech Stack
 
 | Layer | Tech |
 |---|---|
@@ -57,7 +69,8 @@
 | PDF | jsPDF 2.5.1 |
 | Hosting | GitHub Pages |
 | Build | Python (`build.py` — concatenates chunks → `app.js`) |
-| Fonts | Google Fonts (Inter + Space Grotesk) |
+| Fonts | Google Fonts (Inter + Space Grotesk + Syne) |
+| CI/CD | GitHub Actions (auto-deploy + daily date checker) |
 
 ---
 
@@ -84,16 +97,36 @@ pariksha-sathi/
 │   ├── c10.js          # Syllabus tab renderer
 │   ├── c11.js          # PYQ tips + Exam info tab
 │   ├── c12.js          # PDF download (jsPDF)
-│   ├── c13.js          # Telegram bot integration
-│   ├── c14.js          # Exam Registry (all 11 exams)
+│   ├── c13.js          # Welcome back toast + localStorage logic
+│   ├── c14.js          # Exam Registry — 11 core exams
 │   ├── c15.js          # Banking syllabuses (IBPS PO, SBI PO, RRB, Clerk)
 │   ├── c16.js          # SSC CGL + BPSC CCE syllabuses
 │   ├── c17.js          # NDA 2026 syllabus (Maths + GAT)
-│   └── c18.js          # NDA GAT extended + misc
+│   ├── c18.js          # NDA GAT extended + misc
+│   ├── c19.js          # Exam Registry extension — NEET, JEE, State PSCs
+│   ├── c20.js          # NEET UG 2026 syllabus (Physics, Chemistry, Biology)
+│   ├── c21.js          # JEE Main + JEE Advanced syllabuses
+│   └── c22.js          # UPPSC, MPPSC, RPSC RAS, MPSC syllabuses
 └── .github/
-    └── workflows/
-        └── deploy.yml  # Auto-deploy to GitHub Pages on push to main
+    ├── workflows/
+    │   ├── deploy.yml              # Auto-deploy to GitHub Pages on push
+    │   └── exam_date_checker.yml   # Daily exam date auto-checker (7:30 AM IST)
+    └── scripts/
+        └── check_exam_dates.py     # Python script — fetches & updates exam dates
 ```
+
+---
+
+## � Auto Date Checker
+
+A GitHub Action runs every day at **7:30 AM IST** (2:00 AM UTC) to verify all 18 exam dates against official sources (DuckDuckGo + Google). If any date changes, it automatically:
+
+1. Updates the relevant chunk file (`c14.js` or `c19.js`)
+2. Rebuilds `app.js`
+3. Commits and pushes the change
+4. Generates an `exam_date_report.md` artifact (retained 30 days)
+
+You can also trigger it manually from the **Actions** tab → `Exam Date Auto-Checker` → `Run workflow`.
 
 ---
 
@@ -133,6 +166,8 @@ MIT — free to use, fork, and modify. Attribution appreciated.
 <div align="center">
 
 Made with ❤️ by **Er. Sangam Krishna**
+
+[![Buy Me A Coffee](https://img.shields.io/badge/☕%20Buy%20me%20a%20coffee-FFDD00?style=flat-square&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/snakeeye)
 
 *"हर aspirant को एक बराबर मौका मिलना चाहिए।"*
 
