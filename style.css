@@ -1042,3 +1042,31 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 /* ── Toast ───────────────────────────────────────────────────── */
 .cal-toast{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:rgba(16,185,129,.95);color:#fff;padding:.75rem 1.4rem;border-radius:50px;font-size:.85rem;font-weight:600;font-family:'Inter',sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:99999;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .35s;opacity:0;white-space:nowrap;}
 .cal-toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+
+/* ── c27: Weather Widget ─────────────────────────────────────── */
+.weather-widget{display:flex;flex-direction:column;gap:.3rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:.7rem 1rem;margin:.5rem 0;font-family:'Inter',sans-serif;}
+.weather-widget.loading{opacity:.6;}
+.weather-loading{font-size:.8rem;color:var(--t3,rgba(255,255,255,.4));}
+.weather-main{display:flex;align-items:center;gap:.75rem;}
+.weather-label{font-size:.9rem;font-weight:600;color:var(--t1,#f1f5f9);}
+.weather-temp{font-size:.85rem;color:var(--t2,rgba(255,255,255,.65));background:rgba(255,255,255,.06);padding:.15rem .5rem;border-radius:20px;}
+.weather-tip{font-size:.78rem;color:var(--t3,rgba(255,255,255,.5));font-style:italic;}
+
+/* ── c27: News Tab ───────────────────────────────────────────── */
+.news-tab-wrap{padding:.5rem 0;}
+.news-feed-selector{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;}
+.news-src-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--t2,rgba(255,255,255,.65));border-radius:20px;padding:.35rem .85rem;font-size:.78rem;font-family:'Inter',sans-serif;cursor:pointer;transition:all .2s;}
+.news-src-btn.active{background:rgba(66,133,244,.2);border-color:rgba(66,133,244,.5);color:#93c5fd;}
+.news-src-btn:hover:not(.active){background:rgba(255,255,255,.08);}
+.news-container{display:flex;flex-direction:column;gap:.6rem;}
+.news-loading,.news-empty{font-size:.85rem;color:var(--t3,rgba(255,255,255,.4));padding:1rem;text-align:center;}
+.news-card{display:block;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:.85rem 1rem;text-decoration:none;transition:all .2s;}
+.news-card:hover{background:rgba(66,133,244,.08);border-color:rgba(66,133,244,.25);transform:translateX(3px);}
+.news-card-date{font-size:.7rem;color:var(--t3,rgba(255,255,255,.4));margin-bottom:.3rem;font-family:'Inter',sans-serif;}
+.news-card-title{font-size:.85rem;font-weight:600;color:var(--t1,#f1f5f9);line-height:1.4;font-family:'Inter',sans-serif;}
+.news-card-desc{font-size:.75rem;color:var(--t3,rgba(255,255,255,.45));margin-top:.35rem;line-height:1.5;}
+
+/* ── c27: Slot Speak Button ──────────────────────────────────── */
+.slot-speak-btn{position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--t2,rgba(255,255,255,.6));font-size:.8rem;padding:.2rem .4rem;cursor:pointer;transition:all .2s;line-height:1;z-index:2;}
+.slot-speak-btn:hover{background:rgba(66,133,244,.2);border-color:rgba(66,133,244,.4);color:#93c5fd;}
+.subject-slot-card{position:relative;}
