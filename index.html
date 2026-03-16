@@ -8,7 +8,7 @@
   <link rel="icon" type="image/svg+xml" href="logo.svg"/>
   <link rel="apple-touch-icon" href="logo.svg"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
@@ -25,9 +25,16 @@
   </div>
 
   <div class="hero">
+    <!-- Welcome back toast (shown only if saved plan exists) -->
+    <div id="welcomeBackToast" class="welcome-back-toast hidden">
+      <span class="wb-dot"></span>
+      <span>Welcome back, <span id="welcomeBackName"></span> 👋</span>
+    </div>
+
     <div class="hero-brand">
       <div class="brand-logo-wrap">
         <div class="brand-logo-glow"></div>
+        <div class="brand-logo-ring"></div>
         <img src="logo.svg" alt="ParikshaSathi" class="brand-logo-img"/>
       </div>
       <span class="brand-name-hero">Pariksha<span class="brand-name-accent">Sathi</span></span>

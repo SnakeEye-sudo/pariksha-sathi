@@ -65,6 +65,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const sd = document.getElementById('startDate');
   if (sd) { sd.value = today; sd.min = today; }
 
+  // Welcome-back toast: show saved user's name if a plan exists
+  const savedRaw = localStorage.getItem('ps_plan');
+  if (savedRaw) {
+    try {
+      const saved = JSON.parse(savedRaw);
+      const name = saved.userData && saved.userData.name ? saved.userData.name.split(' ')[0] : null;
+      if (name) {
+        const toast = document.getElementById('welcomeBackToast');
+        const nameEl = document.getElementById('welcomeBackName');
+        if (toast && nameEl) {
+          nameEl.textContent = name + '!';
+          toast.classList.remove('hidden');
+        }
+      }
+    } catch(e) {}
+  }
+
   // Restore saved plan — skip welcome screen entirely
   if (loadPlanFromStorage()) {
     renderPlan();
