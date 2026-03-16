@@ -29,8 +29,8 @@ const T = {
     heroTitle2:     'आपका Plan',
     heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
     chooseLabel:    'अपना Exam चुनें 👇',
-    statExams:      '11+ Exams',
-    statVacancies:  'BPSC Vacancies',
+    statExams:      '18+ Exams',
+    statVacancies:  'Total Vacancies',
     statFree:       'Free',
     statPlans:      'Plans',
     // Exam cards
@@ -105,8 +105,8 @@ const T = {
     heroTitle2:     'Your Plan',
     heroSub:        'Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download',
     chooseLabel:    'Choose Your Exam 👇',
-    statExams:      '11+ Exams',
-    statVacancies:  'BPSC Vacancies',
+    statExams:      '18+ Exams',
+    statVacancies:  'Total Vacancies',
     statFree:       'Free',
     statPlans:      'Plans',
     // Exam cards
