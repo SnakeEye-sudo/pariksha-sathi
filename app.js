@@ -2018,7 +2018,7 @@ function buildPlan() {
     return chosen;
   }
 
-  const slotTypes = ['morning', 'afternoon', 'evening'];
+    const SLOT_ORDER = ['early_morning','morning','forenoon','afternoon','evening','night'];  const userSlots = (userData.timeSlots && userData.timeSlots.length) ? SLOT_ORDER.filter(s => userData.timeSlots.includes(s)) : ['morning','afternoon','evening'];  const slotTypes = userSlots.length ? userSlots : ['morning','afternoon','evening'];
   let cur = new Date(userData.startDate);
   // Track last 2 days' subject indices for consecutive-day check
   const recentSubjectDays = []; // recentSubjectDays[0] = yesterday, [1] = day before
@@ -2146,9 +2146,12 @@ function renderPlan() {
 }
 
 const SLOT_META = {
+    early_morning: { label:'🌅 Early Morning', cls:'early-slot', time:'4–6 AM' },
   morning:   { label:'☀️ Morning',   cls:'morning-slot',   time:'6–9 AM'   },
   afternoon: { label:'🌤️ Afternoon', cls:'afternoon-slot', time:'12–3 PM'  },
+    forenoon:     { label:'🕚 Forenoon', cls:'forenoon-slot', time:'9 AM–12 PM' },
   evening:   { label:'🌆 Evening',   cls:'evening-slot',   time:'3–6 PM'   },
+    night:        { label:'🌙 Night', cls:'night-slot', time:'8–11 PM' },
   revision:  { label:'🔄 Revision',  cls:'revision-slot',  time:'1 hr'     },
   current:   { label:'📰 Current Affairs', cls:'current-slot', time:'30 min' },
 };
