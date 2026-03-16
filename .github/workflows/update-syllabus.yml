@@ -1,0 +1,133 @@
+name: Biannual Syllabus Update
+
+# Runs on January 1st and July 1st every year, starting 2027
+# For 2026: this workflow is configured but will NOT run (schedule starts 2027)
+on:
+  schedule:
+    - cron: '0 0 1 1 *'   # January 1st midnight UTC
+    - cron: '0 0 1 7 *'   # July 1st midnight UTC
+  workflow_dispatch:       # Allow manual trigger
+
+jobs:
+  update-syllabus:
+    runs-on: ubuntu-latest
+    # Only run from 2027 onwards
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && (github.event.schedule == '0 0 1 1 *' || github.event.schedule == '0 0 1 7 *')) }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests python-dateutil
+
+      - name: Get current year and period
+        id: date
+        run: |
+          echo "year=$(date +%Y)" >> $GITHUB_OUTPUT
+          echo "month=$(date +%-m)" >> $GITHUB_OUTPUT
+          if [ $(date +%-m) -le 6 ]; then
+            echo "period=H1" >> $GITHUB_OUTPUT
+          else
+            echo "period=H2" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Skip if year is 2026
+        if: ${{ steps.date.outputs.year == '2026' }}
+        run: |
+          echo "Skipping update for 2026 — this workflow starts from 2027"
+          exit 0
+
+      - name: Update exam dates in syllabus chunks
+        run: |
+          python3 << 'EOF'
+          import re, json
+          from datetime import datetime
+
+          year = int("${{ steps.date.outputs.year }}")
+          period = "${{ steps.date.outputs.period }}"
+
+          print(f"Updating syllabus for {year} {period}")
+
+          # Read existing exam registry (c11.js or c14.js contain exam configs)
+          import os, glob
+          chunk_files = glob.glob('chunks/c*.js')
+
+          # Update year references in exam configs
+          # Pattern: update current year references
+          for f in chunk_files:
+              with open(f, 'r', encoding='utf-8') as file:
+                  content = file.read()
+
+              # Update exam year references: replace old year with new year
+              old_year = str(year - 1)
+              new_year = str(year)
+
+              # Only update if year has changed significantly (exam configs)
+              updated = content.replace(
+                  f'Exam: {old_year}',
+                  f'Exam: {new_year}'
+              )
+
+              if updated != content:
+                  with open(f, 'w', encoding='utf-8') as file:
+                      file.write(updated)
+                  print(f'Updated {f}')
+
+          # Update the README timestamp
+          now = datetime.now().strftime('%B %Y')
+          readme_path = 'README.md'
+          if os.path.exists(readme_path):
+              with open(readme_path, 'r') as f:
+                  readme = f.read()
+              readme = re.sub(
+                  r'Last Updated: .*',
+                  f'Last Updated: {now}',
+                  readme
+              )
+              with open(readme_path, 'w') as f:
+                  f.write(readme)
+
+          print('Syllabus update complete!')
+          EOF
+
+      - name: Rebuild app.js from chunks
+        run: python3 build.py
+
+      - name: Bump service worker cache version
+        run: |
+          python3 << 'EOF'
+          import re
+          with open('sw.js', 'r') as f:
+              content = f.read()
+          # Find current version and increment
+          match = re.search(r"pariksha-sathi-v(\d+)", content)
+          if match:
+              old_v = int(match.group(1))
+              new_v = old_v + 1
+              content = content.replace(f'pariksha-sathi-v{old_v}', f'pariksha-sathi-v{new_v}')
+              with open('sw.js', 'w') as f:
+                  f.write(content)
+              print(f'Bumped cache: v{old_v} -> v{new_v}')
+          EOF
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git add .
+          if git diff --staged --quiet; then
+            echo 'No changes to commit'
+          else
+            YEAR="${{ steps.date.outputs.year }}"
+            PERIOD="${{ steps.date.outputs.period }}"
+            git commit -m "chore: Auto-update syllabus for ${YEAR} ${PERIOD} [skip ci]"
+            git push
+          fi
