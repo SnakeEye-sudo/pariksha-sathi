@@ -26,6 +26,8 @@ function toggleSlotCheck(dateStr, slotIdx, el) {
   updateStreakOnCheck(dateStr);
   // Re-render just the day card's progress
   refreshDayProgress(dateStr);
+  // Refresh c24 widgets
+  if (typeof refreshC24Widgets === 'function') refreshC24Widgets();
   // Animate the checkbox
   if (el) el.classList.toggle('checked', !!cl[key]);
 }

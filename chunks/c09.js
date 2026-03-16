@@ -47,6 +47,7 @@ function renderPlan() {
     if (typeof injectPlanHeaderExtras === 'function') injectPlanHeaderExtras();
     if (typeof patchDayCards === 'function') patchDayCards();
     if (typeof initFeatures === 'function') initFeatures();
+    if (typeof initC24Features === 'function') initC24Features();
   }, 0);
 }
 

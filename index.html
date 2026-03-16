@@ -7,6 +7,12 @@
   <meta name="description" content="Free personalized study planner for BPSC TRE 4.0 and UPSC CSE 2026/2027. Day-by-day syllabus plan with PDF download. By Er. Sangam Krishna."/>
   <link rel="icon" type="image/svg+xml" href="logo.svg"/>
   <link rel="apple-touch-icon" href="logo.svg"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#f59e0b"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="ParikshaSathi"/>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="style.css"/>
@@ -750,6 +756,12 @@
 
 <script src="app.js"></script>
 <script>
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/pariksha-sathi/sw.js').catch(() => {});
+  });
+}
 function openTermsModal() {
   document.getElementById('termsModal').classList.add('open');
   document.body.style.overflow = 'hidden';
