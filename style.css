@@ -1076,3 +1076,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .slot-speak-btn{position:absolute;top:.5rem;right:.5rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:8px;color:var(--t2,rgba(255,255,255,.6));font-size:.8rem;padding:.2rem .4rem;cursor:pointer;transition:all .2s;line-height:1;z-index:2;}
 .slot-speak-btn:hover{background:rgba(66,133,244,.2);border-color:rgba(66,133,244,.4);color:#93c5fd;}
 .subject-slot-card{position:relative;}
+
+/* ── Syllabus Accordion ──────────────────────────────────────── */
+.syl-subject{border-left:3px solid var(--amber);border-radius:12px;background:rgba(255,255,255,.03);margin-bottom:.75rem;overflow:hidden;}
+.syl-head{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;cursor:pointer;user-select:none;gap:.5rem;}
+.syl-head:hover{background:rgba(255,255,255,.04);}
+.syl-head-left{flex:1;}
+.syl-head-title{font-size:.9rem;font-weight:700;color:var(--t1,#f1f5f9);font-family:'Inter',sans-serif;}
+.syl-head-right{display:flex;align-items:center;gap:.6rem;flex-shrink:0;}
+.syl-marks{font-size:.75rem;background:rgba(245,158,11,.15);color:#fbbf24;border-radius:20px;padding:.15rem .55rem;font-family:'Inter',sans-serif;font-weight:600;}
+.syl-arrow{font-size:.75rem;color:var(--t3,rgba(255,255,255,.4));transition:transform .25s ease;}
+.syl-body{display:none;padding:0 1rem 1rem;}
+.syl-body.open{display:block;}
+.subtopic{padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.05);}
+.subtopic:last-child{border-bottom:none;}
+.subtopic-name{font-size:.82rem;font-weight:600;color:var(--t2,rgba(255,255,255,.75));font-family:'Inter',sans-serif;}
+.subtopic-hindi{font-size:.75rem;color:var(--t3,rgba(255,255,255,.45));margin-top:.15rem;}
+.micro-list{margin:.35rem 0 0 1rem;padding:0;}
+.micro-list li{font-size:.75rem;color:var(--t3,rgba(255,255,255,.45));margin-bottom:.2rem;line-height:1.5;}
