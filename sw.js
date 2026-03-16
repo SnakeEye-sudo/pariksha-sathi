@@ -1,7 +1,7 @@
 // ParikshaSathi — Service Worker
 // Offline-first caching for PWA support
 
-const CACHE_NAME = 'pariksha-sathi-v5';
+const CACHE_NAME = 'pariksha-sathi-v6';
 const ASSETS = [
   '/pariksha-sathi/',
   '/pariksha-sathi/index.html',
@@ -51,4 +51,60 @@ self.addEventListener('fetch', event => {
       });
     })
   );
+});
+
+// ── Push Notification handler ─────────────────────────────────
+self.addEventListener('push', event => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'ParikshaSathi';
+  const options = {
+    body: data.body || 'Aaj ka study session complete karo!',
+    icon: '/pariksha-sathi/logo.png',
+    badge: '/pariksha-sathi/favicon.svg',
+    tag: data.tag || 'ps-reminder',
+    data: { url: data.url || '/pariksha-sathi/' },
+    actions: [
+      { action: 'open', title: '📚 Plan Dekho' },
+      { action: 'dismiss', title: 'Baad mein' }
+    ]
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  if (event.action === 'dismiss') return;
+  const url = event.notification.data?.url || '/pariksha-sathi/';
+  event.waitUntil(clients.openWindow(url));
+});
+
+// ── Schedule local daily reminders ───────────────────────────
+self.addEventListener('message', event => {
+  if (event.data?.type !== 'SCHEDULE_NOTIFS') return;
+  const { examDate, userName, exam } = event.data;
+
+  // Show immediate confirmation notification
+  self.registration.showNotification('🔔 ParikshaSathi Notifications ON!', {
+    body: `${userName ? userName + ', ' : ''}daily study reminders set ho gaye!`,
+    icon: '/pariksha-sathi/logo.png',
+    badge: '/pariksha-sathi/favicon.svg',
+    tag: 'ps-notif-confirm',
+  });
+
+  // Exam countdown reminder (if exam date available)
+  if (examDate) {
+    const exam_dt = new Date(examDate);
+    const now = new Date();
+    const daysLeft = Math.ceil((exam_dt - now) / 86400000);
+    if (daysLeft > 0 && daysLeft <= 30) {
+      setTimeout(() => {
+        self.registration.showNotification(`⏰ ${daysLeft} din baaki!`, {
+          body: `${exam.toUpperCase()} exam mein sirf ${daysLeft} din bache hain. Aaj ka plan complete karo!`,
+          icon: '/pariksha-sathi/logo.png',
+          tag: 'ps-countdown',
+          data: { url: '/pariksha-sathi/' }
+        });
+      }, 3000);
+    }
+  }
 });
