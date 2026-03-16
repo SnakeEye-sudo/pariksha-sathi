@@ -258,7 +258,7 @@ function closeCalendarModal() {
 }
 
 // ── FCM Push Notifications ────────────────────────────────────
-const FCM_VAPID_KEY = ''; // Set after Firebase Console setup
+const FCM_VAPID_KEY = '0Pkbm-kb7s32ifYoFcC9flRikYHpWPjmcLW6obBVHC0';
 
 async function requestNotificationPermission() {
   if (!('Notification' in window)) {
