@@ -388,18 +388,23 @@ function showNotifToast(state) {
 function injectCalendarAndNotifButtons() {
   if (document.getElementById('calendarExportBtn')) return;
 
-  // Create hidden buttons (for hamburger menu click delegation)
-  // These are NOT added to topbar — they live in hamburger menu only
+  const actions = document.querySelector('.plan-topbar-actions');
+  if (!actions) return;
+
+  // Calendar button
   const calBtn = document.createElement('button');
   calBtn.id = 'calendarExportBtn';
-  calBtn.style.display = 'none';
+  calBtn.className = 'ptb-btn ptb-calendar';
+  calBtn.innerHTML = '📅 Calendar';
   calBtn.onclick = showCalendarModal;
-  document.body.appendChild(calBtn);
+  calBtn.title = lang === 'en' ? 'Export to Google Calendar' : 'Google Calendar में export करें';
 
+  // Notification button
   const notifBtn = document.createElement('button');
   notifBtn.id = 'notifToggleBtn';
-  notifBtn.style.display = 'none';
+  notifBtn.className = 'ptb-btn ptb-notif';
   const notifEnabled = localStorage.getItem('ps_notif_enabled') === '1';
+  notifBtn.textContent = notifEnabled ? '🔔 Notifications ON' : '🔕 Notifications';
   if (notifEnabled) notifBtn.classList.add('notif-on');
   notifBtn.onclick = () => {
     if (localStorage.getItem('ps_notif_enabled') === '1') {
@@ -408,7 +413,16 @@ function injectCalendarAndNotifButtons() {
       setupFCM();
     }
   };
-  document.body.appendChild(notifBtn);
+
+  // Insert before PDF button
+  const pdfBtn = actions.querySelector('.ptb-download');
+  if (pdfBtn) {
+    actions.insertBefore(notifBtn, pdfBtn);
+    actions.insertBefore(calBtn, pdfBtn);
+  } else {
+    actions.appendChild(calBtn);
+    actions.appendChild(notifBtn);
+  }
 }
 
 // ── Auto-init when plan renders ───────────────────────────────
