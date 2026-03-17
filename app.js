@@ -7351,4 +7351,52 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', fixLangTogglePosition);
 } else {
   fixLangTogglePosition();
+
+  // ════════════════════════════════════════════════════════════════════
+// HAMBURGER MENU — Mobile Navigation Toggle
+// ════════════════════════════════════════════════════════════════════
+
+function toggleMobileMenu() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const hamburger = document.getElementById('hamburgerBtn');
+  
+  if (overlay && hamburger) {
+    overlay.classList.toggle('open');
+    hamburger.classList.toggle('active');
+  }
+}
+
+function closeMobileMenu() {
+  const overlay = document.getElementById('mobileMenuOverlay');
+  const hamburger = document.getElementById('hamburgerBtn');
+  
+  if (overlay && hamburger) {
+    overlay.classList.remove('open');
+    hamburger.classList.remove('active');
+  }
+}
+
+// Event listeners for hamburger menu
+document.addEventListener('DOMContentLoaded', () => {
+  const hamburgerBtn = document.getElementById('hamburgerBtn');
+  const mobileMenuClose = document.getElementById('mobileMenuClose');
+  const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+  
+  if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', toggleMobileMenu);
+  }
+  
+  if (mobileMenuClose) {
+    mobileMenuClose.addEventListener('click', closeMobileMenu);
+  }
+  
+  // Close menu when clicking overlay background
+  if (mobileMenuOverlay) {
+    mobileMenuOverlay.addEventListener('click', (e) => {
+      if (e.target === mobileMenuOverlay) {
+        closeMobileMenu();
+      }
+    });
+  }
+});
 }
