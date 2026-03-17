@@ -366,6 +366,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .ptb-logout{background:rgba(239,68,68,.1);color:#fca5a5;border-color:rgba(239,68,68,.25);display:none;align-items:center;gap:4px;}
 .ptb-logout:hover{background:rgba(239,68,68,.85);color:#fff;border-color:rgba(239,68,68,.8);box-shadow:0 4px 14px rgba(239,68,68,.3)}
 .ptb-tg{background:rgba(37,211,102,.1);color:#25d366;border-color:rgba(37,211,102,.25)}
+.ptb-nav-link{text-decoration:none;display:inline-flex;align-items:center}
+.ptb-nav-link:hover{background:var(--surface2);color:var(--t1);border-color:var(--border3)}
+/* Mobile hero PDF/Naya Plan buttons - hidden on desktop */
+.plan-hero-mobile-actions{display:none;gap:.6rem;justify-content:center;margin:.6rem 0 .2rem}
+.plan-hero-mobile-actions .ptb-btn{display:inline-flex!important;align-items:center;gap:.3rem;font-size:.82rem;padding:.45rem 1rem}
 
 /* Plan hero */
 .plan-hero{background:linear-gradient(135deg,var(--bg) 0%,var(--bg3) 100%);border-bottom:1px solid var(--border);padding:3rem 1.5rem;position:relative;overflow:hidden}
@@ -567,6 +572,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
   .plan-topbar-actions::-webkit-scrollbar{display:none}
   .ptb-btn{padding:.35rem .6rem;font-size:.72rem;white-space:nowrap;flex-shrink:0}
   .ptb-btn span:not(.ptb-icon){display:none}
+  /* Hide desktop nav links & action buttons from topbar on mobile */
+  .ptb-nav-link{display:none!important}
+  .ptb-download,.ptb-reset{display:none!important}
+  /* Show PDF & Naya Plan under title on mobile */
+  .plan-hero-mobile-actions{display:flex}
 
   /* Plan hero */
   .plan-hero{padding:1.5rem .8rem}
@@ -1386,6 +1396,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
   font-weight: 600;
   color: var(--t1);
   text-align: left;
+  text-decoration: none;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .mobile-menu-item:hover {

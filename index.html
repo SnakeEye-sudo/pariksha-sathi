@@ -883,15 +883,18 @@ function updateAuthUI(user) {
       <span class="ptb-name">ParikshaSathi</span>
     </div>
     <div class="plan-topbar-actions">
-      <!-- Language Toggle in plan topbar -->
+      <!-- Language Toggle -->
       <div class="lang-toggle-wrap lang-toggle-topbar">
         <button class="lang-btn" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
         <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
       </div>
+      <!-- Desktop nav links -->
+      <a href="about.html" class="ptb-btn ptb-nav-link">About</a>
+      <a href="privacy.html" class="ptb-btn ptb-nav-link">Privacy</a>
+      <a href="resources.html" class="ptb-btn ptb-nav-link">Resources</a>
+      <a href="contact.html" class="ptb-btn ptb-nav-link">Contact</a>
       <button class="ptb-btn ptb-download" onclick="downloadPDF()"><span data-i18n="pdfBtn">⬇️ PDF</span></button>
-      <button class="ptb-btn ptb-edit" onclick="showScreen('formScreen')"><span data-i18n="editBtn">✏️ Edit</span></button>
       <button class="ptb-btn ptb-reset" onclick="confirmResetPlan()"><span data-i18n="resetBtn">🔄 Naya Plan</span></button>
-      <button class="ptb-btn ptb-logout" id="ptbLogoutBtn" onclick="psSignOut()" style="display:none;">🚪 Logout</button>
     </div>
   </div>
 
@@ -900,30 +903,22 @@ function updateAuthUI(user) {
       <div class="mobile-menu">
         <button class="mobile-menu-close" id="mobileMenuClose">✕</button>
         <nav class="mobile-menu-nav">
-          <button class="mobile-menu-item" onclick="document.getElementById('ptbNotifBtn')?.click(); closeMobileMenu();">
-            <span class="menu-icon">🔔</span>
-            <span>Notifications चालू करें</span>
-          </button>
-          <button class="mobile-menu-item" onclick="document.getElementById('ptbCalBtn')?.click(); closeMobileMenu();">
-            <span class="menu-icon">📅</span>
-            <span>Calendar Export</span>
-          </button>
-          <button class="mobile-menu-item" onclick="downloadPDF(); closeMobileMenu();">
-            <span class="menu-icon">📄</span>
-            <span>PDF Download</span>
-          </button>
-          <button class="mobile-menu-item" onclick="showScreen('formScreen'); closeMobileMenu();">
-            <span class="menu-icon">✏️</span>
-            <span>Edit Plan</span>
-          </button>
-          <button class="mobile-menu-item" onclick="confirmResetPlan(); closeMobileMenu();">
-            <span class="menu-icon">🔄</span>
-            <span>Naya Plan</span>
-          </button>
-          <button class="mobile-menu-item" onclick="psSignOut(); closeMobileMenu();">
-            <span class="menu-icon">🚪</span>
-            <span>Logout</span>
-          </button>
+          <a class="mobile-menu-item" href="about.html">
+            <span class="menu-icon">📘</span>
+            <span>About</span>
+          </a>
+          <a class="mobile-menu-item" href="resources.html">
+            <span class="menu-icon">📚</span>
+            <span>Resources</span>
+          </a>
+          <a class="mobile-menu-item" href="privacy.html">
+            <span class="menu-icon">🔒</span>
+            <span>Privacy Policy</span>
+          </a>
+          <a class="mobile-menu-item" href="contact.html">
+            <span class="menu-icon">📧</span>
+            <span>Contact</span>
+          </a>
         </nav>
       </div>
     </div>
@@ -932,6 +927,11 @@ function updateAuthUI(user) {
     <div class="plan-hero-inner">
       <h2 id="planTitle">📅 आपका Study Plan</h2>
       <p id="planSubtitle"></p>
+      <!-- Mobile-only PDF & Naya Plan buttons under title -->
+      <div class="plan-hero-mobile-actions">
+        <button class="ptb-btn ptb-download" onclick="downloadPDF()">⬇️ PDF</button>
+        <button class="ptb-btn ptb-reset" onclick="confirmResetPlan()">🔄 Naya Plan</button>
+      </div>
       <div class="plan-progress-wrap">
         <div class="plan-progress-bar" id="planProgressBar"></div>
       </div>
