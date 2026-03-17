@@ -172,3 +172,40 @@ Made with ❤️ by **Er. Sangam Krishna**
 *"हर aspirant को एक बराबर मौका मिलना चाहिए।"*
 
 </div>
+
+
+---
+
+## ⚙️ Technical Stack
+
+- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
+- **UI Framework**: Bootstrap 5 + Custom CSS
+- **PDF Generation**: jsPDF library
+- **Icons**: Font Awesome
+- **Deployment**: GitHub Pages (static hosting)
+- **Build**: No build step required (pure vanilla JS)
+
+## 🚀 Deployment
+
+The app is deployed on GitHub Pages and accessible at:
+**[https://snakeeye-sudo.github.io/pariksha-sathi/](https://snakeeye-sudo.github.io/pariksha-sathi/)**
+
+Deployment is automatic via GitHub Pages settings:
+- Source: `main` branch
+- Folder: `/` (root)
+- No build process needed
+
+## 📝 Future Enhancements
+
+- [ ] Firebase Authentication for user accounts
+- [ ] Cloud sync for study plans
+- [ ] Mobile app version (React Native)
+- [ ] Telegram/WhatsApp reminder bot integration
+- [ ] AI-powered study recommendations
+- [ ] Performance analytics & progress tracking
+
+---
+
+**Made with ❤️ by [Er. Sangam Krishna](https://github.com/SnakeEye-sudo)**
+
+*Supporting India's competitive exam aspirants — one study plan at a time!*
