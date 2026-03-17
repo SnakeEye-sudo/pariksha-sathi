@@ -1214,4 +1214,9 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .tg-waiting{display:flex;align-items:center;gap:.6rem;justify-content:center;color:rgba(255,255,255,.55);font-size:.82rem;font-family:'Inter',sans-serif;margin:.5rem 0}
 .tg-waiting-dot{width:8px;height:8px;border-radius:50%;background:var(--amber);animation:dotPulse 1.2s infinite}
 .tg-manual-toggle{font-size:.78rem;color:rgba(255,255,255,.35);text-align:center;cursor:pointer;margin-top:.5rem;padding:.3rem;transition:color .2s}
+
+/* Hide Telegram button temporarily */
+.ptb-tg {
+  display: none !important;
+}
 .tg-manual-toggle:hover{color:rgba(255,255,255,.6)}
