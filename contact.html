@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - ParikshaSathi | Competitive Exam Study Planner</title>
+    <meta name="description" content="Contact ParikshaSathi - Get in touch with our team for feedback, suggestions, or support for competitive exam preparation. We're here to help!">
+    <meta name="keywords" content="contact, support, feedback, competitive exams, UPSC, SSC, study planner">
+    <meta name="author" content="ParikshaSathi">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .contact-container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .contact-section { margin: 30px 0; }
+        .contact-section h2 { color: #003d99; margin-top: 30px; margin-bottom: 15px; }
+        .contact-section p { line-height: 1.6; color: #333; margin-bottom: 10px; }
+        .contact-form { background-color: #f9f9f9; padding: 30px; border-radius: 8px; margin: 20px 0; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 150px; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #003d99; background-color: #f0f8ff; }
+        .submit-btn { background-color: #003d99; color: white; padding: 12px 30px; border: none; border-radius: 4px; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .submit-btn:hover { background-color: #002060; }
+        .contact-info { background-color: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #003d99; }
+        .contact-info h3 { color: #003d99; margin-top: 0; }
+        .contact-info p { margin: 8px 0; line-height: 1.6; }
+    </style>
+</head>
+<body>
+    <main>
+        <div class="topbar">
+            <div class="logo-section">
+                <a href="/pariksha-sathi/" style="text-decoration: none;">
+                    <h1 style="margin: 0; color: #003d99; font-size: 24px;">ParikshaSathi</h1>
+                </a>
+            </div>
+            <nav class="menu" id="menu">
+                <a href="/pariksha-sathi/" onclick="window.location.href='/pariksha-sathi/'; return false;" class="menu-item">Home</a>
+                <a href="/pariksha-sathi/about.html" class="menu-item">About</a>
+                <a href="/pariksha-sathi/resources.html" class="menu-item">Resources</a>
+                <a href="/pariksha-sathi/contact.html" class="menu-item">Contact</a>
+                <a href="/pariksha-sathi/privacy.html" class="menu-item">Privacy</a>
+            </nav>
+        </div>
+        <div class="contact-container">
+            <h1>Contact Us</h1>
+            <p style="color: #666; margin-bottom: 20px;">We'd love to hear from you! Whether you have feedback, suggestions, or just want to say hello, feel free to get in touch with us.</p>
+
+            <div class="contact-section">
+                <h2>Get in Touch</h2>
+                <p>ParikshaSathi is dedicated to helping students prepare for competitive exams. We value your feedback and suggestions as they help us improve our platform. If you have any questions or want to share your experience using our study planner, please don't hesitate to contact us.</p>
+            </div>
+
+            <div class="contact-form">
+                <h3 style="color: #003d99; margin-top: 0;">Send us a Message</h3>
+                <form action="#" method="POST" onsubmit="handleContactForm(event)">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="name" required placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" name="subject" required placeholder="What's this about?">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" name="message" required placeholder="Tell us your thoughts, questions, or suggestions..."></textarea>
+                    </div>
+                    <button type="submit" class="submit-btn">Send Message</button>
+                </form>
+            </div>
+
+            <div class="contact-info">
+                <h3>Direct Contact Information</h3>
+                <p><strong>Email:</strong> contact.pariksha.sathi@gmail.com</p>
+                <p><strong>GitHub:</strong> <a href="https://github.com/SnakeEye-sudo/pariksha-sathi" target="_blank" style="color: #003d99; text-decoration: none;">github.com/SnakeEye-sudo/pariksha-sathi</a></p>
+                <p><strong>Response Time:</strong> We typically respond to inquiries within 24-48 hours.</p>
+            </div>
+
+            <div class="contact-section">
+                <h2>Feedback & Suggestions</h2>
+                <p>Your feedback is invaluable in helping us improve ParikshaSathi. Whether you have suggestions for new exam types, study features, improvements to the user interface, or any other ideas, we'd love to hear them. Please use the contact form above or email us directly with your suggestions.</p>
+            </div>
+
+            <div class="contact-section">
+                <h2>Reporting Issues</h2>
+                <p>If you encounter any technical issues or bugs while using ParikshaSathi, please report them to us as soon as possible. Include details about:</p>
+                <ul style="line-height: 1.8; margin-left: 20px;">
+                    <li>What you were doing when the issue occurred</li>
+                    <li>What browser and device you were using</li>
+                    <li>A description of the problem or error message</li>
+                    <li>Steps to reproduce the issue (if possible)</li>
+                </ul>
+                <p>This information helps us fix problems faster and ensure a better experience for all users.</p>
+            </div>
+
+            <div class="contact-section">
+                <h2>Partnership & Collaboration</h2>
+                <p>If you're interested in partnering with ParikshaSathi or collaborating on educational initiatives related to competitive exam preparation, we'd like to hear about it. Please reach out to us with details about your proposal.</p>
+            </div>
+
+            <div class="contact-section">
+                <h2>Frequently Asked Questions</h2>
+                <p><strong>Q: How long does it take to receive a response?</strong><br>
+A: We aim to respond to all inquiries within 24-48 hours during business days.</p>
+                <p><strong>Q: Can I request a specific feature?</strong><br>
+A: Absolutely! We welcome feature requests. Please describe what you'd like to see added to ParikshaSathi.</p>
+                <p><strong>Q: Is ParikshaSathi available for mobile devices?</strong><br>
+A: Yes, ParikshaSathi is fully responsive and works on all devices including mobile phones and tablets.</p>
+                <p><strong>Q: Is there a cost to use ParikshaSathi?</strong><br>
+A: No, ParikshaSathi is completely free to use. There are no hidden charges or premium versions.</p>
+            </div>
+
+            <div class="contact-section" style="background-color: #f0f8ff; padding: 20px; border-radius: 8px; border-left: 4px solid #003d99;">
+                <h2 style="margin-top: 0;">Thank You!</h2>
+                <p>Thank you for being part of the ParikshaSathi community. Your support, feedback, and trust motivate us to keep improving and developing better tools to help you succeed in your competitive exam preparation.</p>
+                <p style="margin-bottom: 0;"><strong>Best of luck with your studies!</strong></p>
+            </div>
+        </div>
+    </main>
+    <script src="app.js"></script>
+    <script>
+        function handleContactForm(event) {
+            event.preventDefault();
+            alert('Thank you for your message! We will get back to you soon.');
+            document.querySelector('.contact-form form').reset();
+        }
+    </script>
+</body>
+</html>
