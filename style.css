@@ -1250,6 +1250,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
   .ptb-btn span:not([class*="icon"]) {
     display: none;
   }
+
+      /* Fix Google Auth button overlap with hamburger menu */
+    #userAvatarBtn {
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        left: auto;
+    }
 }
 
 /* ══════════════════════════════════════════════════
@@ -1406,3 +1414,5 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
   }
 }
 .tg-manual-toggle:hover{color:rgba(255,255,255,.6)}
+
+
