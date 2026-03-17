@@ -15,7 +15,7 @@
 
   function init() {
     setTimeout(() => {
-      addNavigationToTopbar();
+//       addNavigationToTopbar();
       repositionAvatarButton();
       fixCalendarButton();
     }, 1000); // Give time for app.js to initialize
