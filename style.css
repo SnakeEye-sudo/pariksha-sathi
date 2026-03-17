@@ -1399,31 +1399,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
   flex-shrink: 0;
 }
 
-.mobile-menu-divider {
-  height: 1px;
-  background: rgba(255,255,255,0.08);
-  margin: 8px 0;
-}
-
-.mobile-menu-auth {
-  padding: 4px 0 8px;
-}
-
-.mobile-menu-item-logout {
-  color: #fca5a5 !important;
-}
-
-.mobile-menu-item-logout:hover {
-  background: rgba(239,68,68,0.15) !important;
-  border-color: rgba(239,68,68,0.3) !important;
-}
-
-.mobile-menu-item-login {
-  background: rgba(255,255,255,0.05) !important;
-  border-color: rgba(245,158,11,0.3) !important;
-  color: #f59e0b !important;
-}
-
 /* Show hamburger on mobile, hide topbar buttons */
 @media(max-width: 768px) {
   .hamburger-btn {

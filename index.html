@@ -190,31 +190,16 @@ function updateAuthUI(user) {
       const menuName = document.getElementById('menuUserName');
       const menuEmail = document.getElementById('menuUserEmail');
       const ptbLogout = document.getElementById('ptbLogoutBtn');
-      const mobileLogout = document.getElementById('mobileMenuLogoutBtn');
-      const mobileLogin = document.getElementById('mobileMenuLoginBtn');
-      const mobileAuth = document.getElementById('mobileMenuAuth');
       if(user) {
         if(gate) gate.style.display='none';
         if(avatarBtn) avatarBtn.style.display='block';
         if(ptbLogout) ptbLogout.style.display='inline-flex';
-        if(mobileLogout) mobileLogout.style.display='flex';
-        if(mobileLogin) mobileLogin.style.display='none';
         if(avPhoto && user.photoURL) { avPhoto.src=user.photoURL; avPhoto.style.display='block'; if(avInitial) avInitial.style.display='none'; }
         else { if(avPhoto) avPhoto.style.display='none'; if(avInitial) { avInitial.style.display='flex'; avInitial.textContent=(user.displayName||user.email||'U')[0].toUpperCase(); } }
         const firstName = user.displayName ? user.displayName.split(' ')[0] : (user.email||'').split('@')[0];
         if(avName) avName.textContent = firstName;
         if(menuName) menuName.textContent = user.displayName || user.email;
         if(menuEmail) menuEmail.textContent = user.email;
-        if(mobileAuth) mobileAuth.innerHTML = `
-          <div style="display:flex;align-items:center;gap:10px;padding:10px 0;">
-            ${user.photoURL ? `<img src="${user.photoURL}" style="width:36px;height:36px;border-radius:50%;border:2px solid #f59e0b;" />` : `<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:16px;">${(user.displayName||user.email||'U')[0].toUpperCase()}</div>`}
-            <div>
-              <div style="font-weight:700;font-size:14px;color:#f1f5f9;">${user.displayName||''}</div>
-              <div style="font-size:12px;color:rgba(255,255,255,0.5);">${user.email||''}</div>
-            </div>
-          </div>
-          <button onclick="psSaveToCloud(); closeMobileMenu();" style="width:100%;background:rgba(29,78,216,0.25);color:#93c5fd;border:1px solid rgba(29,78,216,0.3);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;display:flex;align-items:center;gap:8px;margin-bottom:6px;">☁️ Cloud Save karein</button>
-        `;
         const nameInput = document.getElementById('userName');
         if(nameInput && !nameInput.value && user.displayName) nameInput.value = user.displayName;
       } else {
@@ -224,9 +209,6 @@ function updateAuthUI(user) {
         if(avPhoto) avPhoto.style.display='none';
         if(avName) avName.textContent = '';
         if(ptbLogout) ptbLogout.style.display='none';
-        if(mobileLogout) mobileLogout.style.display='none';
-        if(mobileLogin) mobileLogin.style.display='flex';
-        if(mobileAuth) mobileAuth.innerHTML = '';
       }
     }
     window.toggleUserMenu = function() {
@@ -244,28 +226,6 @@ function updateAuthUI(user) {
       const btn = document.getElementById('userAvatarBtn');
       const menu = document.getElementById('userDropMenu');
       if(menu && btn && !btn.contains(e.target) && menu.style.display!=='none') menu.style.display='none';
-    });
-  </script>
-  <script>
-    // Plan screen hamburger menu open/close
-    function closeMobileMenu() {
-      const overlay = document.getElementById('mobileMenuOverlay');
-      if (overlay) overlay.classList.remove('open');
-    }
-    function openMobileMenu() {
-      const overlay = document.getElementById('mobileMenuOverlay');
-      if (overlay) overlay.classList.add('open');
-    }
-    document.addEventListener('DOMContentLoaded', function() {
-      const hamburgerBtn = document.getElementById('hamburgerBtn');
-      const closeBtn = document.getElementById('mobileMenuClose');
-      const overlay = document.getElementById('mobileMenuOverlay');
-      if (hamburgerBtn) {
-        hamburgerBtn.addEventListener('click', openMobileMenu);
-        hamburgerBtn.addEventListener('touchend', function(e){ e.preventDefault(); openMobileMenu(); }, { passive: false });
-      }
-      if (closeBtn) closeBtn.addEventListener('click', closeMobileMenu);
-      if (overlay) overlay.addEventListener('click', function(e){ if(e.target === overlay) closeMobileMenu(); });
     });
   </script>
 </head>
@@ -946,11 +906,11 @@ function updateAuthUI(user) {
       <div class="mobile-menu">
         <button class="mobile-menu-close" id="mobileMenuClose">✕</button>
         <nav class="mobile-menu-nav">
-          <button class="mobile-menu-item" onclick="document.getElementById('notifToggleBtn')?.click(); closeMobileMenu();">
+          <button class="mobile-menu-item" onclick="document.getElementById('ptbNotifBtn')?.click(); closeMobileMenu();">
             <span class="menu-icon">🔔</span>
-            <span>Notifications</span>
+            <span>Notifications चालू करें</span>
           </button>
-          <button class="mobile-menu-item" onclick="document.getElementById('calendarExportBtn')?.click(); closeMobileMenu();">
+          <button class="mobile-menu-item" onclick="document.getElementById('ptbCalBtn')?.click(); closeMobileMenu();">
             <span class="menu-icon">📅</span>
             <span>Calendar Export</span>
           </button>
@@ -966,17 +926,9 @@ function updateAuthUI(user) {
             <span class="menu-icon">🔄</span>
             <span>Naya Plan</span>
           </button>
-          <div class="mobile-menu-divider"></div>
-          <div class="mobile-menu-auth" id="mobileMenuAuth">
-            <!-- Google auth info injected here by updateAuthUI -->
-          </div>
-          <button class="mobile-menu-item mobile-menu-item-logout" id="mobileMenuLogoutBtn" onclick="psSignOut(); closeMobileMenu();" style="display:none;">
+          <button class="mobile-menu-item" onclick="psSignOut(); closeMobileMenu();">
             <span class="menu-icon">🚪</span>
             <span>Logout</span>
-          </button>
-          <button class="mobile-menu-item mobile-menu-item-login" id="mobileMenuLoginBtn" onclick="closeMobileMenu(); document.getElementById('loginGate').style.display='flex';" style="display:none;">
-            <span class="menu-icon">🔑</span>
-            <span>Google se Login karein</span>
           </button>
         </nav>
       </div>

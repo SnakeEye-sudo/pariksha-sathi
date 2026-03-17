@@ -1,5 +1,5 @@
-// ParikshaSathi — Hamburger Menu (Welcome Screen)
-// Shows: About, Resources, Contact, Privacy + all plan actions + Google Auth
+// ParikshaSathi Clean Hamburger Menu System
+// Removes top buttons, implements hamburger menu with Google Auth inside
 (function() {
   'use strict';
 
@@ -10,205 +10,305 @@
   }
 
   function init() {
+    removeTopButtons();
     setupHamburgerMenu();
+    fixMobileMenuTap();
   }
 
+  // Remove all top navigation buttons
+  function removeTopButtons() {
+    // Remove page-nav-buttons if exists
+    const pageNavButtons = document.querySelector('.page-nav-buttons');
+    if (pageNavButtons) {
+      pageNavButtons.remove();
+    }
+
+    // Hide top navigation elements that may exist
+    const topNavElements = document.querySelectorAll(
+      '[class*="nav"][class*="button"], [id*="nav"], .top-nav'
+    );
+    topNavElements.forEach(el => {
+      if (el.textContent.includes('About') || 
+          el.textContent.includes('Resources') ||
+          el.textContent.includes('Contact') ||
+          el.textContent.includes('Privacy')) {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  // Setup clean hamburger menu
   function setupHamburgerMenu() {
-    // Only run on welcome screen context (not plan screen which has its own menu)
-    const existingHamburger = document.getElementById('hamburgerBtn');
-    if (existingHamburger) return; // plan screen already has one
+    const topbar = document.querySelector('.plan-topbar');
+    if (!topbar) return;
 
     // Create hamburger button
     const hamburgerBtn = document.createElement('button');
-    hamburgerBtn.id = 'navHamburgerBtn';
-    hamburgerBtn.setAttribute('aria-label', 'Menu');
+    hamburgerBtn.id = 'hamburgerMenu';
+    hamburgerBtn.className = 'hamburger-btn';
+    hamburgerBtn.innerHTML = '☰';
     hamburgerBtn.style.cssText = `
       position: fixed;
       top: 12px;
       left: 12px;
-      background: rgba(15,12,41,0.92);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
-      border: 2px solid rgba(245,158,11,0.5);
-      border-radius: 10px;
-      width: 42px;
-      height: 42px;
-      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
       cursor: pointer;
-      z-index: 9990;
+      z-index: 9998;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.3);
-      transition: all 0.2s ease;
-    `;
-    hamburgerBtn.innerHTML = '☰';
-
-    // Create overlay
-    const overlay = document.createElement('div');
-    overlay.id = 'navMenuOverlay';
-    overlay.style.cssText = `
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      z-index: 9991;
-      display: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
     `;
 
-    // Create menu panel
-    const panel = document.createElement('div');
-    panel.style.cssText = `
+    hamburgerBtn.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+    });
+    hamburgerBtn.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+    });
+
+    // Create mobile menu
+    const mobileMenu = document.createElement('div');
+    mobileMenu.id = 'mobileMenu';
+    mobileMenu.className = 'mobile-menu';
+    mobileMenu.style.cssText = `
       position: fixed;
       top: 0;
       left: 0;
-      width: 280px;
-      max-width: 85vw;
+      width: 100%;
       height: 100%;
-      background: rgba(10,8,35,0.98);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-right: 1px solid rgba(255,255,255,0.1);
-      z-index: 9992;
+      background: rgba(0,0,0,0.7);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 80px;
+    `;
+
+    // Menu container
+    const menuContainer = document.createElement('div');
+    menuContainer.className = 'menu-container';
+    menuContainer.style.cssText = `
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    `;
+
+    // Menu header
+    const menuHeader = document.createElement('div');
+    menuHeader.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    `;
+    
+    const menuTitle = document.createElement('h3');
+    menuTitle.textContent = 'Menu';
+    menuTitle.style.cssText = 'margin: 0; font-size: 20px; color: #333;';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.style.cssText = `
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+    `;
+
+    menuHeader.appendChild(menuTitle);
+    menuHeader.appendChild(closeBtn);
+
+    // Menu items
+    const menuItems = [
+      { text: '📘 About', href: '/pariksha-sathi/about.html' },
+      { text: '📚 Resources', href: '/pariksha-sathi/resources.html' },
+      { text: '📧 Contact', href: '/pariksha-sathi/contact.html' },
+      { text: '🔒 Privacy Policy', href: '/pariksha-sathi/privacy.html' }
+    ];
+
+    const menuList = document.createElement('div');
+    menuList.style.cssText = `
       display: flex;
       flex-direction: column;
-      padding: 0;
-      overflow-y: auto;
-      transform: translateX(-100%);
-      transition: transform 0.25s ease;
+      gap: 10px;
+      margin-bottom: 20px;
     `;
 
-    panel.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <img src="logo.svg" alt="PS" style="width:28px;height:28px;" />
-          <span style="color:#f59e0b;font-weight:800;font-size:16px;font-family:Inter,sans-serif;">ParikshaSathi</span>
-        </div>
-        <button id="navMenuClose" style="background:none;border:none;color:rgba(255,255,255,0.5);font-size:22px;cursor:pointer;padding:4px;line-height:1;">✕</button>
-      </div>
-
-      <!-- Google Auth Section -->
-      <div id="navMenuAuthSection" style="padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);">
-        <!-- filled by updateNavMenuAuth() -->
-      </div>
-
-      <!-- Nav Links -->
-      <nav style="padding:12px 12px;flex:1;">
-        <div style="color:rgba(255,255,255,0.3);font-size:11px;font-weight:600;letter-spacing:1px;padding:8px 8px 4px;font-family:Inter,sans-serif;">NAVIGATION</div>
-        <a href="/pariksha-sathi/about.html" class="nav-menu-link">📘 About</a>
-        <a href="/pariksha-sathi/resources.html" class="nav-menu-link">📚 Resources</a>
-        <a href="/pariksha-sathi/contact.html" class="nav-menu-link">📧 Contact</a>
-        <a href="/pariksha-sathi/privacy.html" class="nav-menu-link">🔒 Privacy Policy</a>
-
-        <div style="color:rgba(255,255,255,0.3);font-size:11px;font-weight:600;letter-spacing:1px;padding:16px 8px 4px;font-family:Inter,sans-serif;">PLAN ACTIONS</div>
-        <button class="nav-menu-btn" onclick="if(typeof toggleDailyNotification==='function')toggleDailyNotification(); closeNavMenu();">🔔 Notifications</button>
-        <button class="nav-menu-btn" onclick="if(typeof showCalendarModal==='function')showCalendarModal(); closeNavMenu();">📅 Calendar Export</button>
-        <button class="nav-menu-btn" onclick="if(typeof downloadPDF==='function')downloadPDF(); closeNavMenu();">📄 PDF Download</button>
-        <button class="nav-menu-btn" onclick="if(typeof showScreen==='function')showScreen('formScreen'); closeNavMenu();">✏️ Edit Plan</button>
-        <button class="nav-menu-btn" onclick="if(typeof confirmResetPlan==='function')confirmResetPlan(); closeNavMenu();">🔄 Naya Plan</button>
-
-        <div id="navMenuLogoutWrap" style="display:none;margin-top:8px;">
-          <button class="nav-menu-btn nav-menu-btn-logout" onclick="if(typeof psSignOut==='function')psSignOut(); closeNavMenu();">🚪 Logout</button>
-        </div>
-      </nav>
-    `;
-
-    // Inject styles
-    const style = document.createElement('style');
-    style.textContent = `
-      .nav-menu-link {
-        display: block;
-        padding: 11px 12px;
+    menuItems.forEach(item => {
+      const link = document.createElement('a');
+      link.href = item.href;
+      link.textContent = item.text;
+      link.style.cssText = `
+        padding: 12px 16px;
         border-radius: 8px;
         text-decoration: none;
-        color: rgba(255,255,255,0.8);
-        font-size: 14px;
-        font-family: Inter, sans-serif;
-        font-weight: 500;
-        transition: background 0.15s, color 0.15s;
-        margin-bottom: 2px;
-      }
-      .nav-menu-link:hover { background: rgba(255,255,255,0.07); color: #fff; }
-      .nav-menu-btn {
-        display: block;
-        width: 100%;
-        padding: 11px 12px;
-        border-radius: 8px;
-        background: none;
+        color: #333;
+        background: #f5f5f5;
         border: none;
-        color: rgba(255,255,255,0.8);
-        font-size: 14px;
-        font-family: Inter, sans-serif;
-        font-weight: 500;
         cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        display: block;
         text-align: left;
-        transition: background 0.15s, color 0.15s;
-        margin-bottom: 2px;
-      }
-      .nav-menu-btn:hover { background: rgba(255,255,255,0.07); color: #fff; }
-      .nav-menu-btn-logout { color: #fca5a5 !important; }
-      .nav-menu-btn-logout:hover { background: rgba(239,68,68,0.15) !important; }
+      `;
+      
+      link.addEventListener('mouseenter', function() {
+        this.style.background = '#e8e8ff';
+        this.style.transform = 'translateX(5px)';
+      });
+      link.addEventListener('mouseleave', function() {
+        this.style.background = '#f5f5f5';
+        this.style.transform = 'translateX(0)';
+      });
+
+      link.addEventListener('click', function() {
+        mobileMenu.style.display = 'none';
+      });
+
+      menuList.appendChild(link);
+    });
+
+    // Divider
+    const divider = document.createElement('div');
+    divider.style.cssText = 'height: 1px; background: #f0f0f0; margin: 15px 0;';
+
+    // Google Auth section inside menu
+    const authSection = document.createElement('div');
+    authSection.style.cssText = `
+      padding-top: 15px;
+      border-top: 2px solid #f0f0f0;
     `;
-    document.head.appendChild(style);
 
-    overlay.appendChild(panel);
-    document.body.appendChild(hamburgerBtn);
-    document.body.appendChild(overlay);
+    const userAvatarBtn = document.getElementById('userAvatarBtn');
+    const userNameEl = document.getElementById('userName');
+    const userName = userNameEl ? userNameEl.textContent : 'User';
 
-    // Open/close logic
-    function openMenu() {
-      overlay.style.display = 'block';
-      setTimeout(() => panel.style.transform = 'translateX(0)', 10);
-      updateNavMenuAuth();
+    if (userAvatarBtn) {
+      const authDiv = document.createElement('div');
+      authDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f9f9f9;
+      `;
+
+      // Avatar clone
+      const avatarClone = document.createElement('div');
+      avatarClone.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      `;
+      avatarClone.textContent = userName.charAt(0).toUpperCase();
+
+      // User info
+      const userInfo = document.createElement('div');
+      userInfo.style.cssText = 'flex: 1;';
+      
+      const nameDiv = document.createElement('div');
+      nameDiv.textContent = userName;
+      nameDiv.style.cssText = 'font-weight: 600; font-size: 14px; color: #333;';
+      
+      const emailDiv = document.createElement('div');
+      emailDiv.textContent = 'Logged In';
+      emailDiv.style.cssText = 'font-size: 12px; color: #999; margin-top: 2px;';
+
+      userInfo.appendChild(nameDiv);
+      userInfo.appendChild(emailDiv);
+
+      authDiv.appendChild(avatarClone);
+      authDiv.appendChild(userInfo);
+      authSection.appendChild(authDiv);
     }
 
-    window.closeNavMenu = function() {
-      panel.style.transform = 'translateX(-100%)';
-      setTimeout(() => overlay.style.display = 'none', 250);
-    };
+    menuContainer.appendChild(menuHeader);
+    menuContainer.appendChild(menuList);
+    menuContainer.appendChild(divider);
+    menuContainer.appendChild(authSection);
+    mobileMenu.appendChild(menuContainer);
 
-    hamburgerBtn.addEventListener('click', openMenu);
-    hamburgerBtn.addEventListener('touchend', function(e) { e.preventDefault(); openMenu(); }, { passive: false });
+    // Event listeners
+    hamburgerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'flex' : 'none';
+    });
 
-    document.getElementById('navMenuClose').addEventListener('click', closeNavMenu);
-    overlay.addEventListener('click', function(e) {
-      if (!panel.contains(e.target)) closeNavMenu();
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      mobileMenu.style.display = 'none';
+    });
+
+    mobileMenu.addEventListener('click', function(e) {
+      if (e.target === mobileMenu) {
+        mobileMenu.style.display = 'none';
+      }
+    });
+
+    // Add to DOM
+    document.body.appendChild(hamburgerBtn);
+    document.body.appendChild(mobileMenu);
+  }
+
+  // Fix mobile menu tap functionality
+  function fixMobileMenuTap() {
+    const hamburgerBtn = document.getElementById('hamburgerMenu');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (!hamburgerBtn || !mobileMenu) return;
+
+    // Prevent default touch behaviors
+    hamburgerBtn.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }, { passive: false });
+
+    hamburgerBtn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'flex' : 'none';
+    }, { passive: false });
+
+    // Mobile menu items tap
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach(link => {
+      link.addEventListener('touchstart', function(e) {
+        this.style.background = '#e8e8ff';
+        this.style.transform = 'translateX(5px)';
+      }, { passive: true });
+
+      link.addEventListener('touchend', function(e) {
+        this.style.background = '#f5f5f5';
+        this.style.transform = 'translateX(0)';
+      }, { passive: true });
     });
   }
-
-  // Update auth section in nav menu
-  function updateNavMenuAuth() {
-    const section = document.getElementById('navMenuAuthSection');
-    const logoutWrap = document.getElementById('navMenuLogoutWrap');
-    if (!section) return;
-
-    const auth = window.psAuth;
-    const user = auth ? auth.currentUser : null;
-
-    if (user) {
-      const photo = user.photoURL
-        ? `<img src="${user.photoURL}" style="width:40px;height:40px;border-radius:50%;border:2px solid #f59e0b;object-fit:cover;" />`
-        : `<div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;">${(user.displayName||user.email||'U')[0].toUpperCase()}</div>`;
-      section.innerHTML = `
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-          ${photo}
-          <div>
-            <div style="color:#f1f5f9;font-weight:700;font-size:14px;font-family:Inter,sans-serif;">${user.displayName||''}</div>
-            <div style="color:rgba(255,255,255,0.45);font-size:12px;font-family:Inter,sans-serif;">${user.email||''}</div>
-          </div>
-        </div>
-        <button onclick="if(typeof psSaveToCloud==='function')psSaveToCloud(); closeNavMenu();" style="width:100%;background:rgba(29,78,216,0.2);color:#93c5fd;border:1px solid rgba(29,78,216,0.3);padding:9px 14px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Inter,sans-serif;display:flex;align-items:center;gap:8px;">☁️ Cloud Save karein</button>
-      `;
-      if (logoutWrap) logoutWrap.style.display = 'block';
-    } else {
-      section.innerHTML = `
-        <button onclick="closeNavMenu(); document.getElementById('loginGate').style.display='flex';" style="width:100%;background:#fff;color:#1f2937;border:none;padding:11px 16px;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:Inter,sans-serif;">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Google se Login karein
-        </button>
-      `;
-      if (logoutWrap) logoutWrap.style.display = 'none';
-    }
-  }
-
 })();
