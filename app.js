@@ -7341,3 +7341,16 @@ async function getFeedbackToken() {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(injectFeedbackButton, 1500);
 });
+
+
+  // CSS fix for language toggle overlap with user profile
+const fixLangTogglePosition = () => {
+  const style = document.createElement('style');
+  style.textContent = '.lang-toggle { right: 180px !important; }';
+  document.head.appendChild(style);
+};
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', fixLangTogglePosition);
+} else {
+  fixLangTogglePosition();
+}
