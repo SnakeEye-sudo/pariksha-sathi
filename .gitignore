@@ -4,3 +4,21 @@
 !.dev.vars.example
 .env*
 !.env.example
+
+# Secrets and credentials (NEVER commit these)
+*.key
+*.pem
+.secrets/
+secrets.json
+credentials.json
+config.secret.js
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# API keys and tokens (environment files)
+.firebase.json
+.env.local
+.env.*.local
