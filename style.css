@@ -1415,4 +1415,112 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 }
 .tg-manual-toggle:hover{color:rgba(255,255,255,.6)}
 
+  /* === PAGE NAVIGATION BUTTONS (for AdSense) === */
+  .page-nav-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin-left: 12px;
+  }
+
+  .page-nav-btn {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 8px 14px;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .page-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  /* === CIRCULAR AVATAR BUTTON === */
+  #userAvatarBtn {
+    position: fixed !important;
+    bottom: 90px !important;  /* Just above feedback button */
+    right: 20px !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    padding: 0 !important;
+    background: linear-gradient(135deg, #3b82f6, #60a5fa) !important;
+    border: 3px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.5) !important;
+    cursor: pointer !important;
+    z-index: 9998 !important;
+    overflow: hidden !important;
+    transition: all 0.3s ease !important;
+  }
+
+  #userAvatarBtn:hover {
+    transform: translateY(-2px) scale(1.05) !important;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.7) !important;
+  }
+
+  #userAvatarBtn img {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+  }
+
+  #userAvatarBtn .uAInitial {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    color: white !important;
+  }
+
+  #userDropMenu {
+    position: fixed !important;
+    bottom: 145px !important;  /* Above avatar button */
+    right: 20px !important;
+    background: rgba(10, 8, 35, 0.97) !important;
+    backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 12px !important;
+    padding: 8px !important;
+    min-width: 180px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+    z-index: 9999 !important;
+  }
+
+  @media(max-width: 768px) {
+    .page-nav-buttons {
+      display: none;
+    }
+    
+    .hamburger-btn {
+      display: flex !important;
+    }
+
+    #userAvatarBtn {
+      bottom: 80px !important;
+      right: 15px !important;
+      width: 44px !important;
+      height: 44px !important;
+    }
+
+    #userDropMenu {
+      bottom: 130px !important;
+      right: 15px !important;
+    }
+  }
+}
+
 
