@@ -1,10 +1,8 @@
-// ParikshaSathi Navigation & Avatar Setup
-// Adds page navigation buttons and repositions Google Auth avatar
-
+// ParikshaSathi Clean Hamburger Menu System
+// Removes top buttons, implements hamburger menu with Google Auth inside
 (function() {
   'use strict';
 
-  // Wait for DOM to be ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
@@ -12,85 +10,305 @@
   }
 
   function init() {
-    addPageNavigation();
-    setupAvatarButton();
+    removeTopButtons();
+    setupHamburgerMenu();
+    fixMobileMenuTap();
   }
 
-  // Add navigation buttons for new pages (About, Resources, Contact, Privacy)
-  function addPageNavigation() {
-    // Find the login gate topbar where buttons should be added
-    const loginGate = document.getElementById('loginGate');
-    if (!loginGate) return;
+  // Remove all top navigation buttons
+  function removeTopButtons() {
+    // Remove page-nav-buttons if exists
+    const pageNavButtons = document.querySelector('.page-nav-buttons');
+    if (pageNavButtons) {
+      pageNavButtons.remove();
+    }
 
-    // Find the topbar inside login gate
-    const topbar = loginGate.querySelector('.topbar, [style*="display"][style*="flex"]');
+    // Hide top navigation elements that may exist
+    const topNavElements = document.querySelectorAll(
+      '[class*="nav"][class*="button"], [id*="nav"], .top-nav'
+    );
+    topNavElements.forEach(el => {
+      if (el.textContent.includes('About') || 
+          el.textContent.includes('Resources') ||
+          el.textContent.includes('Contact') ||
+          el.textContent.includes('Privacy')) {
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  // Setup clean hamburger menu
+  function setupHamburgerMenu() {
+    const topbar = document.querySelector('.plan-topbar');
     if (!topbar) return;
 
-    // Create navigation container
-    const navContainer = document.createElement('div');
-    navContainer.className = 'page-nav-buttons';
-    navContainer.innerHTML = `
-      <a href="/pariksha-sathi/about.html" class="page-nav-btn">📘 About</a>
-      <a href="/pariksha-sathi/resources.html" class="page-nav-btn">📚 Resources</a>
-      <a href="/pariksha-sathi/contact.html" class="page-nav-btn">📧 Contact</a>
-      <a href="/pariksha-sathi/privacy.html" class="page-nav-btn">🔒 Privacy</a>
+    // Create hamburger button
+    const hamburgerBtn = document.createElement('button');
+    hamburgerBtn.id = 'hamburgerMenu';
+    hamburgerBtn.className = 'hamburger-btn';
+    hamburgerBtn.innerHTML = '☰';
+    hamburgerBtn.style.cssText = `
+      position: fixed;
+      top: 12px;
+      left: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      font-size: 24px;
+      cursor: pointer;
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: all 0.3s ease;
     `;
 
-    // Insert after the logo/brand section
-    const logoSection = topbar.querySelector('h1, .logo, [style*="font-size"]');
-    if (logoSection && logoSection.parentElement) {
-      logoSection.parentElement.insertBefore(navContainer, logoSection.nextSibling);
-    } else {
-      // Fallback: append to topbar
-      topbar.appendChild(navContainer);
-    }
-  }
+    hamburgerBtn.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+    });
+    hamburgerBtn.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+    });
 
-  // Setup avatar button with circular styling and proper positioning
-  function setupAvatarButton() {
-    const avatarBtn = document.getElementById('userAvatarBtn');
-    if (!avatarBtn) return;
-
-    // Ensure the avatar button has the correct structure
-    // Add initial if no image exists
-    if (!avatarBtn.querySelector('img') && !avatarBtn.querySelector('.uAInitial')) {
-      const userName = document.querySelector('#userName');
-      if (userName && userName.textContent) {
-        const initial = userName.textContent.trim().charAt(0).toUpperCase();
-        const initialDiv = document.createElement('div');
-        initialDiv.className = 'uAInitial';
-        initialDiv.textContent = initial;
-        avatarBtn.appendChild(initialDiv);
-      }
-    }
-  }
-
-  // Add navigation to hamburger menu for mobile
-  function addToHamburgerMenu() {
-    const hamburgerMenu = document.getElementById('mobileMenu');
-    if (!hamburgerMenu) return;
-
-    const navLinks = `
-      <a href="/pariksha-sathi/about.html" class="mobile-menu-item">
-        <span class="menu-icon">📘</span> About
-      </a>
-      <a href="/pariksha-sathi/resources.html" class="mobile-menu-item">
-        <span class="menu-icon">📚</span> Resources
-      </a>
-      <a href="/pariksha-sathi/contact.html" class="mobile-menu-item">
-        <span class="menu-icon">📧</span> Contact
-      </a>
-      <a href="/pariksha-sathi/privacy.html" class="mobile-menu-item">
-        <span class="menu-icon">🔒</span> Privacy Policy
-      </a>
+    // Create mobile menu
+    const mobileMenu = document.createElement('div');
+    mobileMenu.id = 'mobileMenu';
+    mobileMenu.className = 'mobile-menu';
+    mobileMenu.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding-top: 80px;
     `;
 
+    // Menu container
+    const menuContainer = document.createElement('div');
+    menuContainer.className = 'menu-container';
+    menuContainer.style.cssText = `
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      width: 90%;
+      max-width: 400px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    `;
+
+    // Menu header
+    const menuHeader = document.createElement('div');
+    menuHeader.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    `;
+    
+    const menuTitle = document.createElement('h3');
+    menuTitle.textContent = 'Menu';
+    menuTitle.style.cssText = 'margin: 0; font-size: 20px; color: #333;';
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '✕';
+    closeBtn.style.cssText = `
+      background: none;
+      border: none;
+      font-size: 24px;
+      color: #999;
+      cursor: pointer;
+      padding: 0;
+      width: 30px;
+      height: 30px;
+    `;
+
+    menuHeader.appendChild(menuTitle);
+    menuHeader.appendChild(closeBtn);
+
+    // Menu items
+    const menuItems = [
+      { text: '📘 About', href: '/pariksha-sathi/about.html' },
+      { text: '📚 Resources', href: '/pariksha-sathi/resources.html' },
+      { text: '📧 Contact', href: '/pariksha-sathi/contact.html' },
+      { text: '🔒 Privacy Policy', href: '/pariksha-sathi/privacy.html' }
+    ];
+
+    const menuList = document.createElement('div');
+    menuList.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    `;
+
+    menuItems.forEach(item => {
+      const link = document.createElement('a');
+      link.href = item.href;
+      link.textContent = item.text;
+      link.style.cssText = `
+        padding: 12px 16px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #333;
+        background: #f5f5f5;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        display: block;
+        text-align: left;
+      `;
+      
+      link.addEventListener('mouseenter', function() {
+        this.style.background = '#e8e8ff';
+        this.style.transform = 'translateX(5px)';
+      });
+      link.addEventListener('mouseleave', function() {
+        this.style.background = '#f5f5f5';
+        this.style.transform = 'translateX(0)';
+      });
+
+      link.addEventListener('click', function() {
+        mobileMenu.style.display = 'none';
+      });
+
+      menuList.appendChild(link);
+    });
+
+    // Divider
     const divider = document.createElement('div');
-    divider.innerHTML = navLinks;
-    hamburgerMenu.appendChild(divider);
+    divider.style.cssText = 'height: 1px; background: #f0f0f0; margin: 15px 0;';
+
+    // Google Auth section inside menu
+    const authSection = document.createElement('div');
+    authSection.style.cssText = `
+      padding-top: 15px;
+      border-top: 2px solid #f0f0f0;
+    `;
+
+    const userAvatarBtn = document.getElementById('userAvatarBtn');
+    const userNameEl = document.getElementById('userName');
+    const userName = userNameEl ? userNameEl.textContent : 'User';
+
+    if (userAvatarBtn) {
+      const authDiv = document.createElement('div');
+      authDiv.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #f9f9f9;
+      `;
+
+      // Avatar clone
+      const avatarClone = document.createElement('div');
+      avatarClone.style.cssText = `
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      `;
+      avatarClone.textContent = userName.charAt(0).toUpperCase();
+
+      // User info
+      const userInfo = document.createElement('div');
+      userInfo.style.cssText = 'flex: 1;';
+      
+      const nameDiv = document.createElement('div');
+      nameDiv.textContent = userName;
+      nameDiv.style.cssText = 'font-weight: 600; font-size: 14px; color: #333;';
+      
+      const emailDiv = document.createElement('div');
+      emailDiv.textContent = 'Logged In';
+      emailDiv.style.cssText = 'font-size: 12px; color: #999; margin-top: 2px;';
+
+      userInfo.appendChild(nameDiv);
+      userInfo.appendChild(emailDiv);
+
+      authDiv.appendChild(avatarClone);
+      authDiv.appendChild(userInfo);
+      authSection.appendChild(authDiv);
+    }
+
+    menuContainer.appendChild(menuHeader);
+    menuContainer.appendChild(menuList);
+    menuContainer.appendChild(divider);
+    menuContainer.appendChild(authSection);
+    mobileMenu.appendChild(menuContainer);
+
+    // Event listeners
+    hamburgerBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    closeBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      mobileMenu.style.display = 'none';
+    });
+
+    mobileMenu.addEventListener('click', function(e) {
+      if (e.target === mobileMenu) {
+        mobileMenu.style.display = 'none';
+      }
+    });
+
+    // Add to DOM
+    document.body.appendChild(hamburgerBtn);
+    document.body.appendChild(mobileMenu);
   }
 
-  // Call mobile menu setup
-  addToHamburgerMenu();
+  // Fix mobile menu tap functionality
+  function fixMobileMenuTap() {
+    const hamburgerBtn = document.getElementById('hamburgerMenu');
+    const mobileMenu = document.getElementById('mobileMenu');
+    
+    if (!hamburgerBtn || !mobileMenu) return;
 
+    // Prevent default touch behaviors
+    hamburgerBtn.addEventListener('touchstart', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }, { passive: false });
+
+    hamburgerBtn.addEventListener('touchend', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'flex' : 'none';
+    }, { passive: false });
+
+    // Mobile menu items tap
+    const menuLinks = mobileMenu.querySelectorAll('a');
+    menuLinks.forEach(link => {
+      link.addEventListener('touchstart', function(e) {
+        this.style.background = '#e8e8ff';
+        this.style.transform = 'translateX(5px)';
+      }, { passive: true });
+
+      link.addEventListener('touchend', function(e) {
+        this.style.background = '#f5f5f5';
+        this.style.transform = 'translateX(0)';
+      }, { passive: true });
+    });
+  }
 })();
