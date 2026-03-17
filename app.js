@@ -7346,8 +7346,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // CSS fix for language toggle overlap with user profile
 const fixLangTogglePosition = () => {
   const style = document.createElement('style');
-  style.textContent = '.lang-toggle { left: 20px !important; right: auto !important; }';  document.head.appendChild(style);
-};
+  style.textContent = '.lang-toggle { left: 20px !important; right: auto !important; } @media (max-width: 768px) { .lang-toggle { top: 70px !important; } }';};
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', fixLangTogglePosition);
 } else {
