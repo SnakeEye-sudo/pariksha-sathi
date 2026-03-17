@@ -1663,4 +1663,15 @@ button:has(svg[class*="calendar"]) {
 }
 }
 
+/* Hide old top navigation buttons */
+.page-nav-buttons {
+  display: none !important;
+}
+
+/* Hide other old navigation elements */
+[class*="nav-btn"],
+[class*="page-nav"] {
+  display: none !important;
+}
+
 
