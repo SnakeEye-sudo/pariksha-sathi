@@ -6714,23 +6714,18 @@ function showNotifToast(state) {
 function injectCalendarAndNotifButtons() {
   if (document.getElementById('calendarExportBtn')) return;
 
-  const actions = document.querySelector('.plan-topbar-actions');
-  if (!actions) return;
-
-  // Calendar button
+  // Create hidden buttons (for hamburger menu click delegation)
+  // These are NOT added to topbar — they live in hamburger menu only
   const calBtn = document.createElement('button');
   calBtn.id = 'calendarExportBtn';
-  calBtn.className = 'ptb-btn ptb-calendar';
-  calBtn.innerHTML = '📅 Calendar';
+  calBtn.style.display = 'none';
   calBtn.onclick = showCalendarModal;
-  calBtn.title = lang === 'en' ? 'Export to Google Calendar' : 'Google Calendar में export करें';
+  document.body.appendChild(calBtn);
 
-  // Notification button
   const notifBtn = document.createElement('button');
   notifBtn.id = 'notifToggleBtn';
-  notifBtn.className = 'ptb-btn ptb-notif';
+  notifBtn.style.display = 'none';
   const notifEnabled = localStorage.getItem('ps_notif_enabled') === '1';
-  notifBtn.textContent = notifEnabled ? '🔔 Notifications ON' : '🔕 Notifications';
   if (notifEnabled) notifBtn.classList.add('notif-on');
   notifBtn.onclick = () => {
     if (localStorage.getItem('ps_notif_enabled') === '1') {
@@ -6739,16 +6734,7 @@ function injectCalendarAndNotifButtons() {
       setupFCM();
     }
   };
-
-  // Insert before PDF button
-  const pdfBtn = actions.querySelector('.ptb-download');
-  if (pdfBtn) {
-    actions.insertBefore(notifBtn, pdfBtn);
-    actions.insertBefore(calBtn, pdfBtn);
-  } else {
-    actions.appendChild(calBtn);
-    actions.appendChild(notifBtn);
-  }
+  document.body.appendChild(notifBtn);
 }
 
 // ── Auto-init when plan renders ───────────────────────────────
@@ -7341,62 +7327,3 @@ async function getFeedbackToken() {
 document.addEventListener('DOMContentLoaded', () => {
   setTimeout(injectFeedbackButton, 1500);
 });
-
-
-  // CSS fix for language toggle overlap with user profile
-const fixLangTogglePosition = () => {
-  const style = document.createElement('style');
-  style.textContent = '.lang-toggle { left: 20px !important; right: auto !important; } @media (max-width: 768px) { .lang-toggle { top: 70px !important; } }';};
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', fixLangTogglePosition);
-} else {
-  fixLangTogglePosition();
-
-  // ════════════════════════════════════════════════════════════════════
-// HAMBURGER MENU — Mobile Navigation Toggle
-// ════════════════════════════════════════════════════════════════════
-
-function toggleMobileMenu() {
-  const overlay = document.getElementById('mobileMenuOverlay');
-  const hamburger = document.getElementById('hamburgerBtn');
-  
-  if (overlay && hamburger) {
-    overlay.classList.toggle('open');
-    hamburger.classList.toggle('active');
-  }
-}
-
-function closeMobileMenu() {
-  const overlay = document.getElementById('mobileMenuOverlay');
-  const hamburger = document.getElementById('hamburgerBtn');
-  
-  if (overlay && hamburger) {
-    overlay.classList.remove('open');
-    hamburger.classList.remove('active');
-  }
-}
-
-// Event listeners for hamburger menu
-document.addEventListener('DOMContentLoaded', () => {
-  const hamburgerBtn = document.getElementById('hamburgerBtn');
-  const mobileMenuClose = document.getElementById('mobileMenuClose');
-  const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-  
-  if (hamburgerBtn) {
-    hamburgerBtn.addEventListener('click', toggleMobileMenu);
-  }
-  
-  if (mobileMenuClose) {
-    mobileMenuClose.addEventListener('click', closeMobileMenu);
-  }
-  
-  // Close menu when clicking overlay background
-  if (mobileMenuOverlay) {
-    mobileMenuOverlay.addEventListener('click', (e) => {
-      if (e.target === mobileMenuOverlay) {
-        closeMobileMenu();
-      }
-    });
-  }
-});
-}

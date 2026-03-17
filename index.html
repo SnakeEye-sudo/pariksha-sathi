@@ -203,12 +203,22 @@ function updateAuthUI(user) {
         const nameInput = document.getElementById('userName');
         if(nameInput && !nameInput.value && user.displayName) nameInput.value = user.displayName;
       } else {
-        if(gate) gate.style.display='flex';
-        if(avatarBtn) avatarBtn.style.display='none';
+        if(gate) gate.style.display='none';
+        if(avatarBtn) { avatarBtn.style.display='block'; }
+        if(avInitial) { avInitial.style.display='flex'; avInitial.textContent='👤'; }
+        if(avPhoto) avPhoto.style.display='none';
+        if(avName) avName.textContent = '';
         if(ptbLogout) ptbLogout.style.display='none';
       }
     }
     window.toggleUserMenu = function() {
+      const user = window.psAuth?.currentUser;
+      if (!user) {
+        // Not logged in — show login gate
+        const gate = document.getElementById('loginGate');
+        if(gate) gate.style.display = 'flex';
+        return;
+      }
       const menu = document.getElementById('userDropMenu');
       if(menu) menu.style.display = menu.style.display==='none' ? 'block' : 'none';
     };
@@ -888,10 +898,6 @@ function updateAuthUI(user) {
         <button class="lang-btn" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
         <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
       </div>
-      <button class="ptb-btn ptb-download" onclick="downloadPDF()"><span data-i18n="pdfBtn">⬇️ PDF</span></button>
-      <button class="ptb-btn ptb-edit" onclick="showScreen('formScreen')"><span data-i18n="editBtn">✏️ Edit</span></button>
-      <button class="ptb-btn ptb-reset" onclick="confirmResetPlan()"><span data-i18n="resetBtn">🔄 Naya Plan</span></button>
-      <button class="ptb-btn ptb-logout" id="ptbLogoutBtn" onclick="psSignOut()" style="display:none;">🚪 Logout</button>
     </div>
   </div>
 
