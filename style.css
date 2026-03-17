@@ -1219,4 +1219,36 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .ptb-tg {
   display: none !important;
 }
+
+/* Mobile topbar buttons responsive fix */
+@media(max-width: 768px) {
+  .plan-topbar {
+    padding: .6rem .5rem !important;
+  }
+  
+  .plan-topbar-actions {
+    max-width: calc(100vw - 120px);
+    gap: .2rem !important;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  
+  .plan-topbar-actions::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .ptb-btn {
+    padding: .35rem .5rem !important;
+    font-size: .68rem !important;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: fit-content;
+  }
+  
+  /* Show only icons on mobile, hide text */
+  .ptb-btn span:not([class*="icon"]) {
+    display: none;
+  }
+}
 .tg-manual-toggle:hover{color:rgba(255,255,255,.6)}
