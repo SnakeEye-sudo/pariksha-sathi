@@ -2382,8 +2382,7 @@ function generateDayPlanHTML() {
         if (slot.type === 'current_affairs') {
           // Build date string for the news app link — format YYYY-MM-DD
           const caDateStr = day.date.toISOString().slice(0, 10);
-          const caUrl = `${NEWS_APP_URL}?date=${caDateStr}`;
-          return `<div class="slot-card ca-slot-card" style="cursor:pointer" onclick="window.open('${caUrl}','_blank')" title="News Analysis padhne ke liye click karein">
+          return `<div class="slot-card ca-slot-card" style="cursor:pointer" onclick="openNewsApp('${caDateStr}')" title="News Analysis padhne ke liye click karein">
             <div class="slot-card-header">
               <span class="slot-type-badge" style="background:rgba(239,68,68,.08);color:#fca5a5;border-color:rgba(239,68,68,.2)">📰 Current Affairs</span>
               <span class="slot-duration">30 min</span>
@@ -7137,8 +7136,26 @@ function speakSlot(btn) {
 // ═══ chunks/c28.js ═══
 // c28.js — Feedback Widget + News App URL config
 
-// ── News App URL — replace with actual URL when ready ────────
-const NEWS_APP_URL = 'https://YOUR_NEWS_APP_URL_HERE';
+// ── News App URL — Samachar-Sathi ────────────────────────────
+const NEWS_APP_URL = 'https://snakeeye-sudo.github.io/Samachar-Sathi';
+
+// Opens Samachar-Sathi with date + Firebase ID token for auto sign-in (SSO)
+async function openNewsApp(dateStr) {
+  let url = `${NEWS_APP_URL}?date=${dateStr}`;
+  try {
+    const user = window.psAuth?.currentUser;
+    if (user) {
+      // getIdToken() returns a short-lived JWT — Samachar-Sathi uses it for auto sign-in
+      // NOTE: ID tokens can't be used with signInWithCustomToken directly.
+      // We pass uid + a session marker; Samachar-Sathi shares same Firebase project
+      // so onAuthStateChanged will already have the user if cookies/indexedDB are shared.
+      // As a fallback, we pass the uid so Samachar-Sathi can show the right user.
+      const idToken = await user.getIdToken();
+      url += `&ps_token=${encodeURIComponent(idToken)}&ps_uid=${encodeURIComponent(user.uid)}`;
+    }
+  } catch(e) { /* open without token if error */ }
+  window.open(url, '_blank');
+}
 
 // ── Feedback config ───────────────────────────────────────────
 // Uses GitHub Actions webhook → Python → Telegram (no CORS issues)

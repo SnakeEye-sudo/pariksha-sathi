@@ -1,7 +1,25 @@
 // c28.js — Feedback Widget + News App URL config
 
-// ── News App URL — replace with actual URL when ready ────────
-const NEWS_APP_URL = 'https://YOUR_NEWS_APP_URL_HERE';
+// ── News App URL — Samachar-Sathi ────────────────────────────
+const NEWS_APP_URL = 'https://snakeeye-sudo.github.io/Samachar-Sathi';
+
+// Opens Samachar-Sathi with date + Firebase ID token for auto sign-in (SSO)
+async function openNewsApp(dateStr) {
+  let url = `${NEWS_APP_URL}?date=${dateStr}`;
+  try {
+    const user = window.psAuth?.currentUser;
+    if (user) {
+      // getIdToken() returns a short-lived JWT — Samachar-Sathi uses it for auto sign-in
+      // NOTE: ID tokens can't be used with signInWithCustomToken directly.
+      // We pass uid + a session marker; Samachar-Sathi shares same Firebase project
+      // so onAuthStateChanged will already have the user if cookies/indexedDB are shared.
+      // As a fallback, we pass the uid so Samachar-Sathi can show the right user.
+      const idToken = await user.getIdToken();
+      url += `&ps_token=${encodeURIComponent(idToken)}&ps_uid=${encodeURIComponent(user.uid)}`;
+    }
+  } catch(e) { /* open without token if error */ }
+  window.open(url, '_blank');
+}
 
 // ── Feedback config ───────────────────────────────────────────
 // Uses GitHub Actions webhook → Python → Telegram (no CORS issues)
