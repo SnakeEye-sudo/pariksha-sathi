@@ -871,6 +871,12 @@ function updateAuthUI(user) {
 <div id="planScreen" class="screen">
   <div class="plan-topbar">
     <div class="plan-topbar-brand">
+            <!-- Hamburger Menu Icon (Mobile Only) -->
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
       <img src="logo.svg" alt="PS" class="ptb-logo-img"/>
       <span class="ptb-name">ParikshaSathi</span>
     </div>
@@ -886,6 +892,39 @@ function updateAuthUI(user) {
       <button class="ptb-btn ptb-logout" id="ptbLogoutBtn" onclick="psSignOut()" style="display:none;">🚪 Logout</button>
     </div>
   </div>
+
+      <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+      <div class="mobile-menu">
+        <button class="mobile-menu-close" id="mobileMenuClose">✕</button>
+        <nav class="mobile-menu-nav">
+          <button class="mobile-menu-item" onclick="document.getElementById('ptbNotifBtn')?.click(); closeMobileMenu();">
+            <span class="menu-icon">🔔</span>
+            <span>Notifications चालू करें</span>
+          </button>
+          <button class="mobile-menu-item" onclick="document.getElementById('ptbCalBtn')?.click(); closeMobileMenu();">
+            <span class="menu-icon">📅</span>
+            <span>Calendar Export</span>
+          </button>
+          <button class="mobile-menu-item" onclick="downloadPDF(); closeMobileMenu();">
+            <span class="menu-icon">📄</span>
+            <span>PDF Download</span>
+          </button>
+          <button class="mobile-menu-item" onclick="showScreen('formScreen'); closeMobileMenu();">
+            <span class="menu-icon">✏️</span>
+            <span>Edit Plan</span>
+          </button>
+          <button class="mobile-menu-item" onclick="confirmResetPlan(); closeMobileMenu();">
+            <span class="menu-icon">🔄</span>
+            <span>Naya Plan</span>
+          </button>
+          <button class="mobile-menu-item" onclick="psSignOut(); closeMobileMenu();">
+            <span class="menu-icon">🚪</span>
+            <span>Logout</span>
+          </button>
+        </nav>
+      </div>
+    </div>
 
   <div class="plan-hero">
     <div class="plan-hero-inner">
