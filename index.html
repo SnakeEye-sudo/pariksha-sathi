@@ -220,6 +220,45 @@ function updateAuthUI(user) {
   </script>
 </head>
 <body>
+<script>
+  (function initParikshaFamilyTheme() {
+    const THEME_KEY = "sathi-family-theme";
+    const THEME_MODE_KEY = "sathi-family-theme-mode";
+    const INSTALL_MARKER = "sathi-installed-pariksha-sathi";
+    const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function resolveTheme(themePreference) {
+      if (themePreference === "dark" || themePreference === "light") return themePreference;
+      return systemThemeQuery.matches ? "dark" : "light";
+    }
+
+    function applyTheme() {
+      const themePreference = localStorage.getItem(THEME_MODE_KEY) || localStorage.getItem(THEME_KEY) || "system";
+      const resolvedTheme = resolveTheme(themePreference);
+      if (document.body) document.body.classList.toggle("theme-light", resolvedTheme === "light");
+    }
+
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      localStorage.setItem(INSTALL_MARKER, "true");
+    }
+
+    if (typeof systemThemeQuery.addEventListener === "function") {
+      systemThemeQuery.addEventListener("change", () => {
+        if ((localStorage.getItem(THEME_MODE_KEY) || "system") === "system") applyTheme();
+      });
+    }
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === THEME_KEY || event.key === THEME_MODE_KEY) applyTheme();
+    });
+
+    window.addEventListener("appinstalled", () => {
+      localStorage.setItem(INSTALL_MARKER, "true");
+    });
+
+    document.addEventListener("DOMContentLoaded", applyTheme);
+  })();
+</script>
 <!-- ===LOGIN GATE=== -->
     <div id="loginGate" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);display:none;align-items:center;justify-content:center;">
       <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:48px 40px;text-align:center;max-width:420px;width:90%;box-shadow:0 32px 64px rgba(0,0,0,0.6);">
@@ -954,6 +993,18 @@ function updateAuthUI(user) {
       <span class="footer-disclaimer-text">⚠️ Publicly available sources पर based — official sources से verify करें</span>
       <button class="footer-terms-btn" onclick="openTermsModal()">Terms &amp; Disclaimer</button>
     </div>
+    <div class="footer-family-badge">Part of Aapka-Sathi Family</div>
+    <div class="footer-links-grid">
+      <a href="about.html" class="footer-chip-link">About</a>
+      <a href="resources.html" class="footer-chip-link">Resources</a>
+      <a href="contact.html" class="footer-chip-link">Contact</a>
+      <a href="privacy.html" class="footer-chip-link">Privacy Policy</a>
+      <a href="terms.html" class="footer-chip-link">Terms &amp; Conditions</a>
+      <a href="https://snakeeye-sudo.github.io/Aapka-Sathi/" target="_blank" rel="noopener" class="footer-chip-link">Aapka-Sathi Hub</a>
+      <a href="https://snakeeye-sudo.github.io/rozgar-sathi/" target="_blank" rel="noopener" class="footer-chip-link">Rozgar-Sathi</a>
+      <a href="https://snakeeye-sudo.github.io/Samachar-Sathi/" target="_blank" rel="noopener" class="footer-chip-link">Samachar-Sathi</a>
+    </div>
+    <p class="footer-family-note">Ek login, PWA install, day/night theme, legal pages, reminders aur feedback jaise shared family standards ke saath.</p>
     <div class="footer-bmc">
       <a href="https://buymeacoffee.com/snakeeye" target="_blank" rel="noopener" class="footer-bmc-btn">
         ☕ Buy me a coffee
