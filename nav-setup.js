@@ -13,22 +13,20 @@
     removeTopButtons();
     setupHamburgerMenu();
     fixMobileMenuTap();
+    initThemeSystem();
   }
 
-  // Remove all top navigation buttons
   function removeTopButtons() {
-    // Remove page-nav-buttons if exists
     const pageNavButtons = document.querySelector('.page-nav-buttons');
     if (pageNavButtons) {
       pageNavButtons.remove();
     }
 
-    // Hide top navigation elements that may exist
     const topNavElements = document.querySelectorAll(
       '[class*="nav"][class*="button"], [id*="nav"], .top-nav'
     );
     topNavElements.forEach(el => {
-      if (el.textContent.includes('About') || 
+      if (el.textContent.includes('About') ||
           el.textContent.includes('Resources') ||
           el.textContent.includes('Contact') ||
           el.textContent.includes('Privacy')) {
@@ -37,12 +35,10 @@
     });
   }
 
-  // Setup clean hamburger menu
   function setupHamburgerMenu() {
     const topbar = document.querySelector('.plan-topbar');
     if (!topbar) return;
 
-    // Create hamburger button
     const hamburgerBtn = document.createElement('button');
     hamburgerBtn.id = 'hamburgerMenu';
     hamburgerBtn.className = 'hamburger-btn';
@@ -74,7 +70,6 @@
       this.style.transform = 'scale(1)';
     });
 
-    // Create mobile menu
     const mobileMenu = document.createElement('div');
     mobileMenu.id = 'mobileMenu';
     mobileMenu.className = 'mobile-menu';
@@ -93,7 +88,6 @@
       padding-top: 80px;
     `;
 
-    // Menu container
     const menuContainer = document.createElement('div');
     menuContainer.className = 'menu-container';
     menuContainer.style.cssText = `
@@ -107,7 +101,6 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.3);
     `;
 
-    // Menu header
     const menuHeader = document.createElement('div');
     menuHeader.style.cssText = `
       display: flex;
@@ -117,11 +110,11 @@
       padding-bottom: 15px;
       border-bottom: 2px solid #f0f0f0;
     `;
-    
+
     const menuTitle = document.createElement('h3');
     menuTitle.textContent = 'Menu';
     menuTitle.style.cssText = 'margin: 0; font-size: 20px; color: #333;';
-    
+
     const closeBtn = document.createElement('button');
     closeBtn.textContent = '✕';
     closeBtn.style.cssText = `
@@ -138,12 +131,13 @@
     menuHeader.appendChild(menuTitle);
     menuHeader.appendChild(closeBtn);
 
-    // Menu items
     const menuItems = [
       { text: '📘 About', href: '/pariksha-sathi/about.html' },
       { text: '📚 Resources', href: '/pariksha-sathi/resources.html' },
       { text: '📧 Contact', href: '/pariksha-sathi/contact.html' },
-      { text: '🔒 Privacy Policy', href: '/pariksha-sathi/privacy.html' }
+      { text: '🔒 Privacy Policy', href: '/pariksha-sathi/privacy.html' },
+      { text: '📄 Terms & Conditions', href: '/pariksha-sathi/terms.html' },
+      { text: '🌐 Aapka-Sathi Hub', href: 'https://snakeeye-sudo.github.io/Aapka-Sathi/' }
     ];
 
     const menuList = document.createElement('div');
@@ -158,6 +152,10 @@
       const link = document.createElement('a');
       link.href = item.href;
       link.textContent = item.text;
+      if (item.href.startsWith('http')) {
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+      }
       link.style.cssText = `
         padding: 12px 16px;
         border-radius: 8px;
@@ -171,7 +169,7 @@
         display: block;
         text-align: left;
       `;
-      
+
       link.addEventListener('mouseenter', function() {
         this.style.background = '#e8e8ff';
         this.style.transform = 'translateX(5px)';
@@ -180,7 +178,6 @@
         this.style.background = '#f5f5f5';
         this.style.transform = 'translateX(0)';
       });
-
       link.addEventListener('click', function() {
         mobileMenu.style.display = 'none';
       });
@@ -188,11 +185,9 @@
       menuList.appendChild(link);
     });
 
-    // Divider
     const divider = document.createElement('div');
     divider.style.cssText = 'height: 1px; background: #f0f0f0; margin: 15px 0;';
 
-    // Google Auth section inside menu
     const authSection = document.createElement('div');
     authSection.style.cssText = `
       padding-top: 15px;
@@ -214,7 +209,6 @@
         background: #f9f9f9;
       `;
 
-      // Avatar clone
       const avatarClone = document.createElement('div');
       avatarClone.style.cssText = `
         width: 40px;
@@ -230,33 +224,51 @@
       `;
       avatarClone.textContent = userName.charAt(0).toUpperCase();
 
-      // User info
       const userInfo = document.createElement('div');
       userInfo.style.cssText = 'flex: 1;';
-      
+
       const nameDiv = document.createElement('div');
       nameDiv.textContent = userName;
       nameDiv.style.cssText = 'font-weight: 600; font-size: 14px; color: #333;';
-      
+
       const emailDiv = document.createElement('div');
       emailDiv.textContent = 'Logged In';
       emailDiv.style.cssText = 'font-size: 12px; color: #999; margin-top: 2px;';
 
       userInfo.appendChild(nameDiv);
       userInfo.appendChild(emailDiv);
-
       authDiv.appendChild(avatarClone);
       authDiv.appendChild(userInfo);
       authSection.appendChild(authDiv);
     }
 
+    const themeBtn = document.createElement('button');
+    themeBtn.type = 'button';
+    themeBtn.id = 'psThemeToggleBtn';
+    themeBtn.style.cssText = `
+      width: 100%;
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: none;
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    `;
+    themeBtn.addEventListener('click', function() {
+      toggleTheme();
+      updateThemeButtonLabel();
+    });
+
     menuContainer.appendChild(menuHeader);
     menuContainer.appendChild(menuList);
     menuContainer.appendChild(divider);
     menuContainer.appendChild(authSection);
+    menuContainer.appendChild(themeBtn);
     mobileMenu.appendChild(menuContainer);
 
-    // Event listeners
     hamburgerBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'flex' : 'none';
@@ -273,19 +285,16 @@
       }
     });
 
-    // Add to DOM
     document.body.appendChild(hamburgerBtn);
     document.body.appendChild(mobileMenu);
+    updateThemeButtonLabel();
   }
 
-  // Fix mobile menu tap functionality
   function fixMobileMenuTap() {
     const hamburgerBtn = document.getElementById('hamburgerMenu');
     const mobileMenu = document.getElementById('mobileMenu');
-    
     if (!hamburgerBtn || !mobileMenu) return;
 
-    // Prevent default touch behaviors
     hamburgerBtn.addEventListener('touchstart', function(e) {
       e.preventDefault();
       e.stopPropagation();
@@ -297,18 +306,35 @@
       mobileMenu.style.display = mobileMenu.style.display === 'none' ? 'flex' : 'none';
     }, { passive: false });
 
-    // Mobile menu items tap
     const menuLinks = mobileMenu.querySelectorAll('a');
     menuLinks.forEach(link => {
-      link.addEventListener('touchstart', function(e) {
+      link.addEventListener('touchstart', function() {
         this.style.background = '#e8e8ff';
         this.style.transform = 'translateX(5px)';
       }, { passive: true });
 
-      link.addEventListener('touchend', function(e) {
+      link.addEventListener('touchend', function() {
         this.style.background = '#f5f5f5';
         this.style.transform = 'translateX(0)';
       }, { passive: true });
     });
+  }
+
+  function initThemeSystem() {
+    const savedTheme = localStorage.getItem('ps_theme') || 'dark';
+    document.body.classList.toggle('theme-light', savedTheme === 'light');
+    updateThemeButtonLabel();
+  }
+
+  function toggleTheme() {
+    const isLight = document.body.classList.toggle('theme-light');
+    localStorage.setItem('ps_theme', isLight ? 'light' : 'dark');
+  }
+
+  function updateThemeButtonLabel() {
+    const btn = document.getElementById('psThemeToggleBtn');
+    if (!btn) return;
+    const isLight = document.body.classList.contains('theme-light');
+    btn.textContent = isLight ? '🌙 Switch to Night Theme' : '☀️ Switch to Day Theme';
   }
 })();

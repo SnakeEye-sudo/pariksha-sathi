@@ -34,6 +34,26 @@
 }
 html{scroll-behavior:smooth}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body.theme-light{
+  --bg:#f6f8fc;--bg2:#ffffff;--bg3:#eef3fb;--bg4:#e4ebf7;--bg5:#dae4f3;
+  --surface:rgba(255,255,255,.9);--surface2:rgba(255,255,255,.96);--surface3:rgba(255,255,255,.98);
+  --border:rgba(15,23,42,.08);--border2:rgba(15,23,42,.12);--border3:rgba(15,23,42,.18);
+  --t1:#0f172a;--t2:#475569;--t3:#64748b;--t4:#94a3b8;
+  --grad-bg:radial-gradient(ellipse 100% 70% at 50% -5%,rgba(245,158,11,.12) 0%,transparent 55%),
+            radial-gradient(ellipse 70% 50% at 85% 85%,rgba(16,185,129,.08) 0%,transparent 50%),
+            radial-gradient(ellipse 50% 40% at 10% 60%,rgba(59,130,246,.08) 0%,transparent 50%),
+            linear-gradient(180deg,#f8fafc 0%,#eef4ff 100%);
+  --shadow:0 12px 36px rgba(15,23,42,.08);
+  --shadow-lg:0 30px 80px rgba(15,23,42,.12);
+}
+body.theme-light #bgCanvas{opacity:.22}
+body.theme-light .exam-card,
+body.theme-light .form-card{background:rgba(255,255,255,.88);box-shadow:var(--shadow)}
+body.theme-light .site-footer{background:rgba(255,255,255,.95)}
+body.theme-light .footer-disclaimer-row{background:rgba(245,158,11,.08)}
+body.theme-light .hero-bmc-link,
+body.theme-light .footer-bmc-btn{color:#8a5a00;background:rgba(255,221,0,.12)}
+body.theme-light .hstat{background:rgba(255,255,255,.88)}
 .screen{display:none;min-height:100vh}.screen.active{display:block}
 .hidden{display:none!important}
 ::-webkit-scrollbar{width:5px;height:5px}
@@ -524,6 +544,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-hei
 .footer-bmc{margin-top:1.2rem}
 .footer-bmc-btn{display:inline-flex;align-items:center;gap:.45rem;background:rgba(255,221,0,.07);border:1px solid rgba(255,221,0,.2);color:#FFDD00;padding:.5rem 1.3rem;border-radius:50px;font-size:.82rem;font-weight:700;text-decoration:none;transition:all .2s;letter-spacing:.02em}
 .footer-bmc-btn:hover{background:rgba(255,221,0,.14);box-shadow:0 4px 16px rgba(255,221,0,.15)}
+.footer-family-badge{display:inline-flex;align-items:center;justify-content:center;gap:.4rem;margin:.9rem auto .35rem;padding:.45rem .9rem;border-radius:999px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.18);color:#93c5fd;font-size:.74rem;font-weight:700;letter-spacing:.02em}
+.footer-links-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:.6rem;margin-top:1rem}
+.footer-chip-link{display:inline-flex;align-items:center;justify-content:center;padding:.45rem .85rem;border-radius:999px;background:var(--surface);border:1px solid var(--border2);color:var(--t2);text-decoration:none;font-size:.76rem;font-weight:700;transition:all var(--transition)}
+.footer-chip-link:hover{border-color:rgba(245,158,11,.35);color:var(--amber);transform:translateY(-1px)}
+.footer-family-note{max-width:680px;margin:.9rem auto 0!important;font-size:.74rem!important;color:var(--t3)!important}
 
 /* ══════════════════════════════════════════════════
    TELEGRAM MODAL
