@@ -11,8 +11,6 @@
 
   function init() {
     removeTopButtons();
-    setupHamburgerMenu();
-    fixMobileMenuTap();
     initThemeSystem();
   }
 
