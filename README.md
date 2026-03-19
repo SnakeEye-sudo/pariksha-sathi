@@ -1,4 +1,4 @@
-# Pariksha Sathi
+﻿# Pariksha Sathi
 
 ## About
 
@@ -9,6 +9,12 @@ Study planner for competitive exams with syllabus-aware planning, streaks, and c
 - GitHub repo: https://github.com/SnakeEye-sudo/pariksha-sathi
 - Tags: sathi-family, study-planner, education, competitive-exam, pwa, hindi-app
 
+<!-- app-screenshot:start -->
+## App Screenshot
+
+![App screenshot](docs/preview.png)
+
+<!-- app-screenshot:end -->
 ## Creator
 
 Built and originally created by **Er. Sangam Krishna** ([SnakeEye-sudo](https://github.com/SnakeEye-sudo)).
@@ -24,3 +30,4 @@ Built and originally created by **Er. Sangam Krishna** ([SnakeEye-sudo](https://
 This repository uses the **MIT License** with a required **NOTICE** file.
 That means collaboration is allowed, but copyright and attribution notices must stay preserved.
 See [LICENSE](LICENSE), [NOTICE](NOTICE), and [CONTRIBUTING.md](CONTRIBUTING.md).
+
