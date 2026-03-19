@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="google-adsense-account" content="ca-pub-9998969711223461"/>
+      <meta name="google-site-verification" content="k3PkpbFH3gCWuMlzTK1jIPdqQqmPw5AhHs4d1BFn6rY" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>ParikshaSathi — आपकी परीक्षा, आपका Plan | BPSC TRE 4.0 & UPSC CSE 2026/2027</title>
+  <meta name="description" content="Free personalized study planner for BPSC TRE 4.0 and UPSC CSE 2026/2027. Day-by-day syllabus plan with PDF download. By Er. Sangam Krishna."/>
+  <link rel="icon" type="image/png" href="favicon.png"/>
+  <!-- Icon refresh: 2026-03-19 -->
+  <link rel="apple-touch-icon" href="logo.png"/>
+  <link rel="manifest" href="manifest.json"/>
+  <meta name="theme-color" content="#f59e0b"/>
+  <meta name="mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="ParikshaSathi"/>
+  <meta name="gh-feedback-token" content="FEEDBACK_TOKEN_PLACEHOLDER"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="nav-setup.js" defer></script>
+    <script src="fixes-features.js" defer></script>
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9998969711223461" crossorigin="anonymous"></script>
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+    const firebaseConfig = {
+      apiKey: "AIzaSyC6Cpg83N8fBuvY7YOSwTWsfM9DUsaVc3E",
+      authDomain: "pariksha-sathi.firebaseapp.com",
+      projectId: "pariksha-sathi",
+      storageBucket: "pariksha-sathi.firebasestorage.app",
+      messagingSenderId: "921721697043",
+      appId: "1:921721697043:web:dada90a420c40e11ae60e6",
+      measurementId: "G-NC7955J7KV"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+    window.psAuth = auth;
+    window.psDb = db;
+    window.psProvider = provider;
+    window.psSignIn = async function() {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        await saveUserToFirestore(user);
+        updateAuthUI(user);
+        await syncPlanFromCloud(user);
+      } catch(e) { console.error(e); }
+    };
+    window.psSignOut = async function() {
+      await signOut(auth);
+      updateAuthUI(null);
+      // Go back to welcome screen
+      if (typeof showScreen === 'function') showScreen('welcomeScreen');
+    };
+    async function saveUserToFirestore(user) {
+      const userRef = doc(db, 'users', user.uid);
+      await setDoc(userRef, { name: user.displayName, email: user.email, photo: user.photoURL, lastLogin: new Date().toISOString() }, { merge: true });
+    }
+    async function saveProgressToCloud(user) {
+      try {
+        // 1. Save all localStorage to progress/data subcollection (existing behaviour)
+        const data = {};
+        for(let i = 0; i < localStorage.length; i++) {
+          const k = localStorage.key(i);
+          data[k] = localStorage.getItem(k);
+        }
+        const ref = doc(db, 'users', user.uid, 'progress', 'data');
+        await setDoc(ref, { ...data, updatedAt: new Date().toISOString() });
+
+        // 2. Also save structured plan + checklist to users/{uid} doc
+        //    so the Telegram bot can read plan days with dateStr
+        try {
+          const rawPlan = localStorage.getItem('pariksha_sathi_plan');
+          const rawChecklist = localStorage.getItem('ps_checklist');
+          if (rawPlan) {
+            const parsed = JSON.parse(rawPlan);
+            // studyPlan is the global array built by buildPlan()
+            // We need to serialize it with dateStr per day
+            const planArr = (typeof studyPlan !== 'undefined' && studyPlan.length)
+              ? studyPlan.map(day => ({
+                  day: day.day,
+                  dateStr: day.date instanceof Date
+                    ? day.date.toISOString().slice(0,10)
+                    : String(day.date).slice(0,10),
+                  dayName: day.dayName,
+                  isMock: day.isMock || false,
+                  isRevision: day.isRevision || false,
+                  slots: (day.slots || []).map(s => ({
+                    type: s.type,
+                    subject: s.subject,
+                    topic: s.topic,
+                    slotType: s.slotType,
+                    color: s.color || ''
+                  }))
+                }))
+              : [];
+            const userRef = doc(db, 'users', user.uid);
+            const updatePayload = {
+              plan: planArr,
+              planSavedAt: new Date().toISOString(),
+              name: parsed.userData?.name || user.displayName || ''
+            };
+            if (rawChecklist) {
+              // Only write checklist if not already updated by Telegram bot
+              // Use merge:true so bot's updates aren't overwritten
+              updatePayload.checklist = JSON.parse(rawChecklist);
+            }
+            await setDoc(userRef, updatePayload, { merge: true });
+          }
+        } catch(e2) { console.warn('Structured plan save failed', e2); }
+      } catch(e) { console.error('Cloud save failed', e); }
+    }
+    async function syncPlanFromCloud(user) {
+      try {
+        // 1. Restore localStorage from progress/data subcollection
+        const ref = doc(db, 'users', user.uid, 'progress', 'data');
+        const snap = await getDoc(ref);
+        if(snap.exists()) {
+          const d = snap.data();
+          Object.keys(d).forEach(k => { if(k !== 'updatedAt') localStorage.setItem(k, d[k]); });
+        }
+
+        // 2. Merge checklist from users/{uid} doc (Telegram bot may have updated it)
+        try {
+          const userRef = doc(db, 'users', user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const ud = userSnap.data();
+            if (ud.checklist && typeof ud.checklist === 'object') {
+              // Merge: cloud checklist wins (Telegram ticks should persist)
+              const localCL = JSON.parse(localStorage.getItem('ps_checklist') || '{}');
+              const merged = { ...localCL, ...ud.checklist };
+              localStorage.setItem('ps_checklist', JSON.stringify(merged));
+            }
+          }
+        } catch(e2) { console.warn('Checklist merge failed', e2); }
+
+        if(typeof window.loadSavedPlan === 'function') window.loadSavedPlan();
+        const msg = document.getElementById('cloudSyncMsg');
+        if(msg) { msg.textContent = '☁️ Cloud se sync ho gaya!'; msg.style.display='block'; setTimeout(()=>msg.style.display='none',3000); }
+      } catch(e) { console.error('Cloud sync failed', e); }
+    }
+    window.psSaveToCloud = function() {
+      const user = auth.currentUser;
+      if(user) saveProgressToCloud(user);
+    };
+    onAuthStateChanged(auth, (user) => {
+      updateAuthUI(user);
+      if(user) {
+        // Auto-save every 60s
+        setInterval(() => saveProgressToCloud(user), 60000);
+        // Sync checklist from Firestore every 5 min (picks up Telegram bot ticks)
+        setInterval(async () => {
+          try {
+            const { doc: d2, getDoc: g2 } = await import('https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js');
+            const userSnap = await g2(d2(db, 'users', user.uid));
+            if (userSnap.exists()) {
+              const ud = userSnap.data();
+              if (ud.checklist && typeof ud.checklist === 'object') {
+                const localCL = JSON.parse(localStorage.getItem('ps_checklist') || '{}');
+                const merged = { ...localCL, ...ud.checklist };
+                const localStr = JSON.stringify(localCL);
+                const mergedStr = JSON.stringify(merged);
+                if (localStr !== mergedStr) {
+                  localStorage.setItem('ps_checklist', mergedStr);
+                  // Re-render checklist ticks if plan is visible
+                  if (typeof window.renderChecklist === 'function') window.renderChecklist();
+                  else if (typeof renderPlan === 'function') renderPlan();
+                }
+              }
+            }
+          } catch(e) {}
+        }, 5 * 60 * 1000);
+      }
+    });
+function updateAuthUI(user) {
+      const gate = document.getElementById('loginGate');
+      const avatarBtn = document.getElementById('userAvatarBtn');
+      const avPhoto = document.getElementById('uAvPhoto');
+      const avInitial = document.getElementById('uAvInitial');
+      const avName = document.getElementById('uAvName');
+      const menuName = document.getElementById('menuUserName');
+      const menuEmail = document.getElementById('menuUserEmail');
+      const ptbLogout = document.getElementById('ptbLogoutBtn');
+      if(user) {
+        if(gate) gate.style.display='none';
+        if(avatarBtn) avatarBtn.style.display='block';
+        if(ptbLogout) ptbLogout.style.display='inline-flex';
+        if(avPhoto && user.photoURL) { avPhoto.src=user.photoURL; avPhoto.style.display='block'; if(avInitial) avInitial.style.display='none'; }
+        else { if(avPhoto) avPhoto.style.display='none'; if(avInitial) { avInitial.style.display='flex'; avInitial.textContent=(user.displayName||user.email||'U')[0].toUpperCase(); } }
+        const firstName = user.displayName ? user.displayName.split(' ')[0] : (user.email||'').split('@')[0];
+        if(avName) avName.textContent = firstName;
+        if(menuName) menuName.textContent = user.displayName || user.email;
+        if(menuEmail) menuEmail.textContent = user.email;
+        const nameInput = document.getElementById('userName');
+        if(nameInput && !nameInput.value && user.displayName) nameInput.value = user.displayName;
+      } else {
+        if(gate) gate.style.display='flex';
+        if(avatarBtn) avatarBtn.style.display='none';
+        if(ptbLogout) ptbLogout.style.display='none';
+      }
+    }
+    window.toggleUserMenu = function() {
+      const menu = document.getElementById('userDropMenu');
+      if(menu) menu.style.display = menu.style.display==='none' ? 'block' : 'none';
+    };
+    document.addEventListener('click', function(e) {
+      const btn = document.getElementById('userAvatarBtn');
+      const menu = document.getElementById('userDropMenu');
+      if(menu && btn && !btn.contains(e.target) && menu.style.display!=='none') menu.style.display='none';
+    });
+  </script>
+</head>
+<body>
+<script>
+  (function initParikshaFamilyTheme() {
+    const THEME_KEY = "sathi-family-theme";
+    const THEME_MODE_KEY = "sathi-family-theme-mode";
+    const INSTALL_MARKER = "sathi-installed-pariksha-sathi";
+    const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function resolveTheme(themePreference) {
+      if (themePreference === "dark" || themePreference === "light") return themePreference;
+      return systemThemeQuery.matches ? "dark" : "light";
+    }
+
+    function applyTheme() {
+      const themePreference = localStorage.getItem(THEME_MODE_KEY) || localStorage.getItem(THEME_KEY) || "system";
+      const resolvedTheme = resolveTheme(themePreference);
+      if (document.body) document.body.classList.toggle("theme-light", resolvedTheme === "light");
+    }
+
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      localStorage.setItem(INSTALL_MARKER, "true");
+    }
+
+    if (typeof systemThemeQuery.addEventListener === "function") {
+      systemThemeQuery.addEventListener("change", () => {
+        if ((localStorage.getItem(THEME_MODE_KEY) || "system") === "system") applyTheme();
+      });
+    }
+
+    window.addEventListener("storage", (event) => {
+      if (event.key === THEME_KEY || event.key === THEME_MODE_KEY) applyTheme();
+    });
+
+    window.addEventListener("appinstalled", () => {
+      localStorage.setItem(INSTALL_MARKER, "true");
+    });
+
+    document.addEventListener("DOMContentLoaded", applyTheme);
+  })();
+</script>
+<!-- ===LOGIN GATE=== -->
+    <div id="loginGate" style="position:fixed;inset:0;z-index:99999;background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);display:none;align-items:center;justify-content:center;">
+      <div style="background:rgba(255,255,255,0.05);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:48px 40px;text-align:center;max-width:420px;width:90%;box-shadow:0 32px 64px rgba(0,0,0,0.6);">
+        <div style="width:72px;height:72px;background:linear-gradient(135deg,#f59e0b,#ef4444);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:36px;">&#x1F4DA;</div>
+        <h2 style="color:#fff;font-size:26px;font-weight:800;margin:0 0 8px;font-family:Inter,sans-serif;letter-spacing:-0.5px;">ParikshaSathi</h2>
+        <p style="color:#f59e0b;font-size:13px;font-weight:600;margin:0 0 6px;font-family:Inter,sans-serif;">&#x1F3AF; Er. Sangam Krishna — 100% Free</p>
+        <p style="color:rgba(255,255,255,0.55);font-size:14px;margin:0 0 32px;font-family:Inter,sans-serif;line-height:1.6;">&#x2601;&#xFE0F; Apni Progress kisi bhi device se access karne ke liye <strong style="color:rgba(255,255,255,0.85);">Google se Login karein</strong></p>
+        <button onclick="psSignIn()" style="width:100%;background:#fff;color:#1f2937;border:none;padding:14px 24px;border-radius:14px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:12px;font-family:Inter,sans-serif;box-shadow:0 4px 20px rgba(0,0,0,0.35);transition:transform 0.15s,box-shadow 0.15s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,0,0,0.45)'" onmouseout="this.style.transform='';this.style.boxShadow='0 4px 20px rgba(0,0,0,0.35)'">
+          <svg width="20" height="20" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Google se Login karein
+        </button>
+        <p style="color:rgba(255,255,255,0.3);font-size:11px;margin:18px 0 0;font-family:Inter,sans-serif;">100% Free &bull; No Password &bull; Secure Google Login</p>        <button onclick="document.getElementById('loginGate').style.display='none'" style="background:none;border:none;color:rgba(255,255,255,0.35);font-size:13px;cursor:pointer;margin-top:14px;font-family:Inter,sans-serif;padding:6px 12px;">&#x2715; Skip, website dekho</button>
+      </div>
+    </div>
+    <!-- ===USER AVATAR BUTTON=== -->
+      <div id="userAvatarBtn" style="position:fixed;top:1rem;left:1rem;z-index:9998;display:none;">
+        <button onclick="toggleUserMenu()" style="background:rgba(15,12,41,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:2px solid rgba(245,158,11,0.6);border-radius:50px;padding:6px 14px 6px 6px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:border-color 0.2s;max-width:calc(100vw - 2rem);" onmouseover="this.style.borderColor='rgba(245,158,11,1)'" onmouseout="this.style.borderColor='rgba(245,158,11,0.6)'">
+          <img id="uAvPhoto" style="width:32px;height:32px;border-radius:50%;object-fit:cover;display:none;border:2px solid #f59e0b;" />
+          <div id="uAvInitial" style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ef4444);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;font-family:Inter,sans-serif;">?</div>
+          <span id="uAvName" style="color:#f1f5f9;font-size:13px;font-weight:600;font-family:Inter,sans-serif;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+        </button>
+        <div id="userDropMenu" style="display:none;position:fixed;top:4.5rem;left:1rem;background:rgba(10,8,35,0.97);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:8px;min-width:220px;max-width:calc(100vw - 2rem);box-shadow:0 20px 48px rgba(0,0,0,0.6);z-index:9999;">
+          <div style="padding:12px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.07);margin-bottom:8px;">
+            <p id="menuUserName" style="color:#f1f5f9;font-weight:700;font-size:14px;margin:0;font-family:Inter,sans-serif;"></p>
+            <p id="menuUserEmail" style="color:rgba(255,255,255,0.45);font-size:12px;margin:4px 0 0;font-family:Inter,sans-serif;"></p>
+          </div>
+          <div id="cloudSyncMsg" style="display:none;color:#4ade80;font-size:12px;padding:6px 16px 8px;font-family:Inter,sans-serif;font-weight:600;"></div>
+          <button onclick="psSaveToCloud()" style="width:100%;background:rgba(29,78,216,0.25);color:#93c5fd;border:1px solid rgba(29,78,216,0.3);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Inter,sans-serif;margin-bottom:6px;display:flex;align-items:center;gap:8px;">&#x2601;&#xFE0F; Cloud Save karein</button>
+          <button onclick="psSignOut()" style="width:100%;background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.2);padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;text-align:left;font-family:Inter,sans-serif;display:flex;align-items:center;gap:8px;">&#x1F6AA; Logout</button>
+        </div>
+      </div>
+    </div>
+
+<!-- ═══ WELCOME SCREEN ═══ -->
+<div id="welcomeScreen" class="screen active">
+  <canvas id="bgCanvas"></canvas>
+
+  <!-- Language Toggle — top right -->
+  <div class="lang-toggle-wrap">
+    <button class="lang-btn" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+  </div>
+
+  <div class="hero">
+    <!-- Welcome back toast (shown only if saved plan exists) -->
+    <div id="welcomeBackToast" class="welcome-back-toast hidden">
+      <span class="wb-dot"></span>
+      <span>Welcome back, <span id="welcomeBackName"></span> 👋</span>
+    </div>
+
+    <div class="hero-brand">
+      <div class="brand-logo-wrap">
+        <div class="brand-logo-glow"></div>
+        <div class="brand-logo-ring"></div>
+        <img src="logo.png" alt="ParikshaSathi" class="brand-logo-img"/>
+      </div>
+      <span class="brand-name-hero">Pariksha<span class="brand-name-accent">Sathi</span></span>
+    </div>
+
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      <span data-i18n="badge">🎯 Er. Sangam Krishna — 100% Free Study Planner</span>
+    </div>
+
+    <h1 class="hero-title">
+      <span data-i18n="heroTitle1">आपकी परीक्षा,</span><br/>
+      <span class="hero-title-gradient" data-i18n="heroTitle2">आपका Plan</span>
+    </h1>
+
+    <p class="hero-sub" data-i18n="heroSub">Personalized Day-by-Day Study Plan • Daily Revision • Time Slots • PDF Download</p>
+
+    <div class="hero-stats">
+      <div class="hstat">
+        <div class="hstat-num">18+</div>
+        <div class="hstat-lbl">Exams</div>
+      </div>
+      <div class="hstat-sep"></div>
+      <div class="hstat">
+        <div class="hstat-num">75K+</div>
+        <div class="hstat-lbl">Vacancies</div>
+      </div>
+      <div class="hstat-sep"></div>
+      <div class="hstat">
+        <div class="hstat-num">100%</div>
+        <div class="hstat-lbl">Free</div>
+      </div>
+      <div class="hstat-sep"></div>
+      <div class="hstat">
+        <div class="hstat-num">∞</div>
+        <div class="hstat-lbl">Plans</div>
+      </div>
+    </div>
+
+    <p class="choose-label" data-i18n="chooseLabel">अपना Exam चुनें 👇</p>
+
+    <!-- 🏫 Teaching -->
+    <div class="exam-category-label">🏫 Teaching</div>
+    <div class="exam-cards">
+      <div class="exam-card bpsc-card" onclick="selectExam('bpsc')">
+        <div class="ec-ribbon" data-i18n="ribbon">Most Popular</div>
+        <div class="ec-top">
+          <div class="ec-icon-wrap bpsc-icon-wrap">🏫</div>
+          <div class="ec-info">
+            <div class="ec-title" data-i18n="bpscTitle">BPSC TRE 4.0</div>
+            <div class="ec-sub" data-i18n="bpscSub">Bihar Primary/Middle Teacher</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span data-i18n="bpscDate">Exam: Sep 2026 (Tentative)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span data-i18n="bpscVac">46,595 Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span data-i18n="bpscClass">Class 1–5 (PRT) & 6–8 (TGT)</span></div>
+        </div>
+        <div class="ec-btn"><span data-i18n="bpscBtn">Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 🏛️ Civil Services & State PSC -->
+    <div class="exam-category-label">🏛️ Civil Services & State PSC</div>
+    <div class="exam-cards">
+      <div class="exam-card upsc-card" onclick="selectExam('upsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap upsc-icon-wrap">🏛️</div>
+          <div class="ec-info">
+            <div class="ec-title">UPSC CSE 2026</div>
+            <div class="ec-sub">Civil Services Examination</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: May 24, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>IAS / IPS / IFS</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span data-i18n="upscBtn">Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card upsc-card" onclick="selectExam('upsc_2027')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap upsc-icon-wrap">🏛️</div>
+          <div class="ec-info">
+            <div class="ec-title">UPSC CSE 2027</div>
+            <div class="ec-sub">Civil Services Examination</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: May 2027</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>IAS / IPS / IFS</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span data-i18n="upscBtn">Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card bpsc71-card" onclick="selectExam('bpsc_71')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap bpsc71-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">BPSC 71st CCE</div>
+            <div class="ec-sub">Bihar Combined Competitive Exam</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Mains: Apr 25–30, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>1,298 Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">�</span><span>Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card bpsc72-card" onclick="selectExam('bpsc_72')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap bpsc72-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">BPSC 72nd CCE</div>
+            <div class="ec-sub">Bihar Combined Competitive Exam</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Jul 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~1500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card uppsc-card" onclick="selectExam('uppsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap uppsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">UPPSC PCS 2026</div>
+            <div class="ec-sub">Uttar Pradesh PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Dec 6, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card mppsc-card" onclick="selectExam('mppsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap mppsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">MPPSC SSE 2026</div>
+            <div class="ec-sub">Madhya Pradesh PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Apr 26, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>155–191 Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card rpsc-card" onclick="selectExam('rpsc_ras_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap rpsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">RPSC RAS 2026</div>
+            <div class="ec-sub">Rajasthan Administrative Service</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Jun–Jul 2026 (Tentative)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~500+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>New Syllabus 2026</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card mpsc-card" onclick="selectExam('mpsc_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap mpsc-icon-wrap">⚖️</div>
+          <div class="ec-info">
+            <div class="ec-title">MPSC Rajyaseva 2026</div>
+            <div class="ec-sub">Maharashtra PSC</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Mains: Mar–Apr 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>79 Vacancies (Group A & B)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Pre + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 📋 SSC -->
+    <div class="exam-category-label">📋 SSC</div>
+    <div class="exam-cards">
+      <div class="exam-card ssc-card" onclick="selectExam('ssc_cgl')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap ssc-icon-wrap">📋</div>
+          <div class="ec-info">
+            <div class="ec-title">SSC CGL 2026</div>
+            <div class="ec-sub">Combined Graduate Level</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Tier 1: May–Jun 2026 (Tentative)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~17,000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Tier 1 + Tier 2 (MCQ)</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 🏦 Banking -->
+    <div class="exam-category-label">🏦 Banking</div>
+    <div class="exam-cards">
+      <div class="exam-card ibps-card" onclick="selectExam('ibps_po')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap ibps-icon-wrap">🏦</div>
+          <div class="ec-info">
+            <div class="ec-title">IBPS PO 2026</div>
+            <div class="ec-sub">Probationary Officer</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Aug 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~4000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card sbi-card" onclick="selectExam('sbi_po')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap sbi-icon-wrap">🏦</div>
+          <div class="ec-info">
+            <div class="ec-title">SBI PO 2026</div>
+            <div class="ec-sub">State Bank of India PO</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Sep 2026 (Tentative)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~2000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains + Interview</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card rrb-card" onclick="selectExam('ibps_rrb')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap rrb-icon-wrap">🌾</div>
+          <div class="ec-info">
+            <div class="ec-title">IBPS RRB PO 2026</div>
+            <div class="ec-sub">Regional Rural Banks Officer</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Nov 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~8000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card clerk-card" onclick="selectExam('ibps_clerk')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap clerk-icon-wrap">📑</div>
+          <div class="ec-info">
+            <div class="ec-title">IBPS Clerk 2026</div>
+            <div class="ec-sub">Clerical Cadre — Public Banks</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Prelims: Oct 10–11, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~6000+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Prelims + Mains</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- ⚔️ Defence -->
+    <div class="exam-category-label">⚔️ Defence</div>
+    <div class="exam-cards">
+      <div class="exam-card nda-card" onclick="selectExam('nda_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap nda-icon-wrap">⚔️</div>
+          <div class="ec-info">
+            <div class="ec-title">NDA 2026 (I)</div>
+            <div class="ec-sub">National Defence Academy</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: Apr 12, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>~400+ Vacancies</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Maths + GAT + SSB</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- 🩺 Medical -->
+    <div class="exam-category-label">🩺 Medical</div>
+    <div class="exam-cards">
+      <div class="exam-card neet-card" onclick="selectExam('neet_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap neet-icon-wrap">🩺</div>
+          <div class="ec-info">
+            <div class="ec-title">NEET UG 2026</div>
+            <div class="ec-sub">National Eligibility cum Entrance Test</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: May 3, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>1 Lakh+ MBBS/BDS/AYUSH Seats</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>MCQ • 720 Marks • Offline</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- ⚙️ Engineering -->
+    <div class="exam-category-label">⚙️ Engineering</div>
+    <div class="exam-cards">
+      <div class="exam-card jee-card" onclick="selectExam('jee_main_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap jee-icon-wrap">⚙️</div>
+          <div class="ec-info">
+            <div class="ec-title">JEE Main 2026</div>
+            <div class="ec-sub">NITs / IIITs / GFTIs</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Session 2: Apr 2–9, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>NITs / IIITs / GFTIs</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>CBT • 300 Marks</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+      <div class="exam-card jee-adv-card" onclick="selectExam('jee_advanced_2026')">
+        <div class="ec-top">
+          <div class="ec-icon-wrap jee-adv-icon-wrap">🎓</div>
+          <div class="ec-info">
+            <div class="ec-title">JEE Advanced 2026</div>
+            <div class="ec-sub">IITs — IIT Roorkee</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">📅</span><span>Exam: May 17, 2026</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>IIT Seats (~17,000)</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📝</span><span>Paper 1 + Paper 2 • CBT</span></div>
+        </div>
+        <div class="ec-btn"><span>Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+    <!-- Combined Syllabus Option -->
+    <div class="exam-category-label">&#x1F517; Do Exams Ek Saath</div>
+    <div class="exam-cards">
+      <div class="exam-card combined-card" onclick="selectCombinedExam()">
+        <div class="ec-ribbon" style="background:linear-gradient(135deg,#8b5cf6,#ec4899)">New Feature</div>
+        <div class="ec-top">
+          <div class="ec-icon-wrap" style="background:linear-gradient(135deg,rgba(139,92,246,.2),rgba(236,72,153,.2));border-color:rgba(139,92,246,.3)">🔗</div>
+          <div class="ec-info">
+            <div class="ec-title">Combined Dual Exam Plan</div>
+            <div class="ec-sub">Do exams ek saath prepare karein</div>
+          </div>
+        </div>
+        <div class="ec-divider"></div>
+        <div class="ec-details">
+          <div class="ec-detail-row"><span class="ec-detail-icon">🎯</span><span>UPSC + BPSC / BPSC + SSC etc.</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">📊</span><span>Smart combined syllabus + hours calculation</span></div>
+          <div class="ec-detail-row"><span class="ec-detail-icon">⏰</span><span>Aapke time ke hisab se plan</span></div>
+        </div>
+        <div class="ec-btn" style="background:linear-gradient(135deg,rgba(139,92,246,.15),rgba(236,72,153,.15));border-color:rgba(139,92,246,.3)"><span>Combined Plan बनाएं</span> <span class="ec-arrow">→</span></div>
+      </div>
+    </div>
+
+
+    <!-- Combined Exam Modal (injected by JS) -->
+
+    <div class="hero-footer-note">
+      <span data-i18n="footerBy">Made with ❤️ by</span> <strong>Er. Sangam Krishna</strong>
+      <br/><a href="https://buymeacoffee.com/snakeeye" target="_blank" rel="noopener" class="hero-bmc-link">☕ Buy me a coffee</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FORM SCREEN ═══ -->
+<div id="formScreen" class="screen">
+  <div class="form-page">
+    <div class="form-card">
+      <!-- Language Toggle on form screen -->
+      <div class="lang-toggle-wrap lang-toggle-form">
+        <button class="lang-btn" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+      </div>
+
+      <button class="back-btn" onclick="showScreen('welcomeScreen')">
+        <span data-i18n="backBtn">← वापस</span>
+      </button>
+
+      <div class="form-header">
+        <div class="form-header-icon" id="formHeaderIcon">📝</div>
+        <h2 id="formTitle">अपनी जानकारी भरें</h2>
+        <p id="formSubtitle" class="form-subtitle-text">सभी जानकारी भरें और अपना personalized plan पाएं</p>
+      </div>
+
+      <!-- BPSC Class Selection -->
+      <div id="bpscClassGroup" class="form-section hidden">
+        <div class="section-label">
+          <span class="section-num">01</span>
+          <span data-i18n="bpscClassQ">किस Class का Syllabus चाहिए?</span> <span class="req-star">*</span>
+        </div>
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="bpscClass" value="1-5" checked/>
+            <div class="rc-content">
+              <div class="rc-icon">🏫</div>
+              <div class="rc-text">
+                <div class="rc-title">Class 1–5</div>
+                <div class="rc-sub">Primary Teacher (PRT)</div>
+              </div>
+            </div>
+            <div class="rc-check">✓</div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="bpscClass" value="6-8"/>
+            <div class="rc-content">
+              <div class="rc-icon">📚</div>
+              <div class="rc-text">
+                <div class="rc-title">Class 6–8</div>
+                <div class="rc-sub">Middle Teacher (TGT)</div>
+              </div>
+            </div>
+            <div class="rc-check">✓</div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="bpscClass" value="both"/>
+            <div class="rc-content">
+              <div class="rc-icon">🎯</div>
+              <div class="rc-text">
+                <div class="rc-title">दोनों (1–5 & 6–8)</div>
+                <div class="rc-sub">Combined Plan</div>
+              </div>
+            </div>
+            <div class="rc-check">✓</div>
+          </label>
+        </div>
+      </div>
+
+      <!-- UPSC Year Selection -->
+      <div id="upscYearGroup" class="form-section hidden">
+        <div class="section-label">
+          <span class="section-num">01</span>
+          <span data-i18n="upscYearQ">आप UPSC CSE किस साल दे रहे हैं?</span> <span class="req-star">*</span>
+        </div>
+        <div class="radio-group">
+          <label class="radio-card">
+            <input type="radio" name="upscYear" value="2026"/>
+            <div class="rc-content">
+              <div class="rc-icon">⚡</div>
+              <div class="rc-text">
+                <div class="rc-title">CSE 2026</div>
+                <div class="rc-sub">Prelims: May 2026</div>
+              </div>
+            </div>
+            <div class="rc-check">✓</div>
+          </label>
+          <label class="radio-card">
+            <input type="radio" name="upscYear" value="2027" checked/>
+            <div class="rc-content">
+              <div class="rc-icon">🎯</div>
+              <div class="rc-text">
+                <div class="rc-title">CSE 2027</div>
+                <div class="rc-sub">Prelims: May 2027</div>
+              </div>
+            </div>
+            <div class="rc-check">✓</div>
+          </label>
+        </div>
+      </div>
+
+      <!-- UPSC Optional Subject Selection -->
+      <div id="upscOptionalGroup" class="form-section hidden">
+        <div class="section-label">
+          <span class="section-num">02</span>
+          <span data-i18n="optionalQ">Optional Subject चुनें</span> <span class="opt-badge">Recommended</span>
+        </div>
+        <p class="section-hint" data-i18n="optionalHint">Optional subject 500 marks का होता है — plan में शामिल होगा</p>
+        <div class="input-wrap select-wrap">
+          <span class="input-icon">📖</span>
+          <select id="upscOptional" class="form-select">
+            <option value="">— Optional Subject चुनें (बाद में भी चुन सकते हैं) —</option>
+            <option value="history">History (इतिहास)</option>
+            <option value="geography">Geography (भूगोल)</option>
+            <option value="pub_admin">Public Administration (लोक प्रशासन)</option>
+            <option value="sociology">Sociology (समाजशास्त्र)</option>
+            <option value="pol_sci">Political Science &amp; IR (राजनीति विज्ञान)</option>
+            <option value="anthropology">Anthropology (मानवशास्त्र)</option>
+            <option value="philosophy">Philosophy (दर्शनशास्त्र)</option>
+            <option value="psychology">Psychology (मनोविज्ञान)</option>
+            <option value="economics">Economics (अर्थशास्त्र)</option>
+            <option value="law">Law (विधि)</option>
+          </select>
+        </div>
+        <div class="optional-tip-box">
+          <span class="tip-icon">💡</span>
+          <span data-i18n="optionalTip">Popular choices: <strong>Anthropology, PSIR, Geography, Sociology, Public Administration</strong> — अपने graduation background के हिसाब से चुनें</span>
+        </div>
+      </div>
+
+      <!-- Name -->
+      <div class="form-section">
+        <div class="section-label">
+          <span class="section-num" id="nameNum">01</span>
+          <span data-i18n="nameQ">आपका नाम</span> <span class="req-star">*</span>
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">👤</span>
+          <input type="text" id="userName" data-i18n-placeholder="namePlaceholder" placeholder="जैसे: Rahul Kumar" autocomplete="name"/>
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="form-section">
+        <div class="section-label">
+          <span class="section-num" id="dateNum">02</span>
+          <span data-i18n="dateQ">पढ़ाई शुरू करने की तारीख</span> <span class="req-star">*</span>
+        </div>
+        <div class="input-wrap">
+          <span class="input-icon">📅</span>
+          <input type="date" id="startDate"/>
+        </div>
+      </div>
+
+      <!-- Study Hours -->
+      <div class="form-section">
+        <div class="section-label">
+          <span class="section-num" id="hoursNum">03</span>
+          <span data-i18n="hoursQ">रोज़ कितने घंटे पढ़ सकते हैं?</span> <span class="req-star">*</span>
+        </div>
+        <div class="hours-grid">
+          <label class="hours-card"><input type="radio" name="studyHours" value="3"/><span>3 hrs</span></label>
+          <label class="hours-card"><input type="radio" name="studyHours" value="4" checked/><span>4 hrs</span></label>
+          <label class="hours-card"><input type="radio" name="studyHours" value="5"/><span>5 hrs</span></label>
+          <label class="hours-card"><input type="radio" name="studyHours" value="6"/><span>6 hrs</span></label>
+          <label class="hours-card"><input type="radio" name="studyHours" value="8"/><span>8 hrs</span></label>
+          <label class="hours-card"><input type="radio" name="studyHours" value="10"/><span>10 hrs</span></label>
+        </div>
+      </div>
+
+      <!-- Time Slots -->
+      <div class="form-section">
+        <div class="section-label">
+          <span class="section-num" id="slotNum">04</span>
+          <span data-i18n="slotsQ">आप किस समय पढ़ सकते हैं?</span>
+          <span class="opt-badge">Optional</span>
+        </div>
+        <p class="section-hint" data-i18n="slotsHint">इससे आपका plan और personalized बनेगा</p>
+        <div class="slot-grid">
+          <label class="slot-card"><input type="checkbox" name="slot" value="early_morning"/>
+            <div class="slot-inner"><span class="slot-emoji">🌅</span><span class="slot-name">Early Morning</span><span class="slot-time-txt">4–6 AM</span></div></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="morning"/>
+            <div class="slot-inner"><span class="slot-emoji">☀️</span><span class="slot-name">Morning</span><span class="slot-time-txt">6–9 AM</span></div></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="forenoon"/>
+            <div class="slot-inner"><span class="slot-emoji">🕙</span><span class="slot-name">Forenoon</span><span class="slot-time-txt">9 AM–12 PM</span></div></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="afternoon"/>
+            <div class="slot-inner"><span class="slot-emoji">🌤️</span><span class="slot-name">Afternoon</span><span class="slot-time-txt">12–3 PM</span></div></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="evening"/>
+            <div class="slot-inner"><span class="slot-emoji">🌆</span><span class="slot-name">Evening</span><span class="slot-time-txt">3–6 PM</span></div></label>
+          <label class="slot-card"><input type="checkbox" name="slot" value="night"/>
+            <div class="slot-inner"><span class="slot-emoji">🌙</span><span class="slot-name">Night</span><span class="slot-time-txt">8–11 PM</span></div></label>
+        </div>
+      </div>
+
+      <button class="generate-btn" onclick="generatePlan()">
+        <span class="generate-btn-icon">🚀</span>
+        <span data-i18n="generateBtn">Plan Generate करें</span>
+        <span class="generate-btn-arrow">→</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ PLAN SCREEN ═══ -->
+<div id="planScreen" class="screen">
+  <div class="plan-topbar">
+    <div class="plan-topbar-brand">
+            <!-- Hamburger Menu Icon (Mobile Only) -->
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <img src="logo.png" alt="PS" class="ptb-logo-img"/>
+      <span class="ptb-name">ParikshaSathi</span>
+    </div>
+    <div class="plan-topbar-actions">
+      <!-- Language Toggle -->
+      <div class="lang-toggle-wrap lang-toggle-topbar">
+        <button class="lang-btn" data-lang="hi" onclick="setLang('hi')">हिंदी</button>
+        <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+      </div>
+      <!-- Desktop nav links -->
+      <a href="about.html" class="ptb-btn ptb-nav-link">About</a>
+      <a href="privacy.html" class="ptb-btn ptb-nav-link">Privacy</a>
+      <a href="resources.html" class="ptb-btn ptb-nav-link">Resources</a>
+      <a href="contact.html" class="ptb-btn ptb-nav-link">Contact</a>
+      <button class="ptb-btn ptb-download" onclick="downloadPDF()"><span data-i18n="pdfBtn">⬇️ PDF</span></button>
+      <button class="ptb-btn ptb-reset" onclick="confirmResetPlan()"><span data-i18n="resetBtn">🔄 Naya Plan</span></button>
+    </div>
+  </div>
+
+      <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+      <div class="mobile-menu">
+        <button class="mobile-menu-close" id="mobileMenuClose">✕</button>
+        <nav class="mobile-menu-nav">
+          <a class="mobile-menu-item" href="about.html">
+            <span class="menu-icon">📘</span>
+            <span>About</span>
+          </a>
+          <a class="mobile-menu-item" href="resources.html">
+            <span class="menu-icon">📚</span>
+            <span>Resources</span>
+          </a>
+          <a class="mobile-menu-item" href="privacy.html">
+            <span class="menu-icon">🔒</span>
+            <span>Privacy Policy</span>
+          </a>
+          <a class="mobile-menu-item" href="contact.html">
+            <span class="menu-icon">📧</span>
+            <span>Contact</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+
+  <div class="plan-hero">
+    <div class="plan-hero-inner">
+      <h2 id="planTitle">📅 आपका Study Plan</h2>
+      <p id="planSubtitle"></p>
+      <!-- Mobile-only PDF & Naya Plan buttons under title -->
+      <div class="plan-hero-mobile-actions">
+        <button class="ptb-btn ptb-download" onclick="downloadPDF()">⬇️ PDF</button>
+        <button class="ptb-btn ptb-reset" onclick="confirmResetPlan()">🔄 Naya Plan</button>
+      </div>
+      <div class="plan-progress-wrap">
+        <div class="plan-progress-bar" id="planProgressBar"></div>
+      </div>
+      <div id="planProgressLabel" class="plan-progress-label"></div>
+    </div>
+  </div>
+
+  <div class="plan-body-wrap">
+    <div id="planBody"></div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <img src="logo.png" alt="PS" class="footer-logo-img"/>
+      <span class="footer-name">ParikshaSathi</span>
+    </div>
+    <p><span data-i18n="footerBy">Made with ❤️ by</span> <strong>Er. Sangam Krishna</strong></p>
+    <p class="footer-sub" data-i18n="footerSub">BPSC TRE 4.0 | UPSC CSE 2026/27 | BPSC CCE 71st/72nd | SSC CGL | IBPS PO | SBI PO | IBPS RRB | IBPS Clerk | NDA 2026</p>
+    <div class="footer-disclaimer-row">
+      <span class="footer-disclaimer-text">⚠️ Publicly available sources पर based — official sources से verify करें</span>
+      <button class="footer-terms-btn" onclick="openTermsModal()">Terms &amp; Disclaimer</button>
+    </div>
+    <div class="footer-family-badge">Part of Aapka-Sathi Family</div>
+    <div class="footer-links-grid">
+      <a href="about.html" class="footer-chip-link">About</a>
+      <a href="resources.html" class="footer-chip-link">Resources</a>
+      <a href="contact.html" class="footer-chip-link">Contact</a>
+      <a href="privacy.html" class="footer-chip-link">Privacy Policy</a>
+      <a href="terms.html" class="footer-chip-link">Terms &amp; Conditions</a>
+      <a href="https://snakeeye-sudo.github.io/Aapka-Sathi/" target="_blank" rel="noopener" class="footer-chip-link">Aapka-Sathi Hub</a>
+      <a href="https://snakeeye-sudo.github.io/rozgar-sathi/" target="_blank" rel="noopener" class="footer-chip-link">Rozgar-Sathi</a>
+      <a href="https://snakeeye-sudo.github.io/Samachar-Sathi/" target="_blank" rel="noopener" class="footer-chip-link">Samachar-Sathi</a>
+    </div>
+    <p class="footer-family-note">Ek login, PWA install, day/night theme, legal pages, reminders aur feedback jaise shared family standards ke saath.</p>
+    <div class="footer-bmc">
+      <a href="https://buymeacoffee.com/snakeeye" target="_blank" rel="noopener" class="footer-bmc-btn">
+        ☕ Buy me a coffee
+      </a>
+    </div>
+  </footer>
+</div>
+
+<!-- ═══ RESET CONFIRM MODAL ═══ -->
+<div id="resetConfirmModal" class="terms-modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="reset-confirm-box">
+    <div class="reset-confirm-icon">⚠️</div>
+    <h3 class="reset-confirm-title">सारा Progress Delete हो जाएगा!</h3>
+    <p class="reset-confirm-body">Naya plan banane se aapka <strong>checklist progress, streak, aur reschedule data</strong> permanently delete ho jayega. Kya aap sure hain?</p>
+    <div class="reset-confirm-actions">
+      <button class="reset-cancel-btn" onclick="document.getElementById('resetConfirmModal').classList.remove('open')">रहने दो, वापस जाओ</button>
+      <button class="reset-confirm-btn" onclick="doResetPlan()">हाँ, नया Plan बनाओ</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TERMS & DISCLAIMER MODAL ═══ -->
+<div id="termsModal" class="terms-modal-overlay" onclick="closeTermsModal(event)">
+  <div class="terms-modal-box">
+    <button class="terms-modal-close" onclick="closeTermsModal()">&times;</button>
+    <div class="terms-modal-header">
+      <span class="terms-modal-icon">⚖️</span>
+      <h2 class="terms-modal-title">Terms of Use &amp; Disclaimer</h2>
+      <p class="terms-modal-subtitle">ParikshaSathi — Free Study Planner by Er. Sangam Krishna</p>
+    </div>
+    <div class="terms-modal-body">
+      <div class="terms-section">
+        <div class="terms-section-num">01</div>
+        <h3>यह Tool क्या है?</h3>
+        <p>ParikshaSathi एक <strong>free, open-source study planning tool</strong> है जो publicly available exam syllabuses के आधार पर personalized schedule बनाता है। यह किसी भी coaching institute, government body या official exam authority से affiliated नहीं है।</p>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">02</div>
+        <h3>Accuracy की कोई Guarantee नहीं</h3>
+        <p>Syllabus, exam dates और topics <strong>publicly available internet sources</strong> पर based हैं। 100% accuracy की कोई guarantee नहीं है।</p>
+        <ul>
+          <li>Exam dates बदल सकती हैं — official notification देखें</li>
+          <li>Syllabus में बदलाव हो सकता है — UPSC/BPSC website check करें</li>
+          <li>यह plan एक <em>suggested framework</em> है, final authority नहीं</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">03</div>
+        <h3>आपकी जिम्मेदारी</h3>
+        <ul>
+          <li>सभी जानकारी को <strong>official sources से verify</strong> करें</li>
+          <li>इस tool पर <strong>पूरी तरह निर्भर न रहें</strong></li>
+          <li>Plan को अपनी जरूरत के हिसाब से adjust करें</li>
+        </ul>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">04</div>
+        <h3>No Liability</h3>
+        <p>Developer (Er. Sangam Krishna) किसी भी नुकसान, परीक्षा में असफलता, या किसी भी परिणाम के लिए <strong>जिम्मेदार नहीं होंगे</strong>। यह tool "as-is" basis पर बिल्कुल free में दिया जा रहा है।</p>
+      </div>
+      <div class="terms-section">
+        <div class="terms-section-num">05</div>
+        <h3>Data Privacy</h3>
+      </            <p>आपका study progress <strong>आपके browser के localStorage</strong> में save होता है। अगर आप <strong>Google Login</strong> करते हैं, तो आपका data <strong>Firebase (Google Cloud)</strong> पर भी securely sync होता है — ताकि आप किसी भी device से access कर सकें। कोई भी data third party के साथ share नहीं किया जाता।</p>div>
+      <div class="terms-section terms-section-last">
+        <div class="terms-section-num">06</div>
+        <h3>Free Forever 💛</h3>
+        <p>यह tool हमेशा <strong>100% free</strong> रहेगा — क्योंकि हर aspirant को equal opportunity मिलनी चाहिए।</p>
+      </div>
+      <div class="terms-official-links">
+        <span class="terms-official-label">Official Sources:</span>
+        <a href="https://upsc.gov.in" target="_blank" rel="noopener">upsc.gov.in</a>
+        <a href="https://bpsc.bih.nic.in" target="_blank" rel="noopener">bpsc.bih.nic.in</a>
+      </div>
+    </div>
+    <div class="terms-modal-footer">
+      <button class="terms-accept-btn" onclick="closeTermsModal()">समझ गया, ठीक है ✓</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+// Register Service Worker for PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+function openTermsModal() {
+  document.getElementById('termsModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeTermsModal(e) {
+  if (e && e.target !== document.getElementById('termsModal')) return;
+  document.getElementById('termsModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeTermsModal(); });
+    
+</script>
+  <script defer src="notification-prompt.js"></script>
+  <script defer src="sathi-navigator.js"></script>
+</body>
+</html>
