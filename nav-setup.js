@@ -242,31 +242,10 @@
       authSection.appendChild(authDiv);
     }
 
-    const themeBtn = document.createElement('button');
-    themeBtn.type = 'button';
-    themeBtn.id = 'psThemeToggleBtn';
-    themeBtn.style.cssText = `
-      width: 100%;
-      margin-top: 14px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      border: none;
-      background: linear-gradient(135deg, #f59e0b, #ef4444);
-      color: white;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-    `;
-    themeBtn.addEventListener('click', function() {
-      toggleTheme();
-      updateThemeButtonLabel();
-    });
-
     menuContainer.appendChild(menuHeader);
     menuContainer.appendChild(menuList);
     menuContainer.appendChild(divider);
     menuContainer.appendChild(authSection);
-    menuContainer.appendChild(themeBtn);
     mobileMenu.appendChild(menuContainer);
 
     hamburgerBtn.addEventListener('click', function(e) {
@@ -287,7 +266,6 @@
 
     document.body.appendChild(hamburgerBtn);
     document.body.appendChild(mobileMenu);
-    updateThemeButtonLabel();
   }
 
   function fixMobileMenuTap() {
@@ -321,20 +299,7 @@
   }
 
   function initThemeSystem() {
-    const savedTheme = localStorage.getItem('ps_theme') || 'dark';
-    document.body.classList.toggle('theme-light', savedTheme === 'light');
-    updateThemeButtonLabel();
-  }
-
-  function toggleTheme() {
-    const isLight = document.body.classList.toggle('theme-light');
-    localStorage.setItem('ps_theme', isLight ? 'light' : 'dark');
-  }
-
-  function updateThemeButtonLabel() {
-    const btn = document.getElementById('psThemeToggleBtn');
-    if (!btn) return;
-    const isLight = document.body.classList.contains('theme-light');
-    btn.textContent = isLight ? '🌙 Switch to Night Theme' : '☀️ Switch to Day Theme';
+    localStorage.setItem('ps_theme', 'dark');
+    document.body.classList.remove('theme-light');
   }
 })();

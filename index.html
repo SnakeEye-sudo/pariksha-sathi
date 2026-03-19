@@ -222,41 +222,26 @@ function updateAuthUI(user) {
 <body>
 <script>
   (function initParikshaFamilyTheme() {
-    const THEME_KEY = "sathi-family-theme";
-    const THEME_MODE_KEY = "sathi-family-theme-mode";
     const INSTALL_MARKER = "sathi-installed-pariksha-sathi";
-    const systemThemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-
-    function resolveTheme(themePreference) {
-      if (themePreference === "dark" || themePreference === "light") return themePreference;
-      return systemThemeQuery.matches ? "dark" : "light";
-    }
 
     function applyTheme() {
-      const themePreference = localStorage.getItem(THEME_MODE_KEY) || localStorage.getItem(THEME_KEY) || "system";
-      const resolvedTheme = resolveTheme(themePreference);
-      if (document.body) document.body.classList.toggle("theme-light", resolvedTheme === "light");
+      localStorage.setItem("sathi-family-theme", "dark");
+      localStorage.setItem("sathi-family-theme-mode", "dark");
+      localStorage.setItem("ps_theme", "dark");
+      if (document.body) document.body.classList.remove("theme-light");
     }
 
     if (window.matchMedia("(display-mode: standalone)").matches) {
       localStorage.setItem(INSTALL_MARKER, "true");
     }
 
-    if (typeof systemThemeQuery.addEventListener === "function") {
-      systemThemeQuery.addEventListener("change", () => {
-        if ((localStorage.getItem(THEME_MODE_KEY) || "system") === "system") applyTheme();
-      });
-    }
-
-    window.addEventListener("storage", (event) => {
-      if (event.key === THEME_KEY || event.key === THEME_MODE_KEY) applyTheme();
-    });
-
     window.addEventListener("appinstalled", () => {
       localStorage.setItem(INSTALL_MARKER, "true");
     });
 
+    window.addEventListener("storage", applyTheme);
     document.addEventListener("DOMContentLoaded", applyTheme);
+    applyTheme();
   })();
 </script>
 <!-- ===LOGIN GATE=== -->
