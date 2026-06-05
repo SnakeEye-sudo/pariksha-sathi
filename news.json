@@ -1,8 +1,22 @@
 {
-  "updated": "04 Jun 2026",
+  "updated": "05 Jun 2026",
   "categories": {
     "india": [],
     "upsc": [
+      {
+        "title": "UPSC implements real-time face authentication for civil services exams",
+        "link": "https://www.hindustantimes.com/india-news/upsc-implements-real-time-face-authentication-for-civil-services-exams-101780584563919.html",
+        "pubDate": "2026-06-04",
+        "description": "The UPSC used real-time face authentication at all civil services prelims centres to verify candidates and prevent impersonation. ",
+        "source": "Hindustan Times"
+      },
+      {
+        "title": "Fire Safety in India, Daraxonrasib and Mountbatten Plan",
+        "link": "https://indianexpress.com/article/upsc-current-affairs/upsc-key-fire-safety-in-india-daraxonrasib-and-mountbatten-plan-10724310/",
+        "pubDate": "2026-06-04",
+        "description": "UPSC Key-4th June, 2026: What news you should read in the today's edition of the Indian Express for UPSC Civil Services Preparatio",
+        "source": "The Indian Express"
+      },
       {
         "title": "At 22, he cracked UPSC: Meet IPS Abhijeet Patil and 5 other officers under 25",
         "link": "https://www.indiatimes.com/trending/at-22-he-cracked-upsc-meet-ips-abhijeet-patil-and-5-other-officers-under-25/articleshow/131482181.html",
@@ -57,20 +71,6 @@
         "link": "https://www.tribuneindia.com/news/business/upsc-prelims-2026-last-minute-preparation-tips-next-ias-cmd-b-singh-shares-expert-exam-day-strategy/",
         "pubDate": "2026-05-16",
         "description": "New Delhi [India], May 16: With the UPSC Civil Services Preliminary Examination 2026 scheduled for Sunday, May 24, 2026, lakhs of ",
-        "source": "The Tribune"
-      },
-      {
-        "title": "Ira Singhal’s UPSC success story redefined perseverance and transformed barriers into milestones in civil services",
-        "link": "https://timesofindia.indiatimes.com/education/news/ira-singhal-the-ias-officer-who-redefined-eligibility-and-rewrote-the-rules-of-perseverance/articleshow/131012392.cms",
-        "pubDate": "2026-05-11",
-        "description": "News News: When people talk about India’s toughest exams, the UPSC Civil Services Examination almost always comes up in the same b",
-        "source": "Times of India"
-      },
-      {
-        "title": "How to Choose the Right Optional Subject for Targeting UPSC CSE 2027/2028/2029",
-        "link": "https://www.tribuneindia.com/news/business/how-to-choose-the-right-optional-subject-for-targeting-upsc-cse-2027-2028-2029/",
-        "pubDate": "2026-05-11",
-        "description": "New Delhi [India], May 11: Every year, lakhs of aspirants sit for the Civil Services Examination (CSE) conducted by the Union Publ",
         "source": "The Tribune"
       }
     ],
