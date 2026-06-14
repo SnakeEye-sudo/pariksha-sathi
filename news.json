@@ -1,8 +1,15 @@
 {
-  "updated": "13 Jun 2026",
+  "updated": "14 Jun 2026",
   "categories": {
     "india": [],
     "upsc": [
+      {
+        "title": "UPSC prelims result 2026: How many attempts are too many? The hidden cost of chasing India's toughest exam",
+        "link": "https://timesofindia.indiatimes.com/education/news/upsc-prelims-result-2026-how-many-attempts-are-too-many-the-hidden-cost-of-chasing-indias-toughest-exam/articleshow/131697698.cms",
+        "pubDate": "2026-06-13",
+        "description": "News News: The UPSC Civil Services Preliminary Examination 2026 results will be announced any time now, bringing relief for some a",
+        "source": "Times of India"
+      },
       {
         "title": "NITI Aayog, Nipah Virus and Wages for Housework",
         "link": "https://indianexpress.com/article/upsc-current-affairs/upsc-key-niti-aayog-nipah-virus-and-wages-for-housework-10736903/",
@@ -65,13 +72,6 @@
         "pubDate": "2026-05-26",
         "description": "India News: Every year, over 10 lakh aspirants spend years of their lives preparing for India's most gruelling examination, the UP",
         "source": "Times of India"
-      },
-      {
-        "title": "Was this toughest UPSC Prelims ever? Even bureaucrats struggled to solve GS 1 paper",
-        "link": "https://www.indiatoday.in/education-today/story/upsc-prelims-2026-lengthy-gs-paper-csat-pt-answer-key-syllabus-debate-2916420-2026-05-25",
-        "pubDate": "2026-05-25",
-        "description": "UPSC Prelims 2026 Difficulty Level: More than eight lakh aspirants appeared for the first level of one of India's most competitive",
-        "source": "India Today"
       }
     ],
     "economy": []
