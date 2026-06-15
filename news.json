@@ -1,8 +1,15 @@
 {
-  "updated": "14 Jun 2026",
+  "updated": "15 Jun 2026",
   "categories": {
     "india": [],
     "upsc": [
+      {
+        "title": "How can India rebuild trust among Gen Z?",
+        "link": "https://indianexpress.com/article/upsc-current-affairs/upsc-essentials/upsc-ethics-civil-services-genz-trust-cbse-neet-paper-leak-10738832/",
+        "pubDate": "2026-06-14",
+        "description": "UPSC Ethics Simplified article explores how India's civil services can rebuild confidence among Gen Z for GS Paper 4 Mains 2026.",
+        "source": "The Indian Express"
+      },
       {
         "title": "UPSC prelims result 2026: How many attempts are too many? The hidden cost of chasing India's toughest exam",
         "link": "https://timesofindia.indiatimes.com/education/news/upsc-prelims-result-2026-how-many-attempts-are-too-many-the-hidden-cost-of-chasing-indias-toughest-exam/articleshow/131697698.cms",
@@ -64,13 +71,6 @@
         "link": "https://timesofindia.indiatimes.com/india/upsc-releases-provisional-answer-key-for-civil-services-prelims-2026-for-first-time/articleshow/131353343.cms",
         "pubDate": "2026-05-27",
         "description": "India News: NEW DELHI: In a first, the Union Public Service Commission (UPSC) has released the provisional answer key for the 2026",
-        "source": "Times of India"
-      },
-      {
-        "title": "AI and You: AI vs UPSC-three chatbots attempt India’s toughest exam",
-        "link": "https://timesofindia.indiatimes.com/india/ai-and-you-ai-vs-upscthree-chatbots-attempt-indias-toughest-exam/articleshow/131328885.cms",
-        "pubDate": "2026-05-26",
-        "description": "India News: Every year, over 10 lakh aspirants spend years of their lives preparing for India's most gruelling examination, the UP",
         "source": "Times of India"
       }
     ],
