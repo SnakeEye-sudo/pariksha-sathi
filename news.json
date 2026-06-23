@@ -1,8 +1,15 @@
 {
-  "updated": "22 Jun 2026",
+  "updated": "23 Jun 2026",
   "categories": {
     "india": [],
     "upsc": [
+      {
+        "title": "She became blind at the age of 5. However, that didn’t stop her from cracking UPSC. Who is Poorna Sundari?",
+        "link": "https://economictimes.indiatimes.com/magazines/panache/she-became-blind-at-the-age-of-5-however-that-didnt-stop-her-from-cracking-upsc-who-is-poorna-sundari/articleshow/131896783.cms",
+        "pubDate": "2026-06-21",
+        "description": "Poorna Sundari, who lost her vision at five, defied all odds to achieve an All India Rank of 286 in the 2019 UPSC Civil Services E",
+        "source": "The Economic Times"
+      },
       {
         "title": "How can India rebuild trust among Gen Z?",
         "link": "https://indianexpress.com/article/upsc-current-affairs/upsc-essentials/upsc-ethics-civil-services-genz-trust-cbse-neet-paper-leak-10738832/",
@@ -65,13 +72,6 @@
         "pubDate": "2026-06-03",
         "description": "IPS officer Abhijeet Tulshiram Patil's journey is inspiring young aspirants across India. He cracked the UPSC Civil Services Exami",
         "source": "Indiatimes"
-      },
-      {
-        "title": "UPSC releases provisional answer key for Civil Services Prelims 2026 for first time",
-        "link": "https://timesofindia.indiatimes.com/india/upsc-releases-provisional-answer-key-for-civil-services-prelims-2026-for-first-time/articleshow/131353343.cms",
-        "pubDate": "2026-05-27",
-        "description": "India News: NEW DELHI: In a first, the Union Public Service Commission (UPSC) has released the provisional answer key for the 2026",
-        "source": "Times of India"
       }
     ],
     "economy": []
