@@ -1,8 +1,15 @@
 {
-  "updated": "23 Jun 2026",
+  "updated": "24 Jun 2026",
   "categories": {
     "india": [],
     "upsc": [
+      {
+        "title": "Kheer Bhawani Mela, Right to Walk and Fire Safety in India",
+        "link": "https://indianexpress.com/article/upsc-current-affairs/upsc-key-kheer-bhawani-mela-right-to-walk-and-fire-safety-in-india-10753925/",
+        "pubDate": "2026-06-23",
+        "description": "UPSC Key-23rd June, 2026: What news you should read in the today's edition of the Indian Express for UPSC Civil Services Preparati",
+        "source": "The Indian Express"
+      },
       {
         "title": "She became blind at the age of 5. However, that didn’t stop her from cracking UPSC. Who is Poorna Sundari?",
         "link": "https://economictimes.indiatimes.com/magazines/panache/she-became-blind-at-the-age-of-5-however-that-didnt-stop-her-from-cracking-upsc-who-is-poorna-sundari/articleshow/131896783.cms",
@@ -65,13 +72,6 @@
         "pubDate": "2026-06-04",
         "description": "UPSC Key-4th June, 2026: What news you should read in the today's edition of the Indian Express for UPSC Civil Services Preparatio",
         "source": "The Indian Express"
-      },
-      {
-        "title": "At 22, he cracked UPSC: Meet IPS Abhijeet Patil and 5 other officers under 25",
-        "link": "https://www.indiatimes.com/trending/at-22-he-cracked-upsc-meet-ips-abhijeet-patil-and-5-other-officers-under-25/articleshow/131482181.html",
-        "pubDate": "2026-06-03",
-        "description": "IPS officer Abhijeet Tulshiram Patil's journey is inspiring young aspirants across India. He cracked the UPSC Civil Services Exami",
-        "source": "Indiatimes"
       }
     ],
     "economy": []
