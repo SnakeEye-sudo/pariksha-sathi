@@ -1,8 +1,15 @@
 {
-  "updated": "23 Sep 2026",
+  "updated": "24 Sep 2026",
   "categories": {
     "india": [],
     "upsc": [
+      {
+        "title": "Election Commission of India, Tarang Shakti and Semiconductor Supercycle",
+        "link": "https://indianexpress.com/article/upsc-current-affairs/upsc-key-election-commission-of-india-tarang-shakti-and-semiconductor-supercycle-10890908/",
+        "pubDate": "2026-09-23",
+        "description": "UPSC Key-23rd September, 2026: What news you should read in the today's edition of the Indian Express for UPSC Civil Services Prep",
+        "source": "The Indian Express"
+      },
       {
         "title": "“Don’t Give Up, Keep Going”: Jaya Sharma, Haryana’s Gen Z IPS Officer Who Cleared UPSC After 2 Failures",
         "link": "https://www.newsx.com/regionals/dont-give-up-keep-going-jaya-sharma-haryanas-gen-z-ips-officer-who-cleared-upsc-after-2-failures-274791/",
@@ -44,27 +51,6 @@
         "pubDate": "2026-08-26",
         "description": "UPSC Key-26th August, 2026: What news you should read in the today's edition of the Indian Express for UPSC Civil Services Prepara",
         "source": "The Indian Express"
-      },
-      {
-        "title": "House Training for Civil Services, Defence, Management, Banking & PSUs",
-        "link": "https://www.tribuneindia.com/news/business/chandigarh-university-provides-in-house-training-for-civil-services-defence-management-banking-psus-2-2/",
-        "pubDate": "2026-08-24",
-        "description": "The Department of Career Planning & Development (DCPD) at CU Advances Students' Career Readiness through Preparation for Competiti",
-        "source": "The Tribune"
-      },
-      {
-        "title": "House Training for Civil Services, Defence, Management, Banking & PSUs",
-        "link": "https://www.tribuneindia.com/news/business/chandigarh-university-provides-in-house-training-for-civil-services-defence-management-banking-psus/",
-        "pubDate": "2026-08-24",
-        "description": "Chandigarh [India], August 24: As the higher education and employment environment in the country becomes increasingly competitive,",
-        "source": "The Tribune"
-      },
-      {
-        "title": "House Training for Civil Services, Defence, Management, Banking & PSUs",
-        "link": "https://www.aninews.in/news/business/chandigarh-university-provides-in-house-training-for-civil-services-defence-management-banking-amp-psus20260824163830/",
-        "pubDate": "2026-08-24",
-        "description": "Chandigarh [India], August 24: As the higher education and employment environment in the country becomes increasingly competitive,",
-        "source": "ANI (Asian News International)"
       }
     ],
     "economy": []
